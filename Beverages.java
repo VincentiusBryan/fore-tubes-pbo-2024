@@ -16,7 +16,8 @@ public class Beverages extends ListMenu{
 
     @Override
     public void printMenu() {
-        System.out.println("Beverage: " + getNamaMenu() + " - Size: " + size + " - Price: " + getHarga());
+        super.printMenu();
+        System.out.println("Drink Size : "+size);
     }
 
 }
