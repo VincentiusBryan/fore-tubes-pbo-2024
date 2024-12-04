@@ -1,4 +1,9 @@
+import View.MainMenu;
+
 
 public class Main {
-    new MainMenu();
+    public static void main(String[] args) {
+        
+        new MainMenu();
+    }
 }
