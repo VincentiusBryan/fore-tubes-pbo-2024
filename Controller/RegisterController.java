@@ -18,7 +18,7 @@ public class RegisterController {
         
         if (connection != null) {
             try {
-                // Query untuk menambah user baru
+                // Query nambah user
                 String query = "INSERT INTO users (email, phone_number, password, user_type, created_at) VALUES (?, ?, ?, ?, NOW())";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, email);
@@ -26,10 +26,10 @@ public class RegisterController {
                 statement.setString(3, password);
                 statement.setString(4, "User");
 
-                // Eksekusi query
+                // execute
                 int rowsInserted = statement.executeUpdate();
                 
-                // Jika berhasil memasukkan data
+                // kalau berhasil memasukkan data
                 if (rowsInserted > 0) {
                     return true;
                 }
@@ -39,6 +39,6 @@ public class RegisterController {
                 dbConnection.closeConnection(connection);
             }
         }
-        return false; // Jika registrasi gagal
+        return false; // kalau gagal
     }
 }

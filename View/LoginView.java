@@ -65,7 +65,7 @@ public class LoginView {
                 if (success) {
                     JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     loginFrame.dispose();
-                    new MainMenu(); // Redirect to main menu
+                    new MainMenu(); 
                 } else {
                     JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
                 }

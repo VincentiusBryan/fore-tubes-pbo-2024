@@ -27,7 +27,7 @@ public class LoginController {
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) {
-                    return true; // Login successful
+                    return true; // login sukses
                 }
 
             } catch (SQLException e) {
@@ -36,6 +36,6 @@ public class LoginController {
                 dbConnection.closeConnection(connection);
             }
         }
-        return false; // Invalid credentials
+        return false; 
     }
 }

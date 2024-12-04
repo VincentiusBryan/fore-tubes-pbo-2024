@@ -27,7 +27,7 @@ public class RegisterView {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         registerFrame.add(title);
 
-        // Email
+        // email
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setBounds(50, 80, 100, 25);
         registerFrame.add(emailLabel);
@@ -36,7 +36,7 @@ public class RegisterView {
         emailField.setBounds(150, 80, 200, 25);
         registerFrame.add(emailField);
 
-        // Phone Number
+        // notelp
         JLabel phoneLabel = new JLabel("Phone:");
         phoneLabel.setBounds(50, 120, 100, 25);
         registerFrame.add(phoneLabel);
@@ -45,7 +45,7 @@ public class RegisterView {
         phoneField.setBounds(150, 120, 200, 25);
         registerFrame.add(phoneField);
 
-        // Password
+        // pass
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(50, 160, 100, 25);
         registerFrame.add(passwordLabel);
@@ -54,7 +54,7 @@ public class RegisterView {
         passwordField.setBounds(150, 160, 200, 25);
         registerFrame.add(passwordField);
 
-        // Register Button
+        // register button
         JButton registerButton = new JButton("Register");
         registerButton.setBounds(150, 200, 90, 30);
         registerFrame.add(registerButton);
@@ -64,7 +64,7 @@ public class RegisterView {
             String phone = phoneField.getText();
             String password = new String(passwordField.getPassword());
 
-            // Validasi 
+            // validasi
             if (email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(registerFrame, "Email, Phone, or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!phone.matches("\\d{10,12}")) {
