@@ -1,3 +1,4 @@
+package Model;
 public class Foods extends ListMenu {
     private FoodsType foodsType;
 

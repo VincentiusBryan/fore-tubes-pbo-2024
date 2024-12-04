@@ -1,3 +1,4 @@
+package Model;
 public abstract class User {
     private String id_user;
     private String nama;
@@ -10,7 +11,7 @@ public abstract class User {
     }
 
 
-    public String getId_user() {
+    public String getId_user() {    
         return id_user;
     }
     public void setId_user(String id_user) {

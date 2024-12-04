@@ -1,4 +1,4 @@
-import java.util.List;
+package Model;
 public class Keranjang {
     private String namaMenu;
     private int quantity;

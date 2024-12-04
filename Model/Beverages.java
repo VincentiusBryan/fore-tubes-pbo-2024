@@ -1,3 +1,4 @@
+package Model;
 public class Beverages extends ListMenu{
     private DrinkSize size;
 
