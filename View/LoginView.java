@@ -3,6 +3,9 @@ package View;
 
 
 import javax.swing.*;
+
+import Controller.LoginController;
+
 import java.awt.*;
 
 public class LoginView {
@@ -28,13 +31,13 @@ public class LoginView {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         loginFrame.add(title);
 
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(50, 80, 100, 25);
-        loginFrame.add(usernameLabel);
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setBounds(50, 80, 100, 25);
+        loginFrame.add(emailLabel);
 
-        JTextField usernameField = new JTextField();
-        usernameField.setBounds(150, 80, 200, 25);
-        loginFrame.add(usernameField);
+        JTextField emailField = new JTextField();
+        emailField.setBounds(150, 80, 200, 25);
+        loginFrame.add(emailField);
 
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(50, 120, 100, 25);
@@ -47,6 +50,39 @@ public class LoginView {
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(150, 160, 90, 30);
         loginFrame.add(loginButton);
+
+
+        loginButton.addActionListener(e -> {
+            String email = emailField.getText();
+            String password = new String(passwordField.getPassword());
+
+            if (email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(loginFrame, "Email or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                LoginController controller = new LoginController();
+                boolean success = controller.loginUser(email, password);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loginFrame.dispose();
+                    new MainMenu(); // Redirect to main menu
+                } else {
+                    JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
 
         JButton backButton = new JButton("Back");
         backButton.setBounds(260, 160, 90, 30);

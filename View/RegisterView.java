@@ -64,27 +64,27 @@ public class RegisterView {
             String phone = phoneField.getText();
             String password = new String(passwordField.getPassword());
 
-            // Validasi input
+            // Validasi 
             if (email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(registerFrame, "Email, Phone, or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!phone.matches("\\d{10,12}")) {
                 JOptionPane.showMessageDialog(registerFrame, "Invalid phone number format!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                // Panggil RegisterController untuk registrasi
+            
                 RegisterController controller = new RegisterController();
                 boolean success = controller.registerUser(email, password, phone);
 
                 if (success) {
                     JOptionPane.showMessageDialog(registerFrame, "User registered successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     registerFrame.dispose();
-                    new MainMenu(); // Kembali ke MainMenu
+                    new MainMenu(); 
                 } else {
                     JOptionPane.showMessageDialog(registerFrame, "Failed to register user. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        // Back Button
+       
         JButton backButton = new JButton("Back");
         backButton.setBounds(260, 200, 90, 30);
         registerFrame.add(backButton);
