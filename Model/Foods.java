@@ -18,6 +18,6 @@ public class Foods extends ListMenu {
     @Override
     public void printMenu(){
         super.printMenu();
-        System.out.println("Food type : "+foodsType);
+        System.out.println("Food type : " + foodsType);
     }
 }
