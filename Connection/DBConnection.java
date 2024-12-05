@@ -13,8 +13,10 @@ public class DBConnection {
     public Connection connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver loaded successfully.");
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

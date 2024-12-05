@@ -18,7 +18,6 @@ public class RegisterController {
         
         if (connection != null) {
             try {
-                // Query nambah user
                 String query = "INSERT INTO users (email, phone_number, password, user_type, created_at) VALUES (?, ?, ?, ?, NOW())";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, email);
@@ -26,19 +25,22 @@ public class RegisterController {
                 statement.setString(3, password);
                 statement.setString(4, "User");
 
-                // execute
                 int rowsInserted = statement.executeUpdate();
-                
-                // kalau berhasil memasukkan data
                 if (rowsInserted > 0) {
-                    return true;
+                    System.out.println("User registered successfully.");
+                    return true; // Registrasi berhasil
+                } else {
+                    System.out.println("Failed to insert data into database.");
                 }
             } catch (SQLException e) {
+                System.out.println("Error occurred during registration.");
                 e.printStackTrace();
             } finally {
                 dbConnection.closeConnection(connection);
             }
+        } else {
+            System.out.println("Database connection failed.");
         }
-        return false; // kalau gagal
+        return false; // Jika gagal
     }
 }
