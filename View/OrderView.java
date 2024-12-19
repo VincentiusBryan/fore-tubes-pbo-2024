@@ -26,30 +26,34 @@ public class OrderView {
         mainPanel.setLayout(null);
 
         JLabel titleLabel = new JLabel("Menu");
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
-        titleLabel.setBounds(200, 10, 200, 30);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 30));
+        titleLabel.setBounds(260, 14, 200, 30);
         mainPanel.add(titleLabel);
 
         JLabel typeOfBeverageLabel = new JLabel("Tipe Minuman:");
-        typeOfBeverageLabel.setBounds(30, 60, 100, 25);
+        typeOfBeverageLabel.setBounds(30, 70, 100, 25);
         mainPanel.add(typeOfBeverageLabel);
 
         String[] beverageTypes = {"None", "Coffee", "Non-Coffee", "Tea"};
         JComboBox<String> typeOfBeverageCombo = new JComboBox<>(beverageTypes);
-        typeOfBeverageCombo.setBounds(130, 60, 150, 25);
+        typeOfBeverageCombo.setBounds(130, 70, 150, 25);
         mainPanel.add(typeOfBeverageCombo);
 
         JLabel beverageLabel = new JLabel("Minuman:");
-        beverageLabel.setBounds(30, 100, 100, 25);
+        beverageLabel.setBounds(30, 110, 100, 25);
         mainPanel.add(beverageLabel);
 
         JComboBox<String> beverageCombo = new JComboBox<>();
-        beverageCombo.setBounds(130, 100, 150, 25);
+        beverageCombo.setBounds(130, 110, 150, 25);
         mainPanel.add(beverageCombo);
 
         typeOfBeverageCombo.addActionListener(e -> {
             String selectedType = (String) typeOfBeverageCombo.getSelectedItem();
+
             beverageCombo.removeAllItems();
+            if ("None".equals(selectedType)) {
+                return;
+            }
 
             switch (selectedType) {
                 case "Coffee":
@@ -61,97 +65,86 @@ public class OrderView {
                     beverageCombo.addItem("Iced Matcha Latte");
                     beverageCombo.addItem("Hot Matcha Latte");
                     beverageCombo.addItem("Iced Chocolate");
-                    beverageCombo.addItem("Hot Chocolate");
-                    beverageCombo.addItem("Iced Chai Latte");
                     break;
                 case "Tea":
                     beverageCombo.addItem("Oolong");
                     beverageCombo.addItem("Green Peach");
                     beverageCombo.addItem("Earl Grey");
-                    beverageCombo.addItem("Chamomile");
-                    break;
-                default:
-                    beverageCombo.addItem("None");
                     break;
             }
         });
 
         JLabel sizeLabel = new JLabel("Ukuran:");
-        sizeLabel.setBounds(30, 140, 100, 25);
+        sizeLabel.setBounds(30, 150, 100, 25);
         mainPanel.add(sizeLabel);
 
         String[] sizes = {"None", "Medium", "Large"};
         JComboBox<String> sizeCombo = new JComboBox<>(sizes);
-        sizeCombo.setBounds(130, 140, 150, 25);
+        sizeCombo.setBounds(130, 150, 150, 25);
         mainPanel.add(sizeCombo);
 
         JLabel foodTypeLabel = new JLabel("Tipe Makanan:");
-        foodTypeLabel.setBounds(30, 180, 100, 25); 
+        foodTypeLabel.setBounds(30, 190, 100, 25);
         mainPanel.add(foodTypeLabel);
 
         String[] foodTypes = {"None", "Cake", "Donut", "Churros", "Croissant"};
         JComboBox<String> foodTypeCombo = new JComboBox<>(foodTypes);
-        foodTypeCombo.setBounds(130, 180, 150, 25); 
+        foodTypeCombo.setBounds(130, 190, 150, 25);
         mainPanel.add(foodTypeCombo);
 
         JLabel foodLabel = new JLabel("Makanan:");
-        foodLabel.setBounds(30, 220, 100, 25);
+        foodLabel.setBounds(30, 230, 100, 25);
         mainPanel.add(foodLabel);
 
         JComboBox<String> foodCombo = new JComboBox<>();
-        foodCombo.setBounds(130, 220, 150, 25);
+        foodCombo.setBounds(130, 230, 150, 25);
         mainPanel.add(foodCombo);
 
         foodTypeCombo.addActionListener(e -> {
             String selectedType = (String) foodTypeCombo.getSelectedItem();
+
             foodCombo.removeAllItems();
+            if ("None".equals(selectedType)) {
+                return;
+            }
 
             switch (selectedType) {
                 case "Cake":
                     foodCombo.addItem("Red Velvet");
                     foodCombo.addItem("Tiramisu");
                     foodCombo.addItem("Black Forest");
-                    foodCombo.addItem("Choco Lava");
                     break;
                 case "Donut":
                     foodCombo.addItem("Glazed");
                     foodCombo.addItem("Strawberry");
                     foodCombo.addItem("Choco Mint");
-                    foodCombo.addItem("Blueberry");
                     break;
                 case "Churros":
                     foodCombo.addItem("Honey");
                     foodCombo.addItem("Taro");
-                    foodCombo.addItem("Dark Chocolate");
-                    foodCombo.addItem("Cookies & Cream");
                     break;
                 case "Croissant":
                     foodCombo.addItem("Plain");
                     foodCombo.addItem("Smoke Beef");
-                    foodCombo.addItem("Double Cheese");
-                    foodCombo.addItem("Cheese");
-                    break;
-                default:
-                    foodCombo.addItem("None"); // set default
                     break;
             }
         });
 
-        JLabel quantityLabel = new JLabel("Jumlah:");
-        quantityLabel.setBounds(30, 260, 100, 25);
+        JLabel quantityLabel = new JLabel("Quantity:");
+        quantityLabel.setBounds(30, 270, 100, 25);
         mainPanel.add(quantityLabel);
 
         JLabel quantityValueLabel = new JLabel(String.valueOf(quantity));
-        quantityValueLabel.setBounds(150, 260, 50, 25);
+        quantityValueLabel.setBounds(175, 270, 50, 25);
         quantityValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(quantityValueLabel);
 
         JButton plusButton = new JButton("+");
-        plusButton.setBounds(200, 260, 45, 25);
+        plusButton.setBounds(230, 270, 45, 25);
         mainPanel.add(plusButton);
 
         JButton minusButton = new JButton("-");
-        minusButton.setBounds(100, 260, 45, 25);
+        minusButton.setBounds(130, 270, 45, 25);
         mainPanel.add(minusButton);
 
         plusButton.addActionListener(e -> {
@@ -166,18 +159,18 @@ public class OrderView {
             }
         });
 
-        JLabel cartLabel = new JLabel("Keranjang:");
+        JLabel cartLabel = new JLabel("Cart:");
         cartLabel.setBounds(350, 60, 100, 25);
         mainPanel.add(cartLabel);
 
         cartModel = new DefaultListModel<>();
         JList<String> cartList = new JList<>(cartModel);
         JScrollPane cartScrollPane = new JScrollPane(cartList);
-        cartScrollPane.setBounds(350, 90, 200, 250);
+        cartScrollPane.setBounds(350, 100, 200, 250);
         mainPanel.add(cartScrollPane);
 
-        JButton addButton = new JButton("Tambah");
-        addButton.setBounds(130, 310, 150, 30);
+        JButton addButton = new JButton("Add");
+        addButton.setBounds(130, 320, 150, 30);
         mainPanel.add(addButton);
 
         addButton.addActionListener(e -> {
@@ -187,16 +180,16 @@ public class OrderView {
             String foodType = (String) foodTypeCombo.getSelectedItem();
             String food = (String) foodCombo.getSelectedItem();
 
-            if ((beverageType.equals("None") || beverage.equals("None")) && (foodType.equals("None") || food.equals("None"))) {
+            if (("None".equals(beverageType) || beverage == null) && ("None".equals(foodType) || food == null)) {
                 JOptionPane.showMessageDialog(orderFrame, "Please select at least one item (food or beverage).", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             String order;
-            if (foodType.equals("None") || food.equals("None")) {
-                order = quantity + "x " + size + " " + beverageType + " " + beverage; // Hanya minuman
-            } else if (beverageType.equals("None") || beverage.equals("None")) {
-                order = quantity + "x " + foodType + " " + food; // Hanya makanan
+            if ("None".equals(foodType) || food == null) {
+                order = quantity + "x " + size + " " + beverageType + " " + beverage;
+            } else if ("None".equals(beverageType) || beverage == null) {
+                order = quantity + "x " + foodType + " " + food;
             } else {
                 order = quantity + "x " + size + " " + beverageType + " " + beverage + ", " + foodType + " " + food;
             }
@@ -205,26 +198,53 @@ public class OrderView {
         });
 
         JButton clearButton = new JButton("Clear");
-        clearButton.setBounds(350, 400, 100, 30);
+        clearButton.setBounds(350, 410, 100, 30);
         mainPanel.add(clearButton);
 
+        JButton resetButton = new JButton("Reset");
+        resetButton.setBounds(230, 410, 100, 30);
+        mainPanel.add(resetButton);
+
         JButton checkoutButton = new JButton("Checkout");
-        checkoutButton.setBounds(450, 400, 100, 30);
+        checkoutButton.setBounds(450, 410, 100, 30);
         mainPanel.add(checkoutButton);
+
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(30, 410, 100, 30);
+        mainPanel.add(backButton);
+
+        backButton.addActionListener(e -> {
+            orderFrame.dispose(); // close current order frame
+            new LoginView(); // back to login frame
+        });
 
         clearButton.addActionListener(e -> cartModel.clear());
 
+        resetButton.addActionListener(e -> {
+            typeOfBeverageCombo.setSelectedIndex(0);
+            beverageCombo.removeAllItems();
+            sizeCombo.setSelectedIndex(0);
+            foodTypeCombo.setSelectedIndex(0);
+            foodCombo.removeAllItems();
+            quantity = 1;
+            quantityValueLabel.setText(String.valueOf(quantity));
+        });
+
         checkoutButton.addActionListener(e -> {
-            if (cartModel.getSize() == 0) {
+            if (cartModel.isEmpty()) {
                 JOptionPane.showMessageDialog(orderFrame, "Your cart is empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 StringBuilder orderSummary = new StringBuilder("Order Summary:\n");
                 for (int i = 0; i < cartModel.size(); i++) {
                     orderSummary.append(cartModel.getElementAt(i)).append("\n");
                 }
-                JOptionPane.showMessageDialog(orderFrame, orderSummary.toString(), "Checkout", JOptionPane.INFORMATION_MESSAGE);
+        
+                // Tampilkan PaymentView setelah checkout
+                new PaymentView(orderSummary.toString());
             }
         });
+
+        
 
         orderFrame.add(mainPanel);
         orderFrame.setVisible(true);

@@ -1,7 +1,6 @@
 package View;
 
 import javax.swing.JFrame;
-import java.awt.*;
 
 public class AdminView {
     public AdminView() {
