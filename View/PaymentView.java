@@ -55,86 +55,58 @@ public class PaymentView {
     }
 
     private void handlePayment(String method) {
-        // Use Boolean (object) to allow modification within the windowClosing method
-        final Boolean[] paymentSuccess = {false};  // Wrap boolean in an array to be effectively final
-        
-        if (method.equals("GoPay")) {
-            // show tab input no telp
-            String phoneNumber = JOptionPane.showInputDialog(paymentFrame, "Enter your phone number:", "Phone Number", JOptionPane.QUESTION_MESSAGE);
-            
+        if (method.equals("GoPay") || method.equals("Ovo")) {
+            String phoneNumber = JOptionPane.showInputDialog(paymentFrame, "Enter your phone number for " + method + " payment:", "Phone Number", JOptionPane.QUESTION_MESSAGE);
+
             if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                JOptionPane.showMessageDialog(paymentFrame, "You have successfully paid with GoPay. Payment completed!", "Payment Success", JOptionPane.INFORMATION_MESSAGE);
-                paymentSuccess[0] = true;
+                JOptionPane.showMessageDialog(paymentFrame, "You have successfully paid with " + method + ". Payment completed!", "Payment Success", JOptionPane.INFORMATION_MESSAGE);
+                continueAfterPayment(true);
             } else {
                 JOptionPane.showMessageDialog(paymentFrame, "Phone number is required to complete the payment.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } else if (method.equals("OVO")) {
-            // show tab input no telp
-            String phoneNumber = JOptionPane.showInputDialog(paymentFrame, "Enter your phone number for OVO payment:", "Phone Number", JOptionPane.QUESTION_MESSAGE);
-            
-            if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                JOptionPane.showMessageDialog(paymentFrame, "You have successfully paid with OVO. Payment completed!", "Payment Success", JOptionPane.INFORMATION_MESSAGE);
-                paymentSuccess[0] = true;
-            } else {
-                JOptionPane.showMessageDialog(paymentFrame, "Phone number is required to complete the payment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (method.equals("QRIS")) {
-            // Show image for QRIS
+        } else {
             JPanel imagePanel = new JPanel();
             JLabel qrImageLabel = new JLabel();
-            
-            // Load the image
+
             ImageIcon qrImageIcon = new ImageIcon("C:\\Users\\Asus Pc\\Documents\\1123052_Jordan Emmanuelle\\SEMESTER 3\\PrakPBO\\Tubes\\fore-tubes-pbo-2024\\View\\QRIS_Fore.png");
             qrImageLabel.setIcon(qrImageIcon);
-            
-            // Add the image label to the panel
+
             imagePanel.add(qrImageLabel);
-            
-            // Create a new frame or dialog to show the image
+
             JFrame qrFrame = new JFrame("QRIS Payment");
             qrFrame.setSize(400, 430);
             qrFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            
-            // Position the frame at the center of the screen
+
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Dimension screenSize = toolkit.getScreenSize();
             int x = (screenSize.width - qrFrame.getWidth()) / 2;
             int y = (screenSize.height - qrFrame.getHeight()) / 2;
             qrFrame.setLocation(x, y);
-            
+
             qrFrame.add(imagePanel);
             qrFrame.setVisible(true);
-    
-            // Wait for the QRIS frame to close before proceeding to next step
+
             qrFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                 public void windowClosing(java.awt.event.WindowEvent we) {
-                    paymentSuccess[0] = true; // Payment is considered successful after QRIS image is closed
-                    // Call the method to proceed with the next steps
-                    continueAfterPayment(paymentSuccess[0]);
-                    qrFrame.dispose(); // Close the QRIS frame
-
+                    continueAfterPayment(true);
+                    qrFrame.dispose();
                 }
             });
-        } else {
-            JOptionPane.showMessageDialog(paymentFrame, "You selected " + method + " payment.", "Payment Success", JOptionPane.INFORMATION_MESSAGE);
-            JOptionPane.showMessageDialog(paymentFrame, "nanti idenya munculin QR buat discan, isinya website ada messagenya 'berhasil bayar'. SOON!", "UPDATE", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-    
-    
 
     private void continueAfterPayment(boolean paymentSuccess) {
         if (paymentSuccess) {
             int response = JOptionPane.showConfirmDialog(paymentFrame, "Do you want to create another order?", "Order Again", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 paymentFrame.dispose();
-                new OrderView(); // Open the order view again
+                new OrderView();
             } else if (response == JOptionPane.NO_OPTION) {
                 int logoutResponse = JOptionPane.showConfirmDialog(paymentFrame, "Do you want to log out?", "Log Out", JOptionPane.YES_NO_OPTION);
                 if (logoutResponse == JOptionPane.YES_OPTION) {
                     paymentFrame.dispose();
                     JOptionPane.showMessageDialog(null, "You have been logged out. Goodbye!", "Log Out Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0); // Logout
+                    System.exit(0);
                 }
             }
         }
