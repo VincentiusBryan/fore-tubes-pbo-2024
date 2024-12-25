@@ -15,3 +15,5 @@ public class Admin extends User {
         this.role = role;
     }
 }
+// add, delete, update: harga, namaMenu
+// 

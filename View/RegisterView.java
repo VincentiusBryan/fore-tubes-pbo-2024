@@ -36,7 +36,7 @@ public class RegisterView {
         emailField.setBounds(150, 80, 200, 25);
         registerFrame.add(emailField);
 
-        // notelp
+        // phone
         JLabel phoneLabel = new JLabel("Phone:");
         phoneLabel.setBounds(50, 120, 100, 25);
         registerFrame.add(phoneLabel);
@@ -45,7 +45,7 @@ public class RegisterView {
         phoneField.setBounds(150, 120, 200, 25);
         registerFrame.add(phoneField);
 
-        // pass
+        // password
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(50, 160, 100, 25);
         registerFrame.add(passwordLabel);
@@ -64,27 +64,26 @@ public class RegisterView {
             String phone = phoneField.getText();
             String password = new String(passwordField.getPassword());
 
-            // validasi
+            // validasi input
             if (email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(registerFrame, "Email, Phone, or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!phone.matches("\\d{10,12}")) {
                 JOptionPane.showMessageDialog(registerFrame, "Invalid phone number format!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-            
                 RegisterController controller = new RegisterController();
                 boolean success = controller.registerUser(email, password, phone);
 
                 if (success) {
                     JOptionPane.showMessageDialog(registerFrame, "User registered successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     registerFrame.dispose();
-                    new MainMenu(); 
+                    new MainMenu(); // Kembali ke MainMenu setelah registrasi berhasil
                 } else {
                     JOptionPane.showMessageDialog(registerFrame, "Failed to register user. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-       
+        // back button
         JButton backButton = new JButton("Back");
         backButton.setBounds(260, 200, 90, 30);
         registerFrame.add(backButton);

@@ -38,4 +38,9 @@ public class LoginController {
         }
         return false; 
     }
+
+    public boolean isAdmin(String email) {
+        return email.equalsIgnoreCase("admin@example.com"); // cek admin
+    }
 }
+

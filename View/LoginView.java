@@ -1,11 +1,7 @@
 package View;
 
-
-
 import javax.swing.*;
-
 import Controller.LoginController;
-
 import java.awt.*;
 
 public class LoginView {
@@ -51,7 +47,6 @@ public class LoginView {
         loginButton.setBounds(150, 160, 90, 30);
         loginFrame.add(loginButton);
 
-
         loginButton.addActionListener(e -> {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
@@ -63,26 +58,20 @@ public class LoginView {
                 boolean success = controller.loginUser(email, password);
 
                 if (success) {
-                    JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    loginFrame.dispose();
-                    new MainMenu(); 
+                    if (controller.isAdmin(email)) {
+                        JOptionPane.showMessageDialog(loginFrame, "Welcome Admin!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        loginFrame.dispose();
+                        new AdminView(); // kalau admin
+                    } else {
+                        JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        loginFrame.dispose();
+                        new OrderView(); // kalau user
+                    }
                 } else {
                     JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
-
-
-
-
-
-
-
-
-
-
-
 
         JButton backButton = new JButton("Back");
         backButton.setBounds(260, 160, 90, 30);
@@ -90,7 +79,7 @@ public class LoginView {
 
         backButton.addActionListener(e -> {
             loginFrame.dispose();
-            new MainMenu(); // back to mainmenu
+            new MainMenu(); // back to menu
         });
 
         loginFrame.setVisible(true);

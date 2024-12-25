@@ -34,7 +34,6 @@ public class MainMenu {
         title2.setFont(new Font("SansSerif", Font.BOLD, 36));
         mainMenu.add(title2);
 
-        // Button Login
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(150, 150, 200, 40);
         loginButton.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -42,7 +41,6 @@ public class MainMenu {
         loginButton.setForeground(Color.WHITE);
         mainMenu.add(loginButton);
 
-        // Button Register
         JButton registerButton = new JButton("Register");
         registerButton.setBounds(150, 210, 200, 40);
         registerButton.setFont(new Font("SansSerif", Font.BOLD, 16));
