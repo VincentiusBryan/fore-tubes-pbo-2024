@@ -137,7 +137,7 @@ public class OrderView {
             }
         });
 
-        // Quantity and Buttons for Beverages
+        // Quantity dan buttons buat beverages
         JLabel beverageQuantityLabel = new JLabel("Quantity:");
         beverageQuantityLabel.setBounds(30, 190, 100, 25);
         mainPanel.add(beverageQuantityLabel);
@@ -292,17 +292,20 @@ public class OrderView {
 
         checkoutButton.addActionListener(e -> {
             totalPrice = 0;
+            StringBuilder orderSummary = new StringBuilder();
             for (int i = 0; i < cartModel.size(); i++) {
                 String cartItem = cartModel.get(i);
                 String[] itemParts = cartItem.split(" - Rp");
                 if (itemParts.length > 1) {
                     totalPrice += Double.parseDouble(itemParts[1]);
+                    orderSummary.append(cartItem).append("\n");
                 }
             }
+            orderSummary.append("Total: Rp").append(totalPrice);
             JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
 
             // Masuk ke PaymentView setelah checkout
-            new PaymentView("Order Summary:\n" + cartModel.toString() + "\nTotal: Rp" + totalPrice);
+            new PaymentView(orderSummary.toString(), totalPrice);
             orderFrame.dispose();
         });
 

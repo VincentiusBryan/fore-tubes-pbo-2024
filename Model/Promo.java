@@ -82,3 +82,11 @@ public class Promo {
         return promoName + " (" + discountPercentage + "% off)";
     }
 }
+
+// INSERT INTO promos (id, promo_name, description, discount_percentage, start_date, end_date, is_active)
+// VALUES
+// (1, 'Christmas Sale', 'Diskon spesial untuk Natal, dapatkan potongan hingga 50% untuk semua makanan dan minuman.', 50.0, '2024-12-01', '2024-12-25', TRUE),
+// (2, 'New Year Offer', 'Rayakan Tahun Baru dengan diskon 30% untuk semua jenis kopi.', 30.0, '2024-12-25', '2025-01-01', TRUE),
+// (3, 'Spring Promo', 'Nikmati promo spesial musim semi dengan diskon 20% untuk semua kue dan donut.', 20.0, '2024-03-01', '2024-03-31', TRUE),
+// (4, 'Weekend Deal', 'Dapatkan 10% potongan harga setiap weekend untuk menu minuman', 10.0, '2024-12-01', '2024-12-31', TRUE),
+// (5, 'Member Special', 'Diskon 15% untuk semua member yang melakukan pembelian di atas Rp 200.000', 15.0, '2024-11-01', '2024-11-30', FALSE);
