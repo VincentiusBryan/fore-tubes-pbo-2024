@@ -27,3 +27,15 @@ public class Foods extends ListMenu {
         return namaMenu + " (" + foodsType + ")";
     }
 }
+
+// INSERT INTO foods (name, price) VALUES
+// ('Red Velvet', 25000.0),
+// ('Tiramisu', 30000.0),
+// ('Black Forest', 28000.0),
+// ('Glazed', 15000.0),
+// ('Strawberry', 18000.0),
+// ('Choco Mint', 20000.0),
+// ('Honey', 18000.0),
+// ('Taro', 22000.0),
+// ('Plain', 12000.0),
+// ('Smoke Beef', 20000.0);

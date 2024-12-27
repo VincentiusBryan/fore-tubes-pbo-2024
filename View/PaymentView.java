@@ -1,18 +1,27 @@
 package View;
 
+import Connection.DBConnection;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class PaymentView {
     private JFrame paymentFrame;
+    private double totalPrice;  // Menyimpan total harga dari pesanan
+    private String selectedPromoName = "";  // Nama promo yang dipilih
+    private int selectedDiscount = 0;  // Persentase diskonnya
 
-    public PaymentView(String orderSummary) {
+    public PaymentView(String orderSummary, double totalPrice) {
+        this.totalPrice = totalPrice;
         showPaymentOptions(orderSummary);
     }
 
     private void showPaymentOptions(String orderSummary) {
         paymentFrame = new JFrame("Payment Options");
-        paymentFrame.setSize(400, 400);
+        paymentFrame.setSize(600, 600); 
         paymentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -32,6 +41,18 @@ public class PaymentView {
         orderDetailsArea.setEditable(false);
         JScrollPane orderScrollPane = new JScrollPane(orderDetailsArea);
         mainPanel.add(orderScrollPane, BorderLayout.CENTER);
+
+        // Promo button
+        JPanel promoPanel = new JPanel();
+        promoPanel.setLayout(new GridLayout(0, 1, 10, 10));
+        JLabel promoLabel = new JLabel("Promo", SwingConstants.CENTER);
+        promoLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        promoPanel.add(promoLabel);
+
+        loadPromos(promoPanel);
+
+        JScrollPane promoScrollPane = new JScrollPane(promoPanel);
+        mainPanel.add(promoScrollPane, BorderLayout.EAST);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(3, 1, 10, 10));
@@ -54,7 +75,60 @@ public class PaymentView {
         paymentFrame.setVisible(true);
     }
 
+    private void loadPromos(JPanel promoPanel) {
+        // Koneksi ke database
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.connect();
+
+        String query = "SELECT id, promo_name, description, discount_percentage, start_date, end_date FROM promos WHERE is_active = 1";
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String promoName = resultSet.getString("promo_name");
+                String description = resultSet.getString("description");
+                int discountPercentage = resultSet.getInt("discount_percentage");
+                String startDate = resultSet.getString("start_date");
+                String endDate = resultSet.getString("end_date");
+
+                JButton promoButton = new JButton(promoName + " - " + discountPercentage + "%");
+                promoButton.addActionListener(e -> {
+                    selectedPromoName = promoName;
+                    selectedDiscount = discountPercentage;
+                    JOptionPane.showMessageDialog(paymentFrame, "Selected Promo: " + promoName + "\nDiscount: " + discountPercentage + "%");
+                });
+                promoPanel.add(promoButton);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Failed to load promotions: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            dbConnection.closeConnection(connection);
+        }
+    }
+
     private void handlePayment(String method) {
+        // Menghitung diskon berdasarkan promo yang dipilih
+        double discountAmount = (totalPrice * selectedDiscount) / 100;
+        double finalPrice = totalPrice - discountAmount;
+
+        java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id", "ID"));
+        
+        String formattedTotalPrice = currencyFormat.format(totalPrice);
+        String formattedFinalPrice = currencyFormat.format(finalPrice);
+
+        // Menampilkan info harga
+        JOptionPane.showMessageDialog(paymentFrame, 
+            "Total Price: " + formattedTotalPrice + 
+            "\nPromo: " + selectedPromoName + " - Discount: " + selectedDiscount + "%" +
+            "\nFinal Price: " + formattedFinalPrice, 
+            "Payment Details", 
+            JOptionPane.INFORMATION_MESSAGE);
+
+        // Proses pembayaran
         if (method.equals("GoPay") || method.equals("Ovo")) {
             String phoneNumber = JOptionPane.showInputDialog(paymentFrame, "Enter your phone number for " + method + " payment:", "Phone Number", JOptionPane.QUESTION_MESSAGE);
 
@@ -111,6 +185,4 @@ public class PaymentView {
             }
         }
     }
-
-
 }
