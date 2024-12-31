@@ -48,6 +48,88 @@ public class AdminController {
 
 
 
-    //menu 2
+    //Menu 2
 
+    public void deleteItemFromDatabase(String table, String name) {
+        String deleteQuery = "DELETE FROM " + table + " WHERE name = ?";
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+            stmt.setString(1, name);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateItemInDatabase(String table, String oldName, String newName, double newPrice) {
+        String updateQuery = "UPDATE " + table + " SET name = ?, price = ? WHERE name = ?";
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+            stmt.setString(1, newName);
+            stmt.setDouble(2, newPrice);
+            stmt.setString(3, oldName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateItemInDatabase(String table, String oldName, String newName, String newSize, double newPrice) {
+        String updateQuery = "UPDATE " + table + " SET name = ?, size = ?, price = ? WHERE name = ?";
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+            stmt.setString(1, newName);
+            stmt.setString(2, newSize);
+            stmt.setDouble(3, newPrice);
+            stmt.setString(4, oldName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addItemToDatabase(String table, String name, double price) {
+        String insertQuery = "INSERT INTO " + table + " (name, price) VALUES (?, ?)";
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+            stmt.setString(1, name);
+            stmt.setDouble(2, price);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addItemToDatabase(String table, String name, String size, double price) {
+        String insertQuery = "INSERT INTO " + table + " (name, size, price) VALUES (?, ?, ?)";
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+            stmt.setString(1, name);
+            stmt.setString(2, size);
+            stmt.setDouble(3, price);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResultSet getBeverages() throws SQLException {
+        String query = "SELECT * FROM beverages";
+        Connection conn = dbConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(query);
+        return stmt.executeQuery();
+    }
+
+    
+    public ResultSet getFoods() throws SQLException {
+        String query = "SELECT * FROM foods";
+        Connection conn = dbConnection.connect();
+        PreparedStatement stmt = conn.prepareStatement(query);
+        return stmt.executeQuery();
+    }
+
+
+
+
+    //MENU 3
 }

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 
 import Connection.DBConnection;
 import Controller.AdminController;
+import Model.Admin;
 
 
 public class AdminView {
@@ -89,7 +90,16 @@ public class AdminView {
     }
 
 
+
+
+
+
+
+    
+
+
     private void editMenu() {
+        AdminController controller= new AdminController();
         // Define column names for beverages and foods
         String[] beverageColumns = {"Name", "Size", "Price"};
         String[] foodColumns = {"Name", "Price"};
@@ -98,16 +108,8 @@ public class AdminView {
         DefaultTableModel beverageModel = new DefaultTableModel(beverageColumns, 0);
         DefaultTableModel foodModel = new DefaultTableModel(foodColumns, 0);
 
-        // Create an instance of DBConnection to get the connection
-        DBConnection dbConnection = new DBConnection();
-
         // Retrieve beverage data from the database
-        String beverageQuery = "SELECT * FROM beverages";
-        try (Connection conn = dbConnection.connect();
-             PreparedStatement stmt = conn.prepareStatement(beverageQuery);
-             ResultSet rs = stmt.executeQuery()) {
-
-            // Add beverage data to the beverage model
+        try (ResultSet rs = controller.getBeverages()) {
             while (rs.next()) {
                 String name = rs.getString("name");
                 String size = rs.getString("size");
@@ -120,12 +122,7 @@ public class AdminView {
         }
 
         // Retrieve food data from the database
-        String foodQuery = "SELECT * FROM foods";
-        try (Connection conn = dbConnection.connect();
-             PreparedStatement stmt = conn.prepareStatement(foodQuery);
-             ResultSet rs = stmt.executeQuery()) {
-
-            // Add food data to the food model
+        try (ResultSet rs = controller.getFoods()) {
             while (rs.next()) {
                 String name = rs.getString("name");
                 double price = rs.getDouble("price");
@@ -158,16 +155,14 @@ public class AdminView {
             // Get the selected row from beverage or food table
             int selectedRow = beverageTable.getSelectedRow();
             if (selectedRow != -1) {
-                // If a row in beverage table is selected, remove it from the model and database
                 String name = (String) beverageTable.getValueAt(selectedRow, 0);
-                deleteItemFromDatabase("beverages", name);
+                controller.deleteItemFromDatabase("beverages", name);
                 beverageModel.removeRow(selectedRow);
             } else {
                 selectedRow = foodTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    // If a row in food table is selected, remove it from the model and database
                     String name = (String) foodTable.getValueAt(selectedRow, 0);
-                    deleteItemFromDatabase("foods", name);
+                    controller.deleteItemFromDatabase("foods", name);
                     foodModel.removeRow(selectedRow);
                 }
             }
@@ -176,20 +171,16 @@ public class AdminView {
         // Create Edit button
         JButton editButton = new JButton("Edit");
         editButton.addActionListener(e -> {
-            // Get the selected row from beverage or food table
             int selectedRow = beverageTable.getSelectedRow();
             if (selectedRow != -1) {
-                // If a row in beverage table is selected, open edit dialog
                 String name = (String) beverageTable.getValueAt(selectedRow, 0);
                 String size = (String) beverageTable.getValueAt(selectedRow, 1);
                 double price = (Double) beverageTable.getValueAt(selectedRow, 2);
-                // Prompt for editing
                 String newName = JOptionPane.showInputDialog("Edit Name:", name);
                 String newSize = JOptionPane.showInputDialog("Edit Size:", size);
                 String newPrice = JOptionPane.showInputDialog("Edit Price:", price);
                 if (newName != null && newSize != null && newPrice != null) {
-                    // Update the model and database
-                    updateItemInDatabase("beverages", name, newName, newSize, Double.parseDouble(newPrice));
+                    controller.updateItemInDatabase("beverages", name, newName, newSize, Double.parseDouble(newPrice));
                     beverageModel.setValueAt(newName, selectedRow, 0);
                     beverageModel.setValueAt(newSize, selectedRow, 1);
                     beverageModel.setValueAt(Double.parseDouble(newPrice), selectedRow, 2);
@@ -197,15 +188,12 @@ public class AdminView {
             } else {
                 selectedRow = foodTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    // If a row in food table is selected, open edit dialog
                     String name = (String) foodTable.getValueAt(selectedRow, 0);
                     double price = (Double) foodTable.getValueAt(selectedRow, 1);
-                    // Prompt for editing
                     String newName = JOptionPane.showInputDialog("Edit Name:", name);
                     String newPrice = JOptionPane.showInputDialog("Edit Price:", price);
                     if (newName != null && newPrice != null) {
-                        // Update the model and database
-                        updateItemInDatabase("foods", name, newName, Double.parseDouble(newPrice));
+                        controller.updateItemInDatabase("foods", name, newName, Double.parseDouble(newPrice));
                         foodModel.setValueAt(newName, selectedRow, 0);
                         foodModel.setValueAt(Double.parseDouble(newPrice), selectedRow, 1);
                     }
@@ -216,31 +204,26 @@ public class AdminView {
         // Create Add button
         JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
-            // Ask user if they want to add a food or beverage
             String[] options = {"Food", "Beverage"};
             int choice = JOptionPane.showOptionDialog(null, "Choose the type of item to add", 
                     "Add Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, 
                     null, options, options[0]);
 
             if (choice == 0) {
-                // Food - ask for name and price
                 String name = JOptionPane.showInputDialog("Enter Food Name:");
                 String priceStr = JOptionPane.showInputDialog("Enter Food Price:");
                 if (name != null && priceStr != null) {
                     double price = Double.parseDouble(priceStr);
-                    // Add food to database and update model
-                    addItemToDatabase("foods", name, price);
+                    controller.addItemToDatabase("foods", name, price);
                     foodModel.addRow(new Object[]{name, price});
                 }
             } else if (choice == 1) {
-                // Beverage - ask for name, size, and price
                 String name = JOptionPane.showInputDialog("Enter Beverage Name:");
                 String size = JOptionPane.showInputDialog("Enter Beverage Size:");
                 String priceStr = JOptionPane.showInputDialog("Enter Beverage Price:");
                 if (name != null && size != null && priceStr != null) {
                     double price = Double.parseDouble(priceStr);
-                    // Add beverage to database and update model
-                    addItemToDatabase("beverages", name, size, price);
+                    controller.addItemToDatabase("beverages", name, size, price);
                     beverageModel.addRow(new Object[]{name, size, price});
                 }
             }
@@ -271,74 +254,6 @@ public class AdminView {
         // Revalidate and repaint the content panel to update the display
         contentPanel.revalidate();
         contentPanel.repaint();
-    }
-
-    // Method to delete an item from the database (for foods and beverages)
-    private void deleteItemFromDatabase(String table, String name) {
-        String deleteQuery = "DELETE FROM " + table + " WHERE name = ?";
-        try (Connection conn = new DBConnection().connect();
-             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
-            stmt.setString(1, name);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to update an item in the database (for foods)
-    private void updateItemInDatabase(String table, String oldName, String newName, double newPrice) {
-        String updateQuery = "UPDATE " + table + " SET name = ?, price = ? WHERE name = ?";
-        try (Connection conn = new DBConnection().connect();
-             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-            stmt.setString(1, newName);
-            stmt.setDouble(2, newPrice);
-            stmt.setString(3, oldName);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to update an item in the database (for beverages)
-    private void updateItemInDatabase(String table, String oldName, String newName, String newSize, double newPrice) {
-        String updateQuery = "UPDATE " + table + " SET name = ?, size = ?, price = ? WHERE name = ?";
-        try (Connection conn = new DBConnection().connect();
-             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-            stmt.setString(1, newName);
-            stmt.setString(2, newSize);
-            stmt.setDouble(3, newPrice);
-            stmt.setString(4, oldName);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to add an item to the database (for foods and beverages)
-    private void addItemToDatabase(String table, String name, double price) {
-        String insertQuery = "INSERT INTO " + table + " (name, price) VALUES (?, ?)";
-        try (Connection conn = new DBConnection().connect();
-             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
-            stmt.setString(1, name);
-            stmt.setDouble(2, price);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to add an item to the database (for beverages)
-    private void addItemToDatabase(String table, String name, String size, double price) {
-        String insertQuery = "INSERT INTO " + table + " (name, size, price) VALUES (?, ?, ?)";
-        try (Connection conn = new DBConnection().connect();
-             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
-            stmt.setString(1, name);
-            stmt.setString(2, size);
-            stmt.setDouble(3, price);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public JPanel getContentPanel() {
