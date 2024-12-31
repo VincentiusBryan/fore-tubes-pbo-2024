@@ -15,11 +15,12 @@ public class AdminController {
         dbConnection = new DBConnection();
     }
 
+        //MENU 1 
     public void updateTable(DefaultTableModel tableModel, String userType) {
-        // Clear existing data in the table
+        
         tableModel.setRowCount(0);
 
-        // Query the database
+        
         String query = "SELECT * FROM users WHERE user_type=?";
         try (Connection connection = dbConnection.connect();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -40,4 +41,13 @@ public class AdminController {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+    //menu 2
+
 }
