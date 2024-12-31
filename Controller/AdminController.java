@@ -132,4 +132,8 @@ public class AdminController {
 
 
     //MENU 3
+
+    public void promo(){
+        
+    }
 }
