@@ -6,12 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import Connection.DBConnection;
+import Controller.AdminController;
 
 
 public class AdminView {
@@ -58,74 +55,54 @@ public class AdminView {
 
 
 
-private void showAllCustomer() {
-    contentPanel.removeAll();
+    private void showAllCustomer() {
+        contentPanel.removeAll();
 
-    // Membuat panel utama
-    JPanel menu1Panel = new JPanel();
-    menu1Panel.setLayout(new BorderLayout());
+        // Membuat panel utama
+        JPanel menu1Panel = new JPanel();
+        menu1Panel.setLayout(new BorderLayout());
 
-    // Label judul
-    JLabel titleLabel = new JLabel("MENU 1", JLabel.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-    menu1Panel.add(titleLabel, BorderLayout.NORTH);
+        // Label judul
+        JLabel titleLabel = new JLabel("All Customers", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        menu1Panel.add(titleLabel, BorderLayout.NORTH);
 
-    // Panel untuk tombol filter
-    JPanel buttonPanel = new JPanel(new FlowLayout());
-    JButton adminButton = new JButton("Admin");
-    JButton userButton = new JButton("User");
+        // Panel untuk tombol filter
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton adminButton = new JButton("Admin");
+        JButton userButton = new JButton("User");
 
-    buttonPanel.add(adminButton);
-    buttonPanel.add(userButton);
-    menu1Panel.add(buttonPanel, BorderLayout.CENTER);
+        buttonPanel.add(adminButton);
+        buttonPanel.add(userButton);
+        menu1Panel.add(buttonPanel, BorderLayout.NORTH);
 
-    // Menambahkan panel ke contentPanel
-    contentPanel.add(menu1Panel);
-    contentPanel.revalidate();
-    contentPanel.repaint();
+        // Panel untuk tabel
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable userTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(userTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-    // Event Listener untuk tombol
-    adminButton.addActionListener(e -> filterUsers("Admin"));
-    userButton.addActionListener(e -> filterUsers("User"));
-}
+        // Tambahkan tablePanel ke menu1Panel
+        menu1Panel.add(tablePanel, BorderLayout.CENTER);
 
+        // Tambahkan menu1Panel ke contentPanel
+        contentPanel.add(menu1Panel, BorderLayout.CENTER);
 
+        // Event Listener untuk tombol
+        adminButton.addActionListener(e -> updateTable(tableModel, "Admin"));
+        userButton.addActionListener(e -> updateTable(tableModel, "User"));
 
-// Fungsi untuk menampilkan pengguna berdasarkan filter
-private void filterUsers(String userType) {
-    contentPanel.removeAll();
-
-    // Membuat tabel untuk menampilkan data
-    String[] columnNames = {"id", "email", "phone_number", "user_type","created_at"};
-    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-    JTable userTable = new JTable(tableModel);
-
-    // Query database
-    String query = "SELECT * FROM users WHERE user_type=?";
-    try (Connection connection = dbConnection.connect();
-         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-        preparedStatement.setString(1, userType);
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String email = resultSet.getString("email");
-            String phone_number= resultSet.getString("phone_number");
-            String type = resultSet.getString("user_type");
-            String createdAt = resultSet.getString("created_at");
-
-            tableModel.addRow(new Object[]{id, phone_number, email, type, createdAt});
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
-    
-    JScrollPane scrollPane = new JScrollPane(userTable);
-    contentPanel.add(scrollPane, BorderLayout.CENTER);
-    contentPanel.revalidate();
-    contentPanel.repaint();
+
+
+private void updateTable(DefaultTableModel tableModel, String userType) {
+    AdminController controller = new AdminController();
+    controller.updateTable(tableModel, userType);
 }
 
 
