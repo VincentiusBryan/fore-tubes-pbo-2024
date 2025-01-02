@@ -91,12 +91,77 @@ public class AdminView {
 
 
 
+    // SHOW ALL CUSTOMER
+
+    
+
+    private void showAllCustomer() {
+        contentPanel.removeAll();
+
+        // Membuat panel utama
+        JPanel menu1Panel = new JPanel();
+        menu1Panel.setLayout(new BorderLayout());
+
+        // Label judul
+        JLabel titleLabel = new JLabel("All Customers", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        menu1Panel.add(titleLabel, BorderLayout.NORTH);
+
+        // Panel untuk tombol filter
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton adminButton = new JButton("Admin");
+        JButton userButton = new JButton("User");
+
+        buttonPanel.add(adminButton);
+        buttonPanel.add(userButton);
+        menu1Panel.add(buttonPanel, BorderLayout.NORTH);
+
+        // Panel untuk tabel
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable userTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(userTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Tambahkan tablePanel ke menu1Panel
+        menu1Panel.add(tablePanel, BorderLayout.CENTER);
+
+        // Tambahkan menu1Panel ke contentPanel
+        contentPanel.add(menu1Panel, BorderLayout.CENTER);
+
+        // Event Listener untuk tombol
+        adminButton.addActionListener(e -> updateTable(tableModel, "Admin"));
+        userButton.addActionListener(e -> updateTable(tableModel, "User"));
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+
+
+
+
+
+private void updateTable(DefaultTableModel tableModel, String userType) {
+    AdminController controller = new AdminController();
+    controller.updateTable(tableModel, userType);
+}
+
+
+
+
+
+
+
+
+
 
 
 
 
     
-
+// EDIT MENU
 
     private void editMenu() {
         AdminController controller= new AdminController();
@@ -259,93 +324,6 @@ public class AdminView {
     public JPanel getContentPanel() {
         return contentPanel;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private void showAllCustomer() {
-        contentPanel.removeAll();
-
-        // Membuat panel utama
-        JPanel menu1Panel = new JPanel();
-        menu1Panel.setLayout(new BorderLayout());
-
-        // Label judul
-        JLabel titleLabel = new JLabel("All Customers", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        menu1Panel.add(titleLabel, BorderLayout.NORTH);
-
-        // Panel untuk tombol filter
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton adminButton = new JButton("Admin");
-        JButton userButton = new JButton("User");
-
-        buttonPanel.add(adminButton);
-        buttonPanel.add(userButton);
-        menu1Panel.add(buttonPanel, BorderLayout.NORTH);
-
-        // Panel untuk tabel
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable userTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(userTable);
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-
-        // Tambahkan tablePanel ke menu1Panel
-        menu1Panel.add(tablePanel, BorderLayout.CENTER);
-
-        // Tambahkan menu1Panel ke contentPanel
-        contentPanel.add(menu1Panel, BorderLayout.CENTER);
-
-        // Event Listener untuk tombol
-        adminButton.addActionListener(e -> updateTable(tableModel, "Admin"));
-        userButton.addActionListener(e -> updateTable(tableModel, "User"));
-
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-
-
-
-private void updateTable(DefaultTableModel tableModel, String userType) {
-    AdminController controller = new AdminController();
-    controller.updateTable(tableModel, userType);
-}
-
 
 
 
