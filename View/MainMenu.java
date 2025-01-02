@@ -8,11 +8,35 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainMenu {
+
+    private int statusToko;
+
+
     public MainMenu() {
         showMenu();
     }
 
+
+
+    // public void checkStatus(){
+    //    if (statusToko == 1) {
+    //         showMenu(); // 
+    //     } else if (statusToko == 0) {
+
+    //         System.out.println("The cafe is currently closed.");
+    //     }
+    // }
+
+    // public void updateStatus(int newStatus) {
+    //     this.statusToko = newStatus;
+    //     checkStatus(); 
+    // }
+
+    
+
+
     public void showMenu() {
+        
         Toolkit toolkit = Toolkit.getDefaultToolkit(); // INIT TOOLKIT
         Dimension screenSize = toolkit.getScreenSize(); // get screensize
 
