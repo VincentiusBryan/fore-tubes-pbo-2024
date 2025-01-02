@@ -32,21 +32,21 @@ public class MainMenu {
         mainMenu.add(label);
 
         JLabel title2 = new JLabel("Fore");
-        title2.setBounds(200, 15, 100, 50);
+        title2.setBounds(210, 15, 100, 50);
         title2.setFont(new Font("SansSerif", Font.BOLD, 36));
         mainMenu.add(title2);
 
         JButton adminButton = new JButton("Admin");
         adminButton.setBounds(150, 150, 200, 40);
         adminButton.setFont(new Font("SansSerif", Font.BOLD, 16));
-        adminButton.setBackground(new Color(8, 4, 9));
+        adminButton.setBackground(new Color(208, 44, 49));
         adminButton.setForeground(Color.WHITE);
         mainMenu.add(adminButton);
 
         JButton customerButton = new JButton("Customer");
         customerButton.setBounds(150, 210, 200, 40);
         customerButton.setFont(new Font("SansSerif", Font.BOLD, 16));
-        customerButton.setBackground(new Color(8, 29, 9));
+        customerButton.setBackground(new Color(49, 49, 50));
         customerButton.setForeground(Color.WHITE);
         mainMenu.add(customerButton);
 
@@ -73,6 +73,11 @@ public class MainMenu {
 
 
     public void customer() {
+
+
+        //checkstatus if 0 = toko tutup   if 1 = toko buka lanjutkan kebawah
+
+
         Toolkit toolkit = Toolkit.getDefaultToolkit(); // INIT TOOLKIT
         Dimension screenSize = toolkit.getScreenSize(); // get screensize
 
@@ -116,6 +121,8 @@ public class MainMenu {
                 new LoginView(); // pastikan LoginView sudah didefinisikan
             }
         });
+
+
 
         // Register Button action
         registerButton.addActionListener(new ActionListener() {
