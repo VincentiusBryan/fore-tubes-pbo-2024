@@ -14,6 +14,9 @@ public class LoginController {
         dbConnection = new DBConnection();
     }
 
+
+
+
     public boolean loginUser(String email, String password) {
         Connection connection = dbConnection.connect();
 
@@ -39,8 +42,36 @@ public class LoginController {
         return false; 
     }
 
+
+    
     public boolean isAdmin(String email) {
-        return email.equalsIgnoreCase("admin@example.com"); // cek admin
-    }
+    
+            Connection connection = dbConnection.connect();
+            boolean isAdmin = false;
+    
+            String query = "SELECT user_type FROM users WHERE email = ?";
+            
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, email);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                
+                if (resultSet.next()) {
+                    String userType = resultSet.getString("user_type");
+                    isAdmin = "Admin".equalsIgnoreCase(userType);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+    
+            return isAdmin;
+        }
 }
 
