@@ -13,14 +13,14 @@ import java.sql.SQLException;
 
 import Connection.DBConnection;
 import Controller.AdminController;
-import Model.Admin;
+// import Model.Admin;
 
 
 public class AdminView {
-    private JFrame frame;
-    private JButton openButton;
-    private JButton closeButton;
-    private MainMenu mainMenu;
+    // private JFrame frame;
+    // private JButton openButton;
+    // private JButton closeButton;
+    // private MainMenu mainMenu;
 
     private JFrame adminFrame;
     private JPanel contentPanel;
@@ -597,6 +597,9 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
     }
     
 
+
+
+    
 //    // MENU 6
 //    private void statusToko() {
 //     frame = new JFrame("Cafe Admin Panel");
