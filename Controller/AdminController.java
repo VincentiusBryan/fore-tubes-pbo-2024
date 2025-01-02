@@ -29,7 +29,7 @@ public class AdminController {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int id = resultSet.getInt("id_user");
                 String email = resultSet.getString("email");
                 String phoneNumber = resultSet.getString("phone_number");
                 String type = resultSet.getString("user_type");
