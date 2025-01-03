@@ -80,14 +80,14 @@ public class PaymentView {
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.connect();
 
-        String query = "SELECT id, promo_name, description, discount_percentage, start_date, end_date FROM promos WHERE is_active = 1";
+        String query = "SELECT id_promo, promo_name, description, discount_percentage, start_date, end_date FROM promos WHERE is_active = 1";
 
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int id = resultSet.getInt("id_promo");
                 String promoName = resultSet.getString("promo_name");
                 String description = resultSet.getString("description");
                 int discountPercentage = resultSet.getInt("discount_percentage");

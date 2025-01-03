@@ -83,4 +83,19 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
   ('Weekend Deal', 'Dapatkan 10% potongan harga setiap weekend untuk menu minuman', 10.0, '2024-12-01', '2024-12-31', TRUE),
   ('Member Special', 'Diskon 15% untuk semua member yang melakukan pembelian di atas Rp 200.000', 15.0, '2024-11-01', '2024-11-30', FALSE);
 
+
+  CREATE TABLE transaksi (
+    id_transaksi INT AUTO_INCREMENT PRIMARY KEY,       
+    nama_item VARCHAR(255) NOT NULL,                    
+    tipe_item ENUM('Makanan', 'Minuman') NOT NULL,      
+    ukuran VARCHAR(50),                                 
+    jumlah INT NOT NULL,
+    harga_per_item DECIMAL(10, 2) NOT NULL,             
+    total_harga DECIMAL(10, 2) NOT NULL,               
+    tanggal_transaksi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_user INT,                                
+    FOREIGN KEY (id_user) REFERENCES user(ID_User)    
+  );
+
+
   COMMIT;

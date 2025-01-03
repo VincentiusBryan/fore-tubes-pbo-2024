@@ -4,6 +4,7 @@ import Connection.DBConnection;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class OrderView {
     private int beverageQuantity = 1;
     private int foodQuantity = 1;
     private double totalPrice = 0;
+    private String idUser;
 
     private Map<String, Map<String, Double>> beveragePrices = new HashMap<>();
     private Map<String, Double> foodPrices = new HashMap<>();
@@ -22,6 +24,7 @@ public class OrderView {
     private DBConnection dbConnection;
 
     public OrderView() {
+        this.idUser = idUser; // set the user ID passed from LoginController
         dbConnection = new DBConnection();
         cartModel = new DefaultListModel<>();
         initializePrices();
@@ -88,7 +91,7 @@ public class OrderView {
         typeOfBeverageLabel.setBounds(30, 70, 100, 25);
         mainPanel.add(typeOfBeverageLabel);
 
-        String[] beverageTypes = {"None", "Coffee", "Non-Coffee", "Tea"};
+        String[] beverageTypes = { "None", "Coffee", "Non-Coffee", "Tea" };
         JComboBox<String> typeOfBeverageCombo = new JComboBox<>(beverageTypes);
         typeOfBeverageCombo.setBounds(130, 70, 150, 25);
         mainPanel.add(typeOfBeverageCombo);
@@ -105,7 +108,7 @@ public class OrderView {
         sizeLabel.setBounds(30, 150, 100, 25);
         mainPanel.add(sizeLabel);
 
-        String[] sizes = {"None", "Medium", "Large"};
+        String[] sizes = { "None", "Medium", "Large" };
         JComboBox<String> sizeCombo = new JComboBox<>(sizes);
         sizeCombo.setBounds(130, 150, 150, 25);
         mainPanel.add(sizeCombo);
@@ -172,7 +175,7 @@ public class OrderView {
         foodTypeLabel.setBounds(30, 230, 100, 25);
         mainPanel.add(foodTypeLabel);
 
-        String[] foodTypes = {"None", "Cake", "Donut", "Churros", "Croissant"};
+        String[] foodTypes = { "None", "Cake", "Donut", "Churros", "Croissant" };
         JComboBox<String> foodTypeCombo = new JComboBox<>(foodTypes);
         foodTypeCombo.setBounds(130, 230, 150, 25);
         mainPanel.add(foodTypeCombo);
@@ -275,7 +278,8 @@ public class OrderView {
                     Map<String, Double> size = beveragePrices.get(selectedBeverage);
                     if (size.containsKey(selectedSize)) {
                         double price = size.get(selectedSize) * beverageQuantity;
-                        cartModel.addElement(selectedBeverage + " " + selectedSize + " x" + beverageQuantity + " - Rp" + price);
+                        cartModel.addElement(
+                                selectedBeverage + " " + selectedSize + " x" + beverageQuantity + " - Rp" + price);
                     }
                 }
             }
@@ -293,20 +297,55 @@ public class OrderView {
         checkoutButton.addActionListener(e -> {
             totalPrice = 0;
             StringBuilder orderSummary = new StringBuilder();
-            for (int i = 0; i < cartModel.size(); i++) {
-                String cartItem = cartModel.get(i);
-                String[] itemParts = cartItem.split(" - Rp");
-                if (itemParts.length > 1) {
-                    totalPrice += Double.parseDouble(itemParts[1]);
-                    orderSummary.append(cartItem).append("\n");
+            Connection connection = dbConnection.connect();
+
+            if (connection != null) {
+                try {
+                    for (int i = 0; i < cartModel.size(); i++) {
+                        String cartItem = cartModel.get(i);
+                        String[] itemParts = cartItem.split(" - Rp");
+                        if (itemParts.length > 1) {
+                            totalPrice += Double.parseDouble(itemParts[1]);
+                            orderSummary.append(cartItem).append("\n");
+
+                            // Parse item details
+                            String[] details = itemParts[0].split(" x");
+                            String itemName = details[0].trim();
+                            int quantity = Integer.parseInt(details[1].trim());
+                            double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
+
+                            String itemType = itemName.contains(" ") ? "Minuman" : "Makanan"; // Check if it's food or
+                                                                                              // drink
+                            String size = itemType.equals("Minuman") ? itemName.split(" ")[1].trim() : null;
+
+                            // Insert into transaksi table
+                            String query = "INSERT INTO transaksi (nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                                ps.setString(1, itemName);
+                                ps.setString(2, itemType);
+                                ps.setString(3, size);
+                                ps.setInt(4, quantity);
+                                ps.setDouble(5, pricePerItem);
+                                ps.setDouble(6, pricePerItem * quantity);
+                                ps.setString(7, this.idUser); // Menambahkan id_user ke dalam query
+                                ps.executeUpdate();
+                            }
+
+                        }
+                    }
+
+                    orderSummary.append("Total: Rp").append(totalPrice);
+                    JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
+
+                    // Navigate to PaymentView
+                    new PaymentView(orderSummary.toString(), totalPrice);
+                    orderFrame.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    dbConnection.closeConnection(connection);
                 }
             }
-            orderSummary.append("Total: Rp").append(totalPrice);
-            JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
-
-            // Masuk ke PaymentView setelah checkout
-            new PaymentView(orderSummary.toString(), totalPrice);
-            orderFrame.dispose();
         });
 
         orderFrame.add(mainPanel);
