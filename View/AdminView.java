@@ -38,11 +38,11 @@ public class AdminView {
         adminFrame.setSize(600, 550);
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setLayout(new BorderLayout());
-
+    
         // Create the menu panel
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridLayout(1, 6));
-
+    
         // Add menu buttons
         String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "Menu 5", "Menu 6", "Menu 7","Menu 8"};
         for (String menuName : menuNames) {
@@ -50,15 +50,31 @@ public class AdminView {
             menuButton.addActionListener(new MenuButtonListener(menuName));
             menuPanel.add(menuButton);
         }
-
+    
         // Create the content panel
         contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
-
+    
+        // Create the Back button to return to MainMenu
+        JButton backButton = new JButton("Back");
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+        backButton.setBackground(new Color(44, 62, 80));
+        backButton.setForeground(Color.WHITE);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminFrame.dispose(); // Close the Admin Menu
+                new MainMenu(); // Show the MainMenu again
+            }
+        });
+    
+        // Add back button to the content panel
+        contentPanel.add(backButton, BorderLayout.SOUTH);
+    
         // Add panels to the frame
         adminFrame.add(menuPanel, BorderLayout.NORTH);
         adminFrame.add(contentPanel, BorderLayout.CENTER);
-        
+    
         // Set frame visibility
         adminFrame.setVisible(true);
     }
