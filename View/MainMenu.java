@@ -1,17 +1,65 @@
 package View;
 
 import javax.swing.*;
+
+import Connection.DBConnection;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MainMenu {
 
     private int statusToko;
+    private DBConnection dbConnection;
 
     public MainMenu() {
+        dbConnection = new DBConnection();
         showMenu();
     }
+
+
+
+
+    public int getStatusToko() {
+        // Query to get the status of the store
+        String query = "SELECT status FROM statustoko WHERE id = 1";  // Assuming 'id = 1' references the status of the store
+        
+        try (Connection conn = dbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+    
+            if (rs.next()) {
+                statusToko = rs.getInt("status");  // Retrieve status from the result set
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return statusToko;
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void showMenu() {
         
@@ -73,10 +121,15 @@ public class MainMenu {
 
 
     public void customer() {
-
-
-        //checkstatus if 0 = toko tutup   if 1 = toko buka lanjutkan kebawah
-
+        int statusToko = getStatusToko(); // Fetch the latest status from database
+        System.out.println("Status Toko: " + statusToko); // Debugging: Check the value of statusToko
+    
+        if (statusToko == 0) {
+            // If the store is closed
+            JOptionPane.showMessageDialog(null, "Toko sedang tutup. Silakan coba lagi nanti.");
+            return;
+        }else{
+    
 
         Toolkit toolkit = Toolkit.getDefaultToolkit(); // INIT TOOLKIT
         Dimension screenSize = toolkit.getScreenSize(); // get screensize
@@ -135,4 +188,5 @@ public class MainMenu {
 
         mainMenu.setVisible(true);
     }
+}
 }

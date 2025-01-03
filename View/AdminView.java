@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 import Connection.DBConnection;
 import Controller.AdminController;
-// import Model.Admin;
+
 
 
 public class AdminView {
@@ -21,18 +21,16 @@ public class AdminView {
     // private JButton openButton;
     // private JButton closeButton;
     // private MainMenu mainMenu;
-
+    private AdminController controller;
     private JFrame adminFrame;
     private JPanel contentPanel;
     private DBConnection dbConnection;
+    private MainMenu mainMenu;
 
     public AdminView() {
-        dbConnection= new DBConnection();  
+        controller = new AdminController(); // Inisialisasi AdminController
         showAdminView();
     }
-
-
-
 
     public void showAdminView() {
         // Setup the main frame
@@ -60,7 +58,7 @@ public class AdminView {
         // Add panels to the frame
         adminFrame.add(menuPanel, BorderLayout.NORTH);
         adminFrame.add(contentPanel, BorderLayout.CENTER);
-
+        
         // Set frame visibility
         adminFrame.setVisible(true);
     }
@@ -86,7 +84,7 @@ public class AdminView {
                     showPromos();
                     break;
                 case "Status Toko":
-                    // statusToko();
+                    statusToko();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -599,46 +597,76 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     
 //    // MENU 6
-//    private void statusToko() {
-//     frame = new JFrame("Cafe Admin Panel");
-//     frame.setSize(300, 200);
-//     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+private void statusToko() {
+      // Frame admin untuk menunjukkan status toko
+      
+      adminFrame = new JFrame("Admin View");
+      adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      adminFrame.setSize(400, 200);
+      adminFrame.setLocationRelativeTo(null);
 
-//     // Close button
-//     closeButton = new JButton("Close Cafe");
-//     closeButton.addActionListener(new ActionListener() {
-//         @Override
-//         public void actionPerformed(ActionEvent e) {
-//             mainMenu.updateStatus(0); // Close cafe
-//         }
-//     });
-//     closeButton.setBounds(50, 50, 200, 30);
-    
-//     // Open button
-//     openButton = new JButton("Open Cafe");
-//     openButton.addActionListener(new ActionListener() {
-//         @Override
-//         public void actionPerformed(ActionEvent e) {
-//             mainMenu.updateStatus(1); // Open cafe
-//         }
-//     });
-//     openButton.setBounds(50, 100, 200, 30);
+      contentPanel = new JPanel();
+      contentPanel.setLayout(new BorderLayout());
 
-//     frame.setLayout(null);
-//     frame.add(openButton);
-//     frame.add(closeButton);
-//     frame.setVisible(true);
-// }
+      // Label untuk menunjukkan status
+      JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
+      contentPanel.add(statusLabel, BorderLayout.CENTER);
+
+      // Tombol Buka
+      JButton openButton = new JButton("Buka Toko");
+      openButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              // Ubah status toko menjadi buka
+              controller.updateStatusToko(1);
+              statusLabel.setText("Status Toko: Buka");
+          }
+      });
+
+      // Tombol Tutup
+      JButton closeButton = new JButton("Tutup Toko");
+      closeButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              // Ubah status toko menjadi tutup
+              controller.updateStatusToko(0);
+              statusLabel.setText("Status Toko: Tutup");
+          }
+      });
+
+      // Panel untuk menampung tombol
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.add(openButton);
+      buttonPanel.add(closeButton);
+
+      contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+      adminFrame.setContentPane(contentPanel);
+      adminFrame.setVisible(true);
+  
+}
 
 
 
 
 
+public static void main(String[] args) {
+  new AdminView();
+  
+}
 
-
-    public static void main(String[] args) {
-        new AdminView();
-    }
+  
 }

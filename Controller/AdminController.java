@@ -136,4 +136,19 @@ public class AdminController {
     public void promo(){
         
     }
+
+    //MENU 6
+    public void updateStatusToko(int status) {
+        String query = "UPDATE statusToko SET status = ?, last_updated = CURRENT_TIMESTAMP WHERE id = 1";
+        try (Connection connection = dbConnection.connect();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+             
+            statement.setInt(1, status); // Mengatur status (1 untuk buka, 0 untuk tutup)
+            statement.executeUpdate();
+            
+            System.out.println("Status toko berhasil diubah.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
