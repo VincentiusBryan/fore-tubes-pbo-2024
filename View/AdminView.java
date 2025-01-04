@@ -703,12 +703,10 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
 
     frame.add(scrollPane, BorderLayout.CENTER);
 
-    // Tambahkan Checkbox pada kolom "Selesai"
     table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
-    // Menangani update status saat checkbox diubah
     table.getModel().addTableModelListener(e -> {
-        if (e.getColumn() == 10) {  // Jika kolom "Selesai" diubah
+        if (e.getColumn() == 10) {
             int selectedRow = table.getSelectedRow();
             int idTransaksi = (int) table.getValueAt(selectedRow, 0);
             boolean status = (boolean) table.getValueAt(selectedRow, 10);
@@ -731,7 +729,7 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
 
     frame.setVisible(true);
 }
-//
+
     
 
 
