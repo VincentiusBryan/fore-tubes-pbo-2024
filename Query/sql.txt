@@ -109,9 +109,6 @@ CREATE TABLE transaksi (
     FOREIGN KEY (id_user) REFERENCES users(id_user)
 );
 
-
-
-
 ALTER TABLE transaksi ADD COLUMN id_promo INT,
 ADD FOREIGN KEY (id_promo) REFERENCES promos(id_promo);
 

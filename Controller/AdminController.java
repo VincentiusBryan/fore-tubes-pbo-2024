@@ -127,49 +127,49 @@ public class AdminController {
         // Implementasi promo di sini
     }
 
-    // MENU 5 - View Orders
-    public void viewOrders(DefaultTableModel tableModel) {
-        tableModel.setRowCount(0);  // Membersihkan table
+    // // MENU 5 - View Orders
+    // public void viewOrders(DefaultTableModel tableModel) {
+    //     tableModel.setRowCount(0);  // Membersihkan table
 
-        String query = "SELECT * FROM transaksi";
-        try (Connection connection = dbConnection.connect();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+    //     String query = "SELECT * FROM transaksi";
+    //     try (Connection connection = dbConnection.connect();
+    //          PreparedStatement preparedStatement = connection.prepareStatement(query);
+    //          ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id_transaksi");
-                String namaItem = resultSet.getString("nama_item");
-                String tipeItem = resultSet.getString("tipe_item");
-                String ukuran = resultSet.getString("ukuran");
-                int jumlah = resultSet.getInt("jumlah");
-                double hargaPerItem = resultSet.getDouble("harga_per_item");
-                double totalHarga = resultSet.getDouble("total_harga");
-                Timestamp waktuTransaksi = resultSet.getTimestamp("waktu_transaksi");
-                boolean status = resultSet.getBoolean("status");
+    //         while (resultSet.next()) {
+    //             int id = resultSet.getInt("id_transaksi");
+    //             String namaItem = resultSet.getString("nama_item");
+    //             String tipeItem = resultSet.getString("tipe_item");
+    //             String ukuran = resultSet.getString("ukuran");
+    //             int jumlah = resultSet.getInt("jumlah");
+    //             double hargaPerItem = resultSet.getDouble("harga_per_item");
+    //             double totalHarga = resultSet.getDouble("total_harga");
+    //             Timestamp waktuTransaksi = resultSet.getTimestamp("waktu_transaksi");
+    //             boolean status = resultSet.getBoolean("status");
 
-                String formattedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(waktuTransaksi);
+    //             String formattedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(waktuTransaksi);
 
-                tableModel.addRow(new Object[]{id, namaItem, tipeItem, ukuran, jumlah, hargaPerItem, totalHarga, formattedTime, status});
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    //             tableModel.addRow(new Object[]{id, namaItem, tipeItem, ukuran, jumlah, hargaPerItem, totalHarga, formattedTime, status});
+    //         }
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
-    public void updateOrderStatus(int idTransaksi, boolean status) {
-        String query = "UPDATE transaksi SET status = ? WHERE id_transaksi = ?";
-        try (Connection connection = dbConnection.connect();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+    // public void updateOrderStatus(int idTransaksi, boolean status) {
+    //     String query = "UPDATE transaksi SET status = ? WHERE id_transaksi = ?";
+    //     try (Connection connection = dbConnection.connect();
+    //          PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setBoolean(1, status);
-            statement.setInt(2, idTransaksi);
-            statement.executeUpdate();
+    //         statement.setBoolean(1, status);
+    //         statement.setInt(2, idTransaksi);
+    //         statement.executeUpdate();
 
-            System.out.println("Status pesanan berhasil diperbarui.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    //         System.out.println("Status pesanan berhasil diperbarui.");
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     //MENU 6
     public void updateStatusToko(int status) {
