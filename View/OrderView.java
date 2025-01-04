@@ -123,25 +123,40 @@ public class OrderView {
             String selectedType = (String) typeOfBeverageCombo.getSelectedItem();
 
             beverageCombo.removeAllItems();
+            sizeCombo.removeAllItems(); // Reset ukuran
+
             if ("None".equals(selectedType)) {
                 return;
             }
 
+            // Menentukan ukuran yang relevan berdasarkan tipe minuman
             switch (selectedType) {
                 case "Coffee":
                     beverageCombo.addItem("Iced Americano");
                     beverageCombo.addItem("Espresso");
                     beverageCombo.addItem("Cappuccino");
+
+                    // Menambahkan ukuran untuk Coffee
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
                 case "Non-Coffee":
                     beverageCombo.addItem("Iced Matcha Latte");
                     beverageCombo.addItem("Hot Matcha Latte");
                     beverageCombo.addItem("Iced Chocolate");
+
+                    // Menambahkan ukuran untuk Non-Coffee
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
                 case "Tea":
                     beverageCombo.addItem("Oolong");
                     beverageCombo.addItem("Green Peach");
                     beverageCombo.addItem("Earl Grey");
+
+                    // Menambahkan ukuran untuk Tea
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
             }
         });
@@ -278,7 +293,7 @@ public class OrderView {
         addToCartButton.addActionListener(e -> {
             String selectedBeverage = (String) beverageCombo.getSelectedItem();
             String selectedFood = (String) foodCombo.getSelectedItem();
-        
+
             if (selectedBeverage != null && !"None".equals(selectedBeverage)) {
                 String selectedSize = (String) sizeCombo.getSelectedItem();
                 if (beveragePrices.containsKey(selectedBeverage)) {
@@ -290,7 +305,7 @@ public class OrderView {
                     }
                 }
             }
-        
+
             if (selectedFood != null && !"None".equals(selectedFood)) {
                 if (foodPrices.containsKey(selectedFood)) {
                     double price = foodPrices.get(selectedFood) * foodQuantity;
@@ -300,86 +315,81 @@ public class OrderView {
                 }
             }
         });
-        
 
         clearCartButton.addActionListener(e -> cartModel.clear());
 
-    // TRANSAKSI
-checkoutButton.addActionListener(e -> {
-    totalPrice = 0;
-    StringBuilder orderSummary = new StringBuilder();
-    Connection connection = dbConnection.connect();
+        // TRANSAKSI
+        checkoutButton.addActionListener(e -> {
+            totalPrice = 0;
+            StringBuilder orderSummary = new StringBuilder();
+            Connection connection = dbConnection.connect();
 
-    if (connection != null) {
-        try {
-            int userId = SessionManager.getLoggedInUserId();
-            if (userId == -1) {
-                JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            if (connection != null) {
+                try {
+                    int userId = SessionManager.getLoggedInUserId();
+                    if (userId == -1) {
+                        JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
-            for (int i = 0; i < cartModel.size(); i++) {
-                String cartItem = cartModel.get(i);
-                String[] itemParts = cartItem.split(" - Rp");
-                if (itemParts.length > 1) {
-                    totalPrice += Double.parseDouble(itemParts[1]);
-                    orderSummary.append(cartItem).append("\n");
+                    for (int i = 0; i < cartModel.size(); i++) {
+                        String cartItem = cartModel.get(i);
+                        String[] itemParts = cartItem.split(" - Rp");
+                        if (itemParts.length > 1) {
+                            double itemPrice = Double.parseDouble(itemParts[1]);
+                            totalPrice += itemPrice;
+                            orderSummary.append(cartItem).append("\n");
 
-                    String[] details = itemParts[0].split(" x");
-                    String itemName = details[0].trim();
-                    int quantity = Integer.parseInt(details[1].trim());
-                    double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
+                            String[] details = itemParts[0].split(" x");
+                            String itemName = details[0].trim();
+                            int quantity = Integer.parseInt(details[1].trim());
+                            double pricePerItem = itemPrice / quantity;
 
-                    // Tentukan tipe item dan ukuran dengan benar
-                    String itemType;
-                    String size = null;
+                            String itemType;
+                            String size = null;
 
-                    // Cek apakah nama item mengandung ukuran (contoh: "Iced Americano Medium")
-                    if (itemName.contains("Medium") || itemName.contains("Large")) {
-                        itemType = "Minuman";
-                        // Ambil ukuran dari nama item (Medium/Large)
-                        if (itemName.contains("Medium")) {
-                            size = "Medium";
-                        } else if (itemName.contains("Large")) {
-                            size = "Large";
+                            if (itemName.contains("Medium") || itemName.contains("Large")) {
+                                itemType = "Minuman";
+                                if (itemName.contains("Medium")) {
+                                    size = "Medium";
+                                } else if (itemName.contains("Large")) {
+                                    size = "Large";
+                                }
+                            } else {
+                                itemType = "Makanan";
+                            }
+
+                            // Updated query to include harga_sebelum_promo
+                            String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, harga_sebelum_promo, harga_setelah_promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                                ps.setInt(1, userId);
+                                ps.setString(2, itemName);
+                                ps.setString(3, itemType);
+                                ps.setString(4, size);
+                                ps.setInt(5, quantity);
+                                ps.setDouble(6, pricePerItem);
+                                ps.setDouble(7, itemPrice);
+                                ps.setDouble(8, itemPrice); // Initial price before promo
+                                ps.setDouble(9, itemPrice); // Initial price after promo (will be updated when promo is
+                                                            // applied)
+                                ps.executeUpdate();
+                            }
                         }
-                    } else {
-                        itemType = "Makanan";  // Jika tidak ada ukuran, berarti makanan
                     }
 
-                    // Query untuk memasukkan transaksi
-                    String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                    try (PreparedStatement ps = connection.prepareStatement(query)) {
-                        ps.setInt(1, userId);
-                        ps.setString(2, itemName);
-                        ps.setString(3, itemType);
-                        ps.setString(4, size);  // Untuk makanan, ini null, untuk minuman, ini ukuran
-                        ps.setInt(5, quantity);
-                        ps.setDouble(6, pricePerItem);
-                        ps.setDouble(7, pricePerItem * quantity);
-                        ps.executeUpdate();
-                    }
+                    orderSummary.append("Total: Rp").append(totalPrice);
+                    JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
+
+                    new PaymentView(orderSummary.toString(), totalPrice);
+                    orderFrame.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    dbConnection.closeConnection(connection);
                 }
             }
-
-            orderSummary.append("Total: Rp").append(totalPrice);
-            JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
-
-            // Navigate to PaymentView
-            new PaymentView(orderSummary.toString(), totalPrice);
-            orderFrame.dispose();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            dbConnection.closeConnection(connection);
-        }
-    }
-});
-
-
-
-
-
+        });
 
         orderFrame.add(mainPanel);
         orderFrame.setVisible(true);
