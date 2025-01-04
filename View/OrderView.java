@@ -1,6 +1,8 @@
 package View;
 
 import Connection.DBConnection;
+import Controller.SessionManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
@@ -16,7 +18,6 @@ public class OrderView {
     private int beverageQuantity = 1;
     private int foodQuantity = 1;
     private double totalPrice = 0;
-    private String idUser;
 
     private Map<String, Map<String, Double>> beveragePrices = new HashMap<>();
     private Map<String, Double> foodPrices = new HashMap<>();
@@ -24,7 +25,12 @@ public class OrderView {
     private DBConnection dbConnection;
 
     public OrderView() {
-        this.idUser = idUser; // set the user ID passed from LoginController
+
+        if (!SessionManager.isUserLoggedIn()) {
+            JOptionPane.showMessageDialog(null, "Please log in first!", "Access Denied", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         dbConnection = new DBConnection();
         cartModel = new DefaultListModel<>();
         initializePrices();
@@ -244,6 +250,7 @@ public class OrderView {
                     foodCombo.addItem("Chocolate Croissant");
                     break;
             }
+            System.out.println("Updated foodCombo with item for: " + selectedFoodType);
         });
 
         // Cart Section
@@ -271,8 +278,8 @@ public class OrderView {
         addToCartButton.addActionListener(e -> {
             String selectedBeverage = (String) beverageCombo.getSelectedItem();
             String selectedFood = (String) foodCombo.getSelectedItem();
-
-            if (!"None".equals(selectedBeverage)) {
+        
+            if (selectedBeverage != null && !"None".equals(selectedBeverage)) {
                 String selectedSize = (String) sizeCombo.getSelectedItem();
                 if (beveragePrices.containsKey(selectedBeverage)) {
                     Map<String, Double> size = beveragePrices.get(selectedBeverage);
@@ -283,70 +290,78 @@ public class OrderView {
                     }
                 }
             }
-
-            if (!"None".equals(selectedFood)) {
+        
+            if (selectedFood != null && !"None".equals(selectedFood)) {
                 if (foodPrices.containsKey(selectedFood)) {
                     double price = foodPrices.get(selectedFood) * foodQuantity;
                     cartModel.addElement(selectedFood + " x" + foodQuantity + " - Rp" + price);
+                } else {
+                    System.out.println("Food not found in foodPrices: " + selectedFood);
                 }
             }
         });
+        
 
         clearCartButton.addActionListener(e -> cartModel.clear());
 
-        checkoutButton.addActionListener(e -> {
-            totalPrice = 0;
-            StringBuilder orderSummary = new StringBuilder();
-            Connection connection = dbConnection.connect();
+checkoutButton.addActionListener(e -> {
+    totalPrice = 0;
+    StringBuilder orderSummary = new StringBuilder();
+    Connection connection = dbConnection.connect();
 
-            if (connection != null) {
-                try {
-                    for (int i = 0; i < cartModel.size(); i++) {
-                        String cartItem = cartModel.get(i);
-                        String[] itemParts = cartItem.split(" - Rp");
-                        if (itemParts.length > 1) {
-                            totalPrice += Double.parseDouble(itemParts[1]);
-                            orderSummary.append(cartItem).append("\n");
+    if (connection != null) {
+        try {
+            int userId = SessionManager.getLoggedInUserId();
+            if (userId == -1) {
+                JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-                            // Parse item details
-                            String[] details = itemParts[0].split(" x");
-                            String itemName = details[0].trim();
-                            int quantity = Integer.parseInt(details[1].trim());
-                            double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
+            for (int i = 0; i < cartModel.size(); i++) {
+                String cartItem = cartModel.get(i);
+                String[] itemParts = cartItem.split(" - Rp");
+                if (itemParts.length > 1) {
+                    totalPrice += Double.parseDouble(itemParts[1]);
+                    orderSummary.append(cartItem).append("\n");
 
-                            String itemType = itemName.contains(" ") ? "Minuman" : "Makanan"; // Check if it's food or
-                                                                                              // drink
-                            String size = itemType.equals("Minuman") ? itemName.split(" ")[1].trim() : null;
+                    // Parse item details
+                    String[] details = itemParts[0].split(" x");
+                    String itemName = details[0].trim();
+                    int quantity = Integer.parseInt(details[1].trim());
+                    double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
 
-                            // Insert into transaksi table
-                            String query = "INSERT INTO transaksi (nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                            try (PreparedStatement ps = connection.prepareStatement(query)) {
-                                ps.setString(1, itemName);
-                                ps.setString(2, itemType);
-                                ps.setString(3, size);
-                                ps.setInt(4, quantity);
-                                ps.setDouble(5, pricePerItem);
-                                ps.setDouble(6, pricePerItem * quantity);
-                                ps.setString(7, this.idUser); // Menambahkan id_user ke dalam query
-                                ps.executeUpdate();
-                            }
+                    String itemType = itemName.contains(" ") ? "Minuman" : "Makanan"; // Check if it's food or drink
+                    String size = itemType.equals("Minuman") ? itemName.split(" ")[1].trim() : null;
 
-                        }
+                    // Insert into transaksi table
+                    String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement ps = connection.prepareStatement(query)) {
+                        ps.setInt(1, userId);
+                        ps.setString(2, itemName);
+                        ps.setString(3, itemType);
+                        ps.setString(4, size);
+                        ps.setInt(5, quantity);
+                        ps.setDouble(6, pricePerItem);
+                        ps.setDouble(7, pricePerItem * quantity);
+                        ps.executeUpdate();
                     }
-
-                    orderSummary.append("Total: Rp").append(totalPrice);
-                    JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
-
-                    // Navigate to PaymentView
-                    new PaymentView(orderSummary.toString(), totalPrice);
-                    orderFrame.dispose();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                } finally {
-                    dbConnection.closeConnection(connection);
                 }
             }
-        });
+
+            orderSummary.append("Total: Rp").append(totalPrice);
+            JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
+
+            // Navigate to PaymentView
+            new PaymentView(orderSummary.toString(), totalPrice);
+            orderFrame.dispose();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            dbConnection.closeConnection(connection);
+        }
+    }
+});
+
 
         orderFrame.add(mainPanel);
         orderFrame.setVisible(true);
