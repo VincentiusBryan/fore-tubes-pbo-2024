@@ -625,58 +625,63 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
 
 
     
-//    // MENU 6
-private void statusToko() {
-      // Frame admin untuk menunjukkan status toko
-      
-      adminFrame = new JFrame("Admin View");
-      adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      adminFrame.setSize(400, 200);
-      adminFrame.setLocationRelativeTo(null);
-
-      contentPanel = new JPanel();
-      contentPanel.setLayout(new BorderLayout());
-
-      // Label untuk menunjukkan status
-      JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
-      contentPanel.add(statusLabel, BorderLayout.CENTER);
-
-      // Tombol Buka
-      JButton openButton = new JButton("Buka Toko");
-      openButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              // Ubah status toko menjadi buka
-              controller.updateStatusToko(1);
-              statusLabel.setText("Status Toko: Buka");
-          }
-      });
-
-      // Tombol Tutup
-      JButton closeButton = new JButton("Tutup Toko");
-      closeButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              // Ubah status toko menjadi tutup
-              controller.updateStatusToko(0);
-              statusLabel.setText("Status Toko: Tutup");
-          }
-      });
-
-      // Panel untuk menampung tombol
-      JPanel buttonPanel = new JPanel();
-      buttonPanel.add(openButton);
-      buttonPanel.add(closeButton);
-
-      contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-      adminFrame.setContentPane(contentPanel);
-      adminFrame.setVisible(true);
-  
-}
-
-
-
+    private void statusToko() {
+        // Frame admin untuk menunjukkan status toko
+        adminFrame = new JFrame("Admin View");
+        adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        adminFrame.setSize(400, 200);
+        adminFrame.setLocationRelativeTo(null);
+    
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+    
+        // Label untuk menunjukkan status
+        JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
+        contentPanel.add(statusLabel, BorderLayout.CENTER);
+    
+        // Tombol Buka
+        JButton openButton = new JButton("Buka Toko");
+        openButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Ubah status toko menjadi buka
+                controller.updateStatusToko(1);
+                statusLabel.setText("Status Toko: Buka");
+            }
+        });
+    
+        // Tombol Tutup
+        JButton closeButton = new JButton("Tutup Toko");
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Ubah status toko menjadi tutup
+                controller.updateStatusToko(0);
+                statusLabel.setText("Status Toko: Tutup");
+            }
+        });
+    
+        // Tombol Back
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminFrame.dispose(); // Menutup window saat ini
+            }
+        });
+    
+        // Panel untuk menampung tombol
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(openButton);
+        buttonPanel.add(closeButton);
+        buttonPanel.add(backButton); // Tambahkan tombol Back ke panel
+    
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+    
+        adminFrame.setContentPane(contentPanel);
+        adminFrame.setVisible(true);
+    }
+    
 
 
 public static void main(String[] args) {
