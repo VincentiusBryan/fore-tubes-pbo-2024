@@ -139,6 +139,7 @@ public class AdminController {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id_transaksi");
                 String namaItem = resultSet.getString("nama_item");
+                String tipeItem = resultSet.getString("tipe_item");
                 String ukuran = resultSet.getString("ukuran");
                 int jumlah = resultSet.getInt("jumlah");
                 double hargaPerItem = resultSet.getDouble("harga_per_item");
@@ -148,7 +149,7 @@ public class AdminController {
 
                 String formattedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(waktuTransaksi);
 
-                tableModel.addRow(new Object[]{id, namaItem, ukuran, jumlah, hargaPerItem, totalHarga, formattedTime, status});
+                tableModel.addRow(new Object[]{id, namaItem, tipeItem, ukuran, jumlah, hargaPerItem, totalHarga, formattedTime, status});
             }
         } catch (SQLException e) {
             e.printStackTrace();

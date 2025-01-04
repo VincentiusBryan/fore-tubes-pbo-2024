@@ -102,7 +102,7 @@ public class AdminView {
                     statusToko();
                     break;
                 case "View Order":
-                    showAllOrders();  // Menampilkan data view order
+                    // showAllOrders();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -686,35 +686,33 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
         adminFrame.setVisible(true);
     }
     
-    // MENU 5
-    public void showAllOrders() {
-        String[] columnNames = {"ID", "Nama Item", "Ukuran", "Jumlah", "Harga Per Item", "Total Harga", "Waktu Transaksi", "Selesai"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable ordersTable = new JTable(tableModel);
+    // // MENU 5
+    // public void showAllOrders() {
+    //     String[] columnNames = {"ID", "Nama Item", "Tipe Item", "Ukuran", "Jumlah", "Harga Per Item", "Total Harga", "Waktu Transaksi", "Selesai"};
+    //     DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    //     JTable ordersTable = new JTable(tableModel);
     
-        // Mengambil data dari controller
-        controller.viewOrders(tableModel);  // Menampilkan data pesanan
+    //     controller.viewOrders(tableModel);  // Menampilkan data pesanan
     
-        // Membuat checkbox kolom "Selesai"
-        ordersTable.getColumnModel().getColumn(7).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+    //     // Membuat checkbox kolom "Selesai"
+    //     ordersTable.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor(new JCheckBox()));
     
-        // Menangani update status saat checkbox diubah
-        ordersTable.getModel().addTableModelListener(e -> {
-            if (e.getColumn() == 7) {  // Jika kolom "Selesai" diubah
-                int selectedRow = ordersTable.getSelectedRow();
-                int idTransaksi = (int) ordersTable.getValueAt(selectedRow, 0);
-                boolean status = (boolean) ordersTable.getValueAt(selectedRow, 7);
-                controller.updateOrderStatus(idTransaksi, status);
-            }
-        });
+    //     // Menangani update status saat checkbox diubah
+    //     ordersTable.getModel().addTableModelListener(e -> {
+    //         if (e.getColumn() == 8) {  // Jika kolom "Selesai" diubah
+    //             int selectedRow = ordersTable.getSelectedRow();
+    //             int idTransaksi = (int) ordersTable.getValueAt(selectedRow, 0);
+    //             boolean status = (boolean) ordersTable.getValueAt(selectedRow, 8);
+    //             controller.updateOrderStatus(idTransaksi, status);
+    //         }
+    //     });
     
-        // Menambahkan ordersTable ke contentPanel
-        contentPanel.removeAll();
-        contentPanel.add(new JScrollPane(ordersTable), BorderLayout.CENTER);
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-    
+    //     JScrollPane scrollPane = new JScrollPane(ordersTable);
+    //     contentPanel.removeAll();
+    //     contentPanel.add(scrollPane, BorderLayout.CENTER);
+    //     contentPanel.revalidate();
+    //     contentPanel.repaint();
+    // }
     
 
 

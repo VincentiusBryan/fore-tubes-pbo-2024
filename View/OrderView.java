@@ -304,6 +304,7 @@ public class OrderView {
 
         clearCartButton.addActionListener(e -> cartModel.clear());
 
+    // TRANSAKSI
 checkoutButton.addActionListener(e -> {
     totalPrice = 0;
     StringBuilder orderSummary = new StringBuilder();
@@ -329,15 +330,30 @@ checkoutButton.addActionListener(e -> {
                     int quantity = Integer.parseInt(details[1].trim());
                     double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
 
-                    String itemType = itemName.contains(" ") ? "Minuman" : "Makanan";
-                    String size = itemType.equals("Minuman") ? itemName.split(" ")[1].trim() : null;
+                    // Tentukan tipe item dan ukuran dengan benar
+                    String itemType;
+                    String size = null;
 
+                    // Cek apakah nama item mengandung ukuran (contoh: "Iced Americano Medium")
+                    if (itemName.contains("Medium") || itemName.contains("Large")) {
+                        itemType = "Minuman";
+                        // Ambil ukuran dari nama item (Medium/Large)
+                        if (itemName.contains("Medium")) {
+                            size = "Medium";
+                        } else if (itemName.contains("Large")) {
+                            size = "Large";
+                        }
+                    } else {
+                        itemType = "Makanan";  // Jika tidak ada ukuran, berarti makanan
+                    }
+
+                    // Query untuk memasukkan transaksi
                     String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement ps = connection.prepareStatement(query)) {
                         ps.setInt(1, userId);
                         ps.setString(2, itemName);
                         ps.setString(3, itemType);
-                        ps.setString(4, size);
+                        ps.setString(4, size);  // Untuk makanan, ini null, untuk minuman, ini ukuran
                         ps.setInt(5, quantity);
                         ps.setDouble(6, pricePerItem);
                         ps.setDouble(7, pricePerItem * quantity);
@@ -359,6 +375,10 @@ checkoutButton.addActionListener(e -> {
         }
     }
 });
+
+
+
+
 
 
         orderFrame.add(mainPanel);
