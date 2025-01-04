@@ -102,7 +102,7 @@ public class AdminView {
                     statusToko();
                     break;
                 case "View Order":
-                    // showAllOrders();
+                    showAllOrders();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -687,32 +687,51 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
     }
     
     // // MENU 5
-    // public void showAllOrders() {
-    //     String[] columnNames = {"ID", "Nama Item", "Tipe Item", "Ukuran", "Jumlah", "Harga Per Item", "Total Harga", "Waktu Transaksi", "Selesai"};
-    //     DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-    //     JTable ordersTable = new JTable(tableModel);
-    
-    //     controller.viewOrders(tableModel);  // Menampilkan data pesanan
-    
-    //     // Membuat checkbox kolom "Selesai"
-    //     ordersTable.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor(new JCheckBox()));
-    
-    //     // Menangani update status saat checkbox diubah
-    //     ordersTable.getModel().addTableModelListener(e -> {
-    //         if (e.getColumn() == 8) {  // Jika kolom "Selesai" diubah
-    //             int selectedRow = ordersTable.getSelectedRow();
-    //             int idTransaksi = (int) ordersTable.getValueAt(selectedRow, 0);
-    //             boolean status = (boolean) ordersTable.getValueAt(selectedRow, 8);
-    //             controller.updateOrderStatus(idTransaksi, status);
-    //         }
-    //     });
-    
-    //     JScrollPane scrollPane = new JScrollPane(ordersTable);
-    //     contentPanel.removeAll();
-    //     contentPanel.add(scrollPane, BorderLayout.CENTER);
-    //     contentPanel.revalidate();
-    //     contentPanel.repaint();
-    // }
+    public void showAllOrders() {
+    JFrame frame = new JFrame("View Orders");
+    frame.setSize(800, 600);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    frame.setLayout(new BorderLayout());
+
+    String[] columnNames = {"ID Transaksi", "Email", "Nama Makanan", "Nama Minuman", "Tipe Item", "Ukuran", "Jumlah", "Total Harga", "Waktu Transaksi", "Promo", "Selesai"};
+
+    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    controller.showAllOrders(tableModel);
+
+    JTable table = new JTable(tableModel);
+    JScrollPane scrollPane = new JScrollPane(table);
+
+    frame.add(scrollPane, BorderLayout.CENTER);
+
+    // Tambahkan Checkbox pada kolom "Selesai"
+    table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+
+    // Menangani update status saat checkbox diubah
+    table.getModel().addTableModelListener(e -> {
+        if (e.getColumn() == 10) {  // Jika kolom "Selesai" diubah
+            int selectedRow = table.getSelectedRow();
+            int idTransaksi = (int) table.getValueAt(selectedRow, 0);
+            boolean status = (boolean) table.getValueAt(selectedRow, 10);
+            controller.updateOrderStatus(idTransaksi, status);
+        }
+    });
+
+    JButton backButton = new JButton("Back");
+    backButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+    backButton.setBackground(new Color(44, 62, 80));
+    backButton.setForeground(Color.WHITE);
+    backButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // Close the View Orders window
+        }
+    });
+
+    frame.add(backButton, BorderLayout.SOUTH);
+
+    frame.setVisible(true);
+}
+
     
 
 
