@@ -44,7 +44,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "Menu 5", "Menu 6", "Menu 7","Menu 8"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "Menu 6", "Menu 7","Menu 8"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -79,7 +79,6 @@ public class AdminView {
         adminFrame.setVisible(true);
     }
 
-    
     private class MenuButtonListener implements ActionListener {
         private final String menuName;
 
@@ -102,6 +101,9 @@ public class AdminView {
                 case "Status Toko":
                     statusToko();
                     break;
+                case "View Order":
+                    showAllOrders();  // Menampilkan data view order
+                    break;
                 default:
                     contentPanel.removeAll();
                     contentPanel.add(new JLabel(menuName + " content goes here.", JLabel.CENTER));
@@ -111,6 +113,8 @@ public class AdminView {
             }
         }
     }
+
+
 
 
 
@@ -681,6 +685,36 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
         adminFrame.setContentPane(contentPanel);
         adminFrame.setVisible(true);
     }
+    
+    // MENU 5
+    public void showAllOrders() {
+        String[] columnNames = {"ID", "Nama Item", "Ukuran", "Jumlah", "Harga Per Item", "Total Harga", "Waktu Transaksi", "Selesai"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable ordersTable = new JTable(tableModel);
+    
+        // Mengambil data dari controller
+        controller.viewOrders(tableModel);  // Menampilkan data pesanan
+    
+        // Membuat checkbox kolom "Selesai"
+        ordersTable.getColumnModel().getColumn(7).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+    
+        // Menangani update status saat checkbox diubah
+        ordersTable.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 7) {  // Jika kolom "Selesai" diubah
+                int selectedRow = ordersTable.getSelectedRow();
+                int idTransaksi = (int) ordersTable.getValueAt(selectedRow, 0);
+                boolean status = (boolean) ordersTable.getValueAt(selectedRow, 7);
+                controller.updateOrderStatus(idTransaksi, status);
+            }
+        });
+    
+        // Menambahkan ordersTable ke contentPanel
+        contentPanel.removeAll();
+        contentPanel.add(new JScrollPane(ordersTable), BorderLayout.CENTER);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+    
     
 
 
