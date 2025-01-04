@@ -324,16 +324,14 @@ checkoutButton.addActionListener(e -> {
                     totalPrice += Double.parseDouble(itemParts[1]);
                     orderSummary.append(cartItem).append("\n");
 
-                    // Parse item details
                     String[] details = itemParts[0].split(" x");
                     String itemName = details[0].trim();
                     int quantity = Integer.parseInt(details[1].trim());
                     double pricePerItem = Double.parseDouble(itemParts[1]) / quantity;
 
-                    String itemType = itemName.contains(" ") ? "Minuman" : "Makanan"; // Check if it's food or drink
+                    String itemType = itemName.contains(" ") ? "Minuman" : "Makanan";
                     String size = itemType.equals("Minuman") ? itemName.split(" ")[1].trim() : null;
 
-                    // Insert into transaksi table
                     String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement ps = connection.prepareStatement(query)) {
                         ps.setInt(1, userId);

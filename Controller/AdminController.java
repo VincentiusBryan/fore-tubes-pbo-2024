@@ -15,7 +15,7 @@ public class AdminController {
         dbConnection = new DBConnection();
     }
 
-        //MENU 1 
+    //MENU 1 
     public void updateTable(DefaultTableModel tableModel, String userType) {
         
         tableModel.setRowCount(0);
@@ -48,8 +48,7 @@ public class AdminController {
 
 
 
-    //Menu 2
-
+    // MENU 2
     public void deleteItemFromDatabase(String table, String name) {
         String deleteQuery = "DELETE FROM " + table + " WHERE name = ?";
         try (Connection conn = dbConnection.connect();
@@ -136,6 +135,7 @@ public class AdminController {
     public void promo(){
         
     }
+    
 
     //MENU 6
     public void updateStatusToko(int status) {
