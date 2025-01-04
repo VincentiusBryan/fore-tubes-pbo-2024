@@ -44,7 +44,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "Menu 5", "Menu 6", "Menu 7","Menu 8"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "Show Transaction", "Menu 6", "Menu 7","Menu 8"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -101,6 +101,9 @@ public class AdminView {
                     break;
                 case "Status Toko":
                     statusToko();
+                    break;
+                case "Show Transaction":
+                    showAllTransactions();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -682,6 +685,62 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
         adminFrame.setVisible(true);
     }
     
+
+
+
+
+
+
+    private void showAllTransactions() {
+        contentPanel.removeAll();
+    
+        // Membuat panel utama
+        JPanel transactionPanel = new JPanel();
+        transactionPanel.setLayout(new BorderLayout());
+    
+        // Label judul
+        JLabel titleLabel = new JLabel("All Transactions", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        transactionPanel.add(titleLabel, BorderLayout.NORTH);
+    
+        // Panel untuk tombol filter
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton foodButton = new JButton("Makanan");
+        JButton drinkButton = new JButton("Minuman");
+    
+        buttonPanel.add(foodButton);
+        buttonPanel.add(drinkButton);
+        transactionPanel.add(buttonPanel, BorderLayout.NORTH);
+    
+        // Panel untuk tabel
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"ID", "Nama Item", "Tipe Item", "Ukuran", "Jumlah", "Harga per Item", "Total Harga", "Tanggal Transaksi", "ID User"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable transactionTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(transactionTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+    
+        // Tambahkan tablePanel ke transactionPanel
+        transactionPanel.add(tablePanel, BorderLayout.CENTER);
+    
+        // Tambahkan transactionPanel ke contentPanel
+        contentPanel.add(transactionPanel, BorderLayout.CENTER);
+    
+        // Event Listener untuk tombol
+        foodButton.addActionListener(e -> updateTransactionTable(tableModel, "Makanan"));
+        drinkButton.addActionListener(e -> updateTransactionTable(tableModel, "Minuman"));
+    
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+    
+    // Method untuk mengupdate tabel transaksi berdasarkan tipe item
+    private void updateTransactionTable(DefaultTableModel tableModel, String itemType) {
+        AdminController controller = new AdminController();
+        controller.updateTransactionTable(tableModel,itemType);
+    }
+
+
 
 
 public static void main(String[] args) {

@@ -129,6 +129,34 @@ public class AdminController {
     }
 
 
+    public void updateTransactionTable(DefaultTableModel tableModel, String itemType) {
+        tableModel.setRowCount(0);
+
+        String query = "SELECT * FROM transaksi WHERE tipe_item = ?";
+        try (Connection connection = dbConnection.connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, itemType);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id_transaksi");
+                String namaItem = resultSet.getString("nama_item");
+                String tipeItem = resultSet.getString("tipe_item");
+                String ukuran = resultSet.getString("ukuran");
+                int jumlah = resultSet.getInt("jumlah");
+                double hargaPerItem = resultSet.getDouble("harga_per_item");
+                double totalHarga = resultSet.getDouble("total_harga");
+                String tanggalTransaksi = resultSet.getString("tanggal_transaksi");
+                int idUser = resultSet.getInt("id_user");
+
+                tableModel.addRow(new Object[]{id, namaItem, tipeItem, ukuran, jumlah, hargaPerItem, totalHarga, tanggalTransaksi, idUser});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     //MENU 3
@@ -151,4 +179,14 @@ public class AdminController {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+
+
+    
 }
