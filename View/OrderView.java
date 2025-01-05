@@ -294,13 +294,13 @@ public class OrderView {
             String selectedBeverage = (String) beverageCombo.getSelectedItem();
             String selectedFood = (String) foodCombo.getSelectedItem();
 
-            if (selectedBeverage != null && !"None".equals(selectedBeverage)) {
+            if (selectedBeverage != null && !"None".equals(selectedBeverage)) { // cek apakah minumannya none/tidak
                 String selectedSize = (String) sizeCombo.getSelectedItem();
-                if (beveragePrices.containsKey(selectedBeverage)) {
-                    Map<String, Double> size = beveragePrices.get(selectedBeverage);
+                if (beveragePrices.containsKey(selectedBeverage)) {  // cek apakah beverage yang dipilih ada di beveragePrice
+                    Map<String, Double> size = beveragePrices.get(selectedBeverage); // mendapatkan daftar harga minuman berdasarkan ukuran
                     if (size.containsKey(selectedSize)) {
                         double price = size.get(selectedSize) * beverageQuantity;
-                        cartModel.addElement(
+                        cartModel.addElement( // add to cart
                                 selectedBeverage + " " + selectedSize + " x" + beverageQuantity + " - Rp" + price);
                     }
                 }
@@ -321,25 +321,25 @@ public class OrderView {
         // TRANSAKSI
         checkoutButton.addActionListener(e -> {
             totalPrice = 0;
-            StringBuilder orderSummary = new StringBuilder();
+            StringBuilder orderSummary = new StringBuilder(); 
             Connection connection = dbConnection.connect();
 
             if (connection != null) {
                 try {
-                    int userId = SessionManager.getLoggedInUserId();
-                    if (userId == -1) {
+                    int userId = SessionManager.getLoggedInUserId(); // get id user yang login dari SessionManager
+                    if (userId == -1) { // jika user belum login, kasih message error
                         JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
-                    for (int i = 0; i < cartModel.size(); i++) {
-                        String cartItem = cartModel.get(i);
-                        String[] itemParts = cartItem.split(" - Rp");
+                    for (int i = 0; i < cartModel.size(); i++) { // iterasi setiap item di keranjang
+                        String cartItem = cartModel.get(i); // get string item dari keranjang
+                        String[] itemParts = cartItem.split(" - Rp"); // misahin nama item dan harga
                         if (itemParts.length > 1) {
-                            double itemPrice = Double.parseDouble(itemParts[1]);
-                            totalPrice += itemPrice;
-                            orderSummary.append(cartItem).append("\n");
+                            double itemPrice = Double.parseDouble(itemParts[1]); // get harga item
+                            totalPrice += itemPrice; // add harga ke harga total
+                            orderSummary.append(cartItem).append("\n"); // nambahin item ke orderSummary
 
                             String[] details = itemParts[0].split(" x");
                             String itemName = details[0].trim();
@@ -349,6 +349,7 @@ public class OrderView {
                             String itemType;
                             String size = null;
 
+                            // jika itemName mengandung "medium" atau "large", maka itemType = minuman
                             if (itemName.contains("Medium") || itemName.contains("Large")) {
                                 itemType = "Minuman";
                                 if (itemName.contains("Medium")) {
@@ -356,8 +357,8 @@ public class OrderView {
                                 } else if (itemName.contains("Large")) {
                                     size = "Large";
                                 }
-                            } else {
-                                itemType = "Makanan";
+                            } else { // else itemType = makanan
+                                itemType = "Makanan"; 
                             }
 
                             // Updated query to include harga_sebelum_promo
@@ -370,9 +371,8 @@ public class OrderView {
                                 ps.setInt(5, quantity);
                                 ps.setDouble(6, pricePerItem);
                                 ps.setDouble(7, itemPrice);
-                                ps.setDouble(8, itemPrice); // Initial price before promo
-                                ps.setDouble(9, itemPrice); // Initial price after promo (will be updated when promo is
-                                                            // applied)
+                                ps.setDouble(8, itemPrice); 
+                                ps.setDouble(9, itemPrice);
                                 ps.executeUpdate();
                             }
                         }
@@ -381,10 +381,10 @@ public class OrderView {
                     orderSummary.append("Total: Rp").append(totalPrice);
                     JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
 
-                    new PaymentView(orderSummary.toString(), totalPrice);
+                    new PaymentView(orderSummary.toString(), totalPrice); // open paymentView dengan pesanan yang udah dibuat dan total harganya
                     orderFrame.dispose();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    ex.printStackTrace(); // buat nangkep dan print error
                 } finally {
                     dbConnection.closeConnection(connection);
                 }
