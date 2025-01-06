@@ -67,16 +67,22 @@ public class AdminView {
                 new MainMenu(); // Show the MainMenu again
             }
         });
+
+
+        
     
         // Add back button to the content panel
         contentPanel.add(backButton, BorderLayout.SOUTH);
     
+
+        
         // Add panels to the frame
         adminFrame.add(menuPanel, BorderLayout.NORTH);
         adminFrame.add(contentPanel, BorderLayout.CENTER);
     
         // Set frame visibility
         adminFrame.setVisible(true);
+
     }
 
     private class MenuButtonListener implements ActionListener {
