@@ -686,49 +686,34 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
         adminFrame.setVisible(true);
     }
     
-    // // MENU 5
-    public void showAllOrders() {
-    JFrame frame = new JFrame("View Orders");
-    frame.setSize(800, 600);
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    frame.setLayout(new BorderLayout());
-
-    String[] columnNames = {"ID Transaksi", "Email", "Nama Makanan", "Nama Minuman", "Tipe Item", "Ukuran", "Jumlah", "Total Harga", "Waktu Transaksi", "Promo", "Selesai"};
-
-    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-    controller.showAllOrders(tableModel);
-
-    JTable table = new JTable(tableModel);
-    JScrollPane scrollPane = new JScrollPane(table);
-
-    frame.add(scrollPane, BorderLayout.CENTER);
-
-    table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
-
-    table.getModel().addTableModelListener(e -> {
-        if (e.getColumn() == 10) {
-            int selectedRow = table.getSelectedRow();
-            int idTransaksi = (int) table.getValueAt(selectedRow, 0);
-            boolean status = (boolean) table.getValueAt(selectedRow, 10);
-            controller.updateOrderStatus(idTransaksi, status);
-        }
-    });
-
-    JButton backButton = new JButton("Back");
-    backButton.setFont(new Font("SansSerif", Font.BOLD, 16));
-    backButton.setBackground(new Color(44, 62, 80));
-    backButton.setForeground(Color.WHITE);
-    backButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            frame.dispose(); // Close the View Orders window
-        }
-    });
-
-    frame.add(backButton, BorderLayout.SOUTH);
-
-    frame.setVisible(true);
-}
+    // MENU 5
+    private void showAllOrders() {
+        contentPanel.removeAll();
+        JPanel ordersPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("View Orders", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        ordersPanel.add(titleLabel, BorderLayout.NORTH);
+        String[] columnNames = {"ID Transaksi", "Email", "Nama Makanan", "Nama Minuman", 
+                              "Tipe Item", "Ukuran", "Jumlah", "Total Harga", 
+                              "Waktu Transaksi", "Promo", "Selesai"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        controller.showAllOrders(tableModel);
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        table.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 10) {
+                int selectedRow = table.getSelectedRow();
+                int idTransaksi = (int) table.getValueAt(selectedRow, 0);
+                boolean status = (boolean) table.getValueAt(selectedRow, 10);
+                controller.updateOrderStatus(idTransaksi, status);
+            }
+        });
+        ordersPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(ordersPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
 
     
 
