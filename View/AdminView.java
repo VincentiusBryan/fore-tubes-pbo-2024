@@ -385,7 +385,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
         // Retrieve promo data from the database
         String promoQuery = "SELECT * FROM promos";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(promoQuery);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -520,7 +520,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
     private void deletePromoFromDatabase(String promoName) {
         String deleteQuery = "DELETE FROM promos WHERE promo_name = ?";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
     
             // Set parameters
@@ -546,7 +546,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
     
 private void updatePromoInDatabase(String oldName, String newName, String newDescription, double newDiscount, String newStartDate, String newEndDate, boolean isActive) {
     String updateQuery = "UPDATE promos SET promo_name = ?, description = ?, discount_percentage = ?, start_date = ?, end_date = ?, is_active = ? WHERE promo_name = ?";
-    try (Connection conn = new DBConnection().connect();
+    try (Connection conn = DBConnection.getInstance().getConnection();
          PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
 
         // Nonaktifkan autoCommit
@@ -585,7 +585,7 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
     // Add promo to database
     private void addPromoToDatabase(String promoName, String description, double discount, String startDate, String endDate, boolean isActive) {
         String insertQuery = "INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
     
             // Set parameters
