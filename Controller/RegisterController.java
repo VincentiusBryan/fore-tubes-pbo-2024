@@ -6,15 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class RegisterController {
-
     private DBConnection dbConnection;
 
     public RegisterController() {
-        dbConnection = new DBConnection();
+        dbConnection = DBConnection.getInstance();
     }
 
     public boolean registerUser(String email, String password, String phone) {
-        Connection connection = dbConnection.connect();
+        Connection connection = dbConnection.getConnection();
         
         if (connection != null) {
             try {
@@ -28,19 +27,17 @@ public class RegisterController {
                 int rowsInserted = statement.executeUpdate();
                 if (rowsInserted > 0) {
                     System.out.println("User registered successfully.");
-                    return true; // Registrasi berhasil
+                    return true;
                 } else {
                     System.out.println("Failed to insert data into database.");
                 }
             } catch (SQLException e) {
                 System.out.println("Error occurred during registration.");
                 e.printStackTrace();
-            } finally {
-                dbConnection.closeConnection(connection);
             }
         } else {
             System.out.println("Database connection failed.");
         }
-        return false; // Jika gagal
+        return false;
     }
 }

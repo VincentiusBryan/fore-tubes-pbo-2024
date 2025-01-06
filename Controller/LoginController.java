@@ -7,18 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LoginController {
-
     private DBConnection dbConnection;
 
     public LoginController() {
-        dbConnection = new DBConnection();
+        dbConnection = DBConnection.getInstance();
     }
 
-
-
-
     public boolean loginUser(String email, String password) {
-        Connection connection = dbConnection.connect();
+        Connection connection = dbConnection.getConnection();
     
         if (connection != null) {
             try {
@@ -31,28 +27,22 @@ public class LoginController {
     
                 if (resultSet.next()) {
                     int userId = resultSet.getInt("id_user");
-                    SessionManager.setLoggedInUserId(userId); // Simpan user ID ke session
+                    SessionManager.setLoggedInUserId(userId);
                     return true;
                 }
     
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                dbConnection.closeConnection(connection);
             }
         }
-    
         return false;
     }
-    
 
-
-    
     public boolean isAdmin(String email) {
-    
-            Connection connection = dbConnection.connect();
-            boolean isAdmin = false;
-    
+        Connection connection = dbConnection.getConnection();
+        boolean isAdmin = false;
+
+        if (connection != null) {
             String query = "SELECT user_type FROM users WHERE email = ?";
             
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -65,17 +55,8 @@ public class LoginController {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (connection != null) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
-    
-            return isAdmin;
         }
+        return isAdmin;
+    }
 }
-
