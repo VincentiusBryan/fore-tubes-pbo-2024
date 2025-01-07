@@ -388,7 +388,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
         // Retrieve promo data from the database
         String promoQuery = "SELECT * FROM promos";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(promoQuery);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -417,19 +417,18 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         JLabel promoLabel = new JLabel("PROMOS", JLabel.CENTER);
         promoLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-      // Create Delete button
-      JButton deleteButton = new JButton("Delete");
-      deleteButton.addActionListener(e -> {
-          // Get the selected row
-          int selectedRow = promoTable.getSelectedRow();
-          if (selectedRow != -1) {
-              // Remove the selected row from the model and database
-              String promoName = (String) promoTable.getValueAt(selectedRow, 0);
-              controller.deletePromoFromDatabase(promoName);
-              promoModel.removeRow(selectedRow);
-          }
-      });
-
+        // Create Delete button
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            // Get the selected row
+            int selectedRow = promoTable.getSelectedRow();
+            if (selectedRow != -1) {
+                // Remove the selected row from the model and database
+                String promoName = (String) promoTable.getValueAt(selectedRow, 0);
+                deletePromoFromDatabase(promoName);
+                promoModel.removeRow(selectedRow);
+            }
+        });
 
         // Create Edit button
         JButton editButton = new JButton("Edit");
@@ -455,7 +454,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
                 if (newPromoName != null && newDescription != null && newDiscountStr != null && newStartDate != null && newEndDate != null) {
                     // Update database and table model
-                    controller.updatePromoInDatabase(
+                    updatePromoInDatabase(
                             promoName,
                             newPromoName,
                             newDescription,
@@ -487,7 +486,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
             if (promoName != null && description != null && discountStr != null && startDate != null && endDate != null) {
                 // Add promo to database and update table model
-                controller.addPromoToDatabase(
+                addPromoToDatabase(
                         promoName,
                         description,
                         Double.parseDouble(discountStr),
@@ -522,7 +521,101 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         contentPanel.repaint();
     }
 
-  
+    private void deletePromoFromDatabase(String promoName) {
+        String deleteQuery = "DELETE FROM promos WHERE promo_name = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+    
+            // Execute delete
+            int rowsDeleted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsDeleted > 0) {
+                System.out.println("Promo deleted successfully: " + promoName);
+            } else {
+                System.err.println("Failed to delete promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+private void updatePromoInDatabase(String oldName, String newName, String newDescription, double newDiscount, String newStartDate, String newEndDate, boolean isActive) {
+    String updateQuery = "UPDATE promos SET promo_name = ?, description = ?, discount_percentage = ?, start_date = ?, end_date = ?, is_active = ? WHERE promo_name = ?";
+    try (Connection conn = DBConnection.getInstance().getConnection();
+         PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+
+        // Nonaktifkan autoCommit
+        conn.setAutoCommit(false);
+
+        // Set parameters
+        stmt.setString(1, newName);
+        stmt.setString(2, newDescription);
+        stmt.setDouble(3, newDiscount);
+        stmt.setString(4, newStartDate);
+        stmt.setString(5, newEndDate);
+        stmt.setBoolean(6, isActive);
+        stmt.setString(7, oldName);
+
+        // Execute update
+        int rowsUpdated = stmt.executeUpdate();
+
+        // Commit changes
+        if (rowsUpdated > 0) {
+            conn.commit();
+            System.out.println("Promo updated successfully: " + oldName + " -> " + newName);
+        } else {
+            System.err.println("Failed to update promo: " + oldName);
+        }
+
+        // Aktifkan kembali autoCommit
+        conn.setAutoCommit(true);
+    } catch (SQLException e) {
+        System.err.println("Error updating promo: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+    
+
+    // Add promo to database
+    private void addPromoToDatabase(String promoName, String description, double discount, String startDate, String endDate, boolean isActive) {
+        String insertQuery = "INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+            stmt.setString(2, description);
+            stmt.setDouble(3, discount);
+            stmt.setString(4, startDate);
+            stmt.setString(5, endDate);
+            stmt.setBoolean(6, isActive);
+    
+            // Execute update
+            int rowsInserted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsInserted > 0) {
+                System.out.println("Promo added successfully: " + promoName);
+            } else {
+                System.err.println("Failed to add promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error inserting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     
 
 
@@ -540,55 +633,55 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
     
     private void statusToko() {
-        // Clear existing content
-        contentPanel.removeAll();
-        
-        // Create main panel for status toko
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BorderLayout());
-        statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // Create and style the status label
-        JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
-        statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        statusPanel.add(statusLabel, BorderLayout.CENTER);
-        
-        // Create button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        
-        // Create and style the open button
-        JButton openButton = new JButton("Buka Toko");
-        openButton.setPreferredSize(new Dimension(120, 40));
-        openButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        openButton.addActionListener(e -> {
-            controller.updateStatusToko(1);
-            statusLabel.setText("Status Toko: Buka");
-        });
-        
-        // Create and style the close button
-        JButton closeButton = new JButton("Tutup Toko");
-        closeButton.setPreferredSize(new Dimension(120, 40));
-        closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        closeButton.addActionListener(e -> {
-            controller.updateStatusToko(0);
-            statusLabel.setText("Status Toko: Tutup");
-        });
-        
-        // Add buttons to button panel
-        buttonPanel.add(openButton);
-        buttonPanel.add(closeButton);
-        
-        // Add button panel to status panel
-        statusPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        // Add status panel to content panel
-        contentPanel.add(statusPanel, BorderLayout.CENTER);
-        
-        // Refresh the display
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
+    // Clear existing content
+    contentPanel.removeAll();
+    
+    // Create main panel for status toko
+    JPanel statusPanel = new JPanel();
+    statusPanel.setLayout(new BorderLayout());
+    statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    
+    // Create and style the status label
+    JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
+    statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    statusPanel.add(statusLabel, BorderLayout.CENTER);
+    
+    // Create button panel
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    
+    // Create and style the open button
+    JButton openButton = new JButton("Buka Toko");
+    openButton.setPreferredSize(new Dimension(120, 40));
+    openButton.setFont(new Font("Arial", Font.PLAIN, 14));
+    openButton.addActionListener(e -> {
+        controller.updateStatusToko(1);
+        statusLabel.setText("Status Toko: Buka");
+    });
+    
+    // Create and style the close button
+    JButton closeButton = new JButton("Tutup Toko");
+    closeButton.setPreferredSize(new Dimension(120, 40));
+    closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
+    closeButton.addActionListener(e -> {
+        controller.updateStatusToko(0);
+        statusLabel.setText("Status Toko: Tutup");
+    });
+    
+    // Add buttons to button panel
+    buttonPanel.add(openButton);
+    buttonPanel.add(closeButton);
+    
+    // Add button panel to status panel
+    statusPanel.add(buttonPanel, BorderLayout.SOUTH);
+    
+    // Add status panel to content panel
+    contentPanel.add(statusPanel, BorderLayout.CENTER);
+    
+    // Refresh the display
+    contentPanel.revalidate();
+    contentPanel.repaint();
+}
     
     // MENU 5
     private void showAllOrders() {
@@ -626,44 +719,33 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     public void showAllKaryawan(){
+
         contentPanel.removeAll();
-JPanel karyawanPanel = new JPanel(new BorderLayout());
-JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
-titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-karyawanPanel.add(titleLabel, BorderLayout.NORTH);
+        JPanel karyawanPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        karyawanPanel.add(titleLabel, BorderLayout.NORTH);
+        
+        // Definisikan kolom tabel
+        String[] columnNames = {"ID", "Nama", "Peran", "Jam Kerja", "Gaji"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        
+        // Ambil data karyawan dari controller
+        controller.showAllKaryawan(tableModel);
+        
+        // Tampilkan tabel
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        karyawanPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Tambahkan panel ke contentPanel
+        contentPanel.add(karyawanPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        
 
-// Definisikan kolom tabel
-String[] columnNames = {"ID", "Nama", "Peran", "Jam Kerja", "Gaji"};
-DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-
-// Ambil data karyawan dari controller
-controller.showAllKaryawan(tableModel);
-
-// Tampilkan tabel
-JTable table = new JTable(tableModel);
-JScrollPane scrollPane = new JScrollPane(table);
-karyawanPanel.add(scrollPane, BorderLayout.CENTER);
-
-// Tambahkan panel ke contentPanel
-contentPanel.add(karyawanPanel);
-contentPanel.revalidate();
-contentPanel.repaint();
-
-
-JPanel actionPanel = new JPanel(new FlowLayout());
+        JPanel actionPanel = new JPanel(new FlowLayout());
 
 JButton addButton = new JButton("Add");
 addButton.addActionListener(e -> {
@@ -711,7 +793,6 @@ actionPanel.add(addButton);
 actionPanel.add(editButton);
 actionPanel.add(deleteButton);
 contentPanel.add(actionPanel, BorderLayout.SOUTH);
-
 
     }
     

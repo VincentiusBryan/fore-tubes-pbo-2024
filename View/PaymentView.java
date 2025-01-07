@@ -79,8 +79,8 @@ public class PaymentView {
 
     private void loadPromos(JPanel promoPanel) {
         // Koneksi ke database
-        DBConnection dbConnection = new DBConnection();
-        Connection connection = dbConnection.connect();
+        DBConnection dbConnection = DBConnection.getInstance();
+        Connection connection = dbConnection.getConnection();
 
         String query = "SELECT id_promo, promo_name, description, discount_percentage, start_date, end_date FROM promos WHERE is_active = 1";
 
@@ -111,8 +111,6 @@ public class PaymentView {
             JOptionPane.showMessageDialog(null, "Failed to load promotions: " + e.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-        } finally {
-            dbConnection.closeConnection(connection);
         }
     }
 
@@ -185,8 +183,8 @@ public class PaymentView {
     }
 
     private void updateTransactionWithPromo(int promoId) {
-        DBConnection dbConnection = new DBConnection();
-        Connection connection = dbConnection.connect();
+        DBConnection dbConnection = DBConnection.getInstance();
+        Connection connection = dbConnection.getConnection();
 
         if (connection != null) {
             try {
@@ -222,8 +220,6 @@ public class PaymentView {
                         "Failed to update transaction with promo: " + e.getMessage(),
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
-            } finally {
-                dbConnection.closeConnection(connection);
             }
         }
     }

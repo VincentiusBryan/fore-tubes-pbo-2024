@@ -31,14 +31,14 @@ public class OrderView {
             return;
         }
 
-        dbConnection = new DBConnection();
+        dbConnection = DBConnection.getInstance();
         cartModel = new DefaultListModel<>();
         initializePrices();
         showOrderMenu();
     }
 
     private void initializePrices() {
-        Connection connection = dbConnection.connect();
+        Connection connection = dbConnection.getConnection();
         if (connection != null) {
             try {
                 // Ngambil harga beverages dari database
@@ -67,8 +67,6 @@ public class OrderView {
                 statement.close();
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                dbConnection.closeConnection(connection);
             }
         }
     }
@@ -322,7 +320,7 @@ public class OrderView {
         checkoutButton.addActionListener(e -> {
             totalPrice = 0;
             StringBuilder orderSummary = new StringBuilder(); 
-            Connection connection = dbConnection.connect();
+            Connection connection = dbConnection.getConnection();
 
             if (connection != null) {
                 try {
@@ -385,8 +383,6 @@ public class OrderView {
                     orderFrame.dispose();
                 } catch (Exception ex) {
                     ex.printStackTrace(); // buat nangkep dan print error
-                } finally {
-                    dbConnection.closeConnection(connection);
                 }
             }
         });
