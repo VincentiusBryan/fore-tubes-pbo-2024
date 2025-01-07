@@ -44,7 +44,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "Show Transaction", "Menu 6", "Menu 7","Menu 8"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Menu 7","Menu 8"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -79,7 +79,6 @@ public class AdminView {
         adminFrame.setVisible(true);
     }
 
-    
     private class MenuButtonListener implements ActionListener {
         private final String menuName;
 
@@ -102,8 +101,11 @@ public class AdminView {
                 case "Status Toko":
                     statusToko();
                     break;
-                case "Show Transaction":
-                    showAllTransactions();
+                case "View Order":
+                    showAllOrders();
+                    break;
+                case "View Karyawan":
+                    showAllKaryawan();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -117,9 +119,11 @@ public class AdminView {
 
 
 
+
+
     // SHOW ALL CUSTOMER
 
-    
+
 
     private void showAllCustomer() {
         contentPanel.removeAll();
@@ -629,118 +633,181 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
 
     
     private void statusToko() {
-        // Frame admin untuk menunjukkan status toko
-        adminFrame = new JFrame("Admin View");
-        adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        adminFrame.setSize(400, 200);
-        adminFrame.setLocationRelativeTo(null);
-    
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
-    
-        // Label untuk menunjukkan status
+        // Clear existing content
+        contentPanel.removeAll();
+        
+        // Create main panel for status toko
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Create and style the status label
         JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
-        contentPanel.add(statusLabel, BorderLayout.CENTER);
-    
-        // Tombol Buka
-        JButton openButton = new JButton("Buka Toko");
-        openButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Ubah status toko menjadi buka
-                controller.updateStatusToko(1);
-                statusLabel.setText("Status Toko: Buka");
-            }
-        });
-    
-        // Tombol Tutup
-        JButton closeButton = new JButton("Tutup Toko");
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Ubah status toko menjadi tutup
-                controller.updateStatusToko(0);
-                statusLabel.setText("Status Toko: Tutup");
-            }
-        });
-    
-        // Tombol Back
-        JButton backButton = new JButton("Back");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminFrame.dispose(); // Menutup window saat ini
-            }
-        });
-    
-        // Panel untuk menampung tombol
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        statusPanel.add(statusLabel, BorderLayout.CENTER);
+        
+        // Create button panel
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        
+        // Create and style the open button
+        JButton openButton = new JButton("Buka Toko");
+        openButton.setPreferredSize(new Dimension(120, 40));
+        openButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        openButton.addActionListener(e -> {
+            controller.updateStatusToko(1);
+            statusLabel.setText("Status Toko: Buka");
+        });
+        
+        // Create and style the close button
+        JButton closeButton = new JButton("Tutup Toko");
+        closeButton.setPreferredSize(new Dimension(120, 40));
+        closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        closeButton.addActionListener(e -> {
+            controller.updateStatusToko(0);
+            statusLabel.setText("Status Toko: Tutup");
+        });
+        
+        // Add buttons to button panel
         buttonPanel.add(openButton);
         buttonPanel.add(closeButton);
-        buttonPanel.add(backButton); // Tambahkan tombol Back ke panel
-    
-        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-    
-        adminFrame.setContentPane(contentPanel);
-        adminFrame.setVisible(true);
-    }
-    
-
-
-
-
-
-
-    private void showAllTransactions() {
-        contentPanel.removeAll();
-    
-        // Membuat panel utama
-        JPanel transactionPanel = new JPanel();
-        transactionPanel.setLayout(new BorderLayout());
-    
-        // Label judul
-        JLabel titleLabel = new JLabel("All Transactions", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        transactionPanel.add(titleLabel, BorderLayout.NORTH);
-    
-        // Panel untuk tombol filter
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton foodButton = new JButton("Makanan");
-        JButton drinkButton = new JButton("Minuman");
-    
-        buttonPanel.add(foodButton);
-        buttonPanel.add(drinkButton);
-        transactionPanel.add(buttonPanel, BorderLayout.NORTH);
-    
-        // Panel untuk tabel
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Nama Item", "Tipe Item", "Ukuran", "Jumlah", "Harga per Item", "Total Harga", "Tanggal Transaksi", "ID User"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable transactionTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(transactionTable);
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-    
-        // Tambahkan tablePanel ke transactionPanel
-        transactionPanel.add(tablePanel, BorderLayout.CENTER);
-    
-        // Tambahkan transactionPanel ke contentPanel
-        contentPanel.add(transactionPanel, BorderLayout.CENTER);
-    
-        // Event Listener untuk tombol
-        foodButton.addActionListener(e -> updateTransactionTable(tableModel, "Makanan"));
-        drinkButton.addActionListener(e -> updateTransactionTable(tableModel, "Minuman"));
-    
+        
+        // Add button panel to status panel
+        statusPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        // Add status panel to content panel
+        contentPanel.add(statusPanel, BorderLayout.CENTER);
+        
+        // Refresh the display
         contentPanel.revalidate();
         contentPanel.repaint();
     }
     
-    // Method untuk mengupdate tabel transaksi berdasarkan tipe item
-    private void updateTransactionTable(DefaultTableModel tableModel, String itemType) {
-        AdminController controller = new AdminController();
-        controller.updateTransactionTable(tableModel,itemType);
+    // MENU 5
+    private void showAllOrders() {
+        contentPanel.removeAll();
+        JPanel ordersPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("View Orders", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        ordersPanel.add(titleLabel, BorderLayout.NORTH);
+        String[] columnNames = {"ID Transaksi", "Email", "Nama Makanan", "Nama Minuman", 
+                              "Tipe Item", "Ukuran", "Jumlah", "Total Harga", 
+                              "Waktu Transaksi", "Promo", "Selesai"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        controller.showAllOrders(tableModel);
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        table.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 10) {
+                int selectedRow = table.getSelectedRow();
+                int idTransaksi = (int) table.getValueAt(selectedRow, 0);
+                boolean status = (boolean) table.getValueAt(selectedRow, 10);
+                controller.updateOrderStatus(idTransaksi, status);
+            }
+        });
+        ordersPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(ordersPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void showAllKaryawan(){
+        contentPanel.removeAll();
+JPanel karyawanPanel = new JPanel(new BorderLayout());
+JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
+titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+karyawanPanel.add(titleLabel, BorderLayout.NORTH);
+
+// Definisikan kolom tabel
+String[] columnNames = {"ID", "Nama", "Peran", "Jam Kerja", "Gaji"};
+DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+
+// Ambil data karyawan dari controller
+controller.showAllKaryawan(tableModel);
+
+// Tampilkan tabel
+JTable table = new JTable(tableModel);
+JScrollPane scrollPane = new JScrollPane(table);
+karyawanPanel.add(scrollPane, BorderLayout.CENTER);
+
+// Tambahkan panel ke contentPanel
+contentPanel.add(karyawanPanel);
+contentPanel.revalidate();
+contentPanel.repaint();
+
+
+JPanel actionPanel = new JPanel(new FlowLayout());
+
+JButton addButton = new JButton("Add");
+addButton.addActionListener(e -> {
+    String nama = JOptionPane.showInputDialog("Masukkan Nama:");
+    String peran = JOptionPane.showInputDialog("Masukkan Peran:");
+    String jamKerja = JOptionPane.showInputDialog("Masukkan Jam Kerja (contoh: Senin–Jumat 09:00–17:00):");
+    double gaji = Double.parseDouble(JOptionPane.showInputDialog("Masukkan Gaji:"));
+    controller.addKaryawan(nama, peran, jamKerja, gaji);
+    controller.showAllKaryawan(tableModel); // Refresh tabel
+});
+
+JButton editButton = new JButton("Edit");
+editButton.addActionListener(e -> {
+    int selectedRow = table.getSelectedRow();
+    if (selectedRow >= 0) {
+        int id = (int) table.getValueAt(selectedRow, 0);
+        String nama = JOptionPane.showInputDialog("Edit Nama:", table.getValueAt(selectedRow, 1));
+        String peran = JOptionPane.showInputDialog("Edit Peran:", table.getValueAt(selectedRow, 2));
+        String jamKerja = JOptionPane.showInputDialog("Edit Jam Kerja:", table.getValueAt(selectedRow, 3));
+        double gaji = Double.parseDouble(JOptionPane.showInputDialog("Edit Gaji:", table.getValueAt(selectedRow, 4)));
+        controller.editKaryawan(id, nama, peran, jamKerja, gaji);
+        controller.showAllKaryawan(tableModel); // Refresh tabel
+    } else {
+        JOptionPane.showMessageDialog(null, "Pilih baris untuk diedit.");
+    }
+});
+
+JButton deleteButton = new JButton("Delete");
+deleteButton.addActionListener(e -> {
+    int selectedRow = table.getSelectedRow();
+    if (selectedRow >= 0) {
+        int id = (int) table.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(null, "Yakin ingin menghapus karyawan?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            controller.deleteKaryawan(id);
+            controller.showAllKaryawan(tableModel); // Refresh tabel
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Pilih baris untuk dihapus.");
+    }
+});
+
+// Tambahkan tombol ke panel
+actionPanel.add(addButton);
+actionPanel.add(editButton);
+actionPanel.add(deleteButton);
+contentPanel.add(actionPanel, BorderLayout.SOUTH);
+
+
+    }
+    
 
 
 public static void main(String[] args) {
