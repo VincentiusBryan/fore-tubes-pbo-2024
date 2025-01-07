@@ -133,6 +133,106 @@ public class AdminController {
 
     //PROMO 
 
+    public void deletePromoFromDatabase(String promoName) {
+        String deleteQuery = "DELETE FROM promos WHERE promo_name = ?";
+        try (Connection conn = new DBConnection().connect();
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+    
+            // Execute delete
+            int rowsDeleted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsDeleted > 0) {
+                System.out.println("Promo deleted successfully: " + promoName);
+            } else {
+                System.err.println("Failed to delete promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+    
+public void updatePromoInDatabase(String oldName, String newName, String newDescription, double newDiscount, String newStartDate, String newEndDate, boolean isActive) {
+    String updateQuery = "UPDATE promos SET promo_name = ?, description = ?, discount_percentage = ?, start_date = ?, end_date = ?, is_active = ? WHERE promo_name = ?";
+    try (Connection conn = new DBConnection().connect();
+         PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+
+        // Nonaktifkan autoCommit
+        conn.setAutoCommit(false);
+
+        // Set parameters
+        stmt.setString(1, newName);
+        stmt.setString(2, newDescription);
+        stmt.setDouble(3, newDiscount);
+        stmt.setString(4, newStartDate);
+        stmt.setString(5, newEndDate);
+        stmt.setBoolean(6, isActive);
+        stmt.setString(7, oldName);
+
+        // Execute update
+        int rowsUpdated = stmt.executeUpdate();
+
+        // Commit changes
+        if (rowsUpdated > 0) {
+            conn.commit();
+            System.out.println("Promo updated successfully: " + oldName + " -> " + newName);
+        } else {
+            System.err.println("Failed to update promo: " + oldName);
+        }
+
+        // Aktifkan kembali autoCommit
+        conn.setAutoCommit(true);
+    } catch (SQLException e) {
+        System.err.println("Error updating promo: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
+
+    // Add promo to database
+    public void addPromoToDatabase(String promoName, String description, double discount, String startDate, String endDate, boolean isActive) {
+        String insertQuery = "INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = new DBConnection().connect();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+            stmt.setString(2, description);
+            stmt.setDouble(3, discount);
+            stmt.setString(4, startDate);
+            stmt.setString(5, endDate);
+            stmt.setBoolean(6, isActive);
+    
+            // Execute update
+            int rowsInserted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsInserted > 0) {
+                System.out.println("Promo added successfully: " + promoName);
+            } else {
+                System.err.println("Failed to add promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error inserting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+
     
 
 
