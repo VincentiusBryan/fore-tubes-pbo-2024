@@ -44,7 +44,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "Menu 6", "Menu 7","Menu 8"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Menu 7","Menu 8"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -103,6 +103,9 @@ public class AdminView {
                     break;
                 case "View Order":
                     showAllOrders();
+                    break;
+                case "View Karyawan":
+                    showAllKaryawan();
                     break;
                 default:
                     contentPanel.removeAll();
@@ -709,6 +712,89 @@ private void updatePromoInDatabase(String oldName, String newName, String newDes
         contentPanel.repaint();
     }
 
+
+
+
+
+
+
+
+    public void showAllKaryawan(){
+
+        contentPanel.removeAll();
+        JPanel karyawanPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        karyawanPanel.add(titleLabel, BorderLayout.NORTH);
+        
+        // Definisikan kolom tabel
+        String[] columnNames = {"ID", "Nama", "Peran", "Jam Kerja", "Gaji"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        
+        // Ambil data karyawan dari controller
+        controller.showAllKaryawan(tableModel);
+        
+        // Tampilkan tabel
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        karyawanPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Tambahkan panel ke contentPanel
+        contentPanel.add(karyawanPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        
+
+        JPanel actionPanel = new JPanel(new FlowLayout());
+
+JButton addButton = new JButton("Add");
+addButton.addActionListener(e -> {
+    String nama = JOptionPane.showInputDialog("Masukkan Nama:");
+    String peran = JOptionPane.showInputDialog("Masukkan Peran:");
+    String jamKerja = JOptionPane.showInputDialog("Masukkan Jam Kerja (contoh: Senin–Jumat 09:00–17:00):");
+    double gaji = Double.parseDouble(JOptionPane.showInputDialog("Masukkan Gaji:"));
+    controller.addKaryawan(nama, peran, jamKerja, gaji);
+    controller.showAllKaryawan(tableModel); // Refresh tabel
+});
+
+JButton editButton = new JButton("Edit");
+editButton.addActionListener(e -> {
+    int selectedRow = table.getSelectedRow();
+    if (selectedRow >= 0) {
+        int id = (int) table.getValueAt(selectedRow, 0);
+        String nama = JOptionPane.showInputDialog("Edit Nama:", table.getValueAt(selectedRow, 1));
+        String peran = JOptionPane.showInputDialog("Edit Peran:", table.getValueAt(selectedRow, 2));
+        String jamKerja = JOptionPane.showInputDialog("Edit Jam Kerja:", table.getValueAt(selectedRow, 3));
+        double gaji = Double.parseDouble(JOptionPane.showInputDialog("Edit Gaji:", table.getValueAt(selectedRow, 4)));
+        controller.editKaryawan(id, nama, peran, jamKerja, gaji);
+        controller.showAllKaryawan(tableModel); // Refresh tabel
+    } else {
+        JOptionPane.showMessageDialog(null, "Pilih baris untuk diedit.");
+    }
+});
+
+JButton deleteButton = new JButton("Delete");
+deleteButton.addActionListener(e -> {
+    int selectedRow = table.getSelectedRow();
+    if (selectedRow >= 0) {
+        int id = (int) table.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(null, "Yakin ingin menghapus karyawan?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            controller.deleteKaryawan(id);
+            controller.showAllKaryawan(tableModel); // Refresh tabel
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Pilih baris untuk dihapus.");
+    }
+});
+
+// Tambahkan tombol ke panel
+actionPanel.add(addButton);
+actionPanel.add(editButton);
+actionPanel.add(deleteButton);
+contentPanel.add(actionPanel, BorderLayout.SOUTH);
+
+    }
     
 
 

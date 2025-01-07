@@ -191,4 +191,115 @@ public class AdminController {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+//MENU SHOW KARYAWAN
+
+// Menampilkan data karyawan
+public void showAllKaryawan(DefaultTableModel tableModel) {
+    String query = "SELECT id, nama, peran, jam_kerja, gaji FROM karyawan";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query);
+         ResultSet resultSet = statement.executeQuery()) {
+
+        // Membersihkan tableModel sebelum diisi ulang
+        tableModel.setRowCount(0);
+
+        // Iterasi hasil query
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String nama = resultSet.getString("nama");
+            String peran = resultSet.getString("peran");
+            String jamKerja = resultSet.getString("jam_kerja");
+            double gaji = resultSet.getDouble("gaji");
+
+            // Tambahkan data ke tableModel
+            tableModel.addRow(new Object[]{id, nama, peran, jamKerja, gaji});
+        }
+
+        System.out.println("Data karyawan berhasil diambil.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal mengambil data karyawan.");
+    }
+}
+
+
+
+public void addKaryawan(String nama, String peran, String jamKerja, double gaji) {
+    String query = "INSERT INTO karyawan (nama, peran, jam_kerja, gaji) VALUES (?, ?, ?, ?)";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setString(1, nama);
+        statement.setString(2, peran);
+        statement.setString(3, jamKerja);
+        statement.setDouble(4, gaji);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil ditambahkan.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal menambahkan karyawan.");
+    }
+}
+
+
+
+public void editKaryawan(int id, String nama, String peran, String jamKerja, double gaji) {
+    String query = "UPDATE karyawan SET nama = ?, peran = ?, jam_kerja = ?, gaji = ? WHERE id = ?";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setString(1, nama);
+        statement.setString(2, peran);
+        statement.setString(3, jamKerja);
+        statement.setDouble(4, gaji);
+        statement.setInt(5, id);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil diperbarui.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal memperbarui karyawan.");
+    }
+}
+
+
+
+public void deleteKaryawan(int id) {
+    String query = "DELETE FROM karyawan WHERE id = ?";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setInt(1, id);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil dihapus.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal menghapus karyawan.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 }
