@@ -2,6 +2,7 @@ package Controller;
 
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -122,10 +123,130 @@ public class AdminController {
         return stmt.executeQuery();
     }
 
-    //MENU 3
-    public void promo() {
-        // Implementasi promo di sini
+
+
+
+
+
+
+
+
+    //PROMO 
+
+    public void deletePromoFromDatabase(String promoName) {
+        String deleteQuery = "DELETE FROM promos WHERE promo_name = ?";
+        try (Connection conn = new DBConnection().connect();
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+    
+            // Execute delete
+            int rowsDeleted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsDeleted > 0) {
+                System.out.println("Promo deleted successfully: " + promoName);
+            } else {
+                System.err.println("Failed to delete promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    
+public void updatePromoInDatabase(String oldName, String newName, String newDescription, double newDiscount, String newStartDate, String newEndDate, boolean isActive) {
+    String updateQuery = "UPDATE promos SET promo_name = ?, description = ?, discount_percentage = ?, start_date = ?, end_date = ?, is_active = ? WHERE promo_name = ?";
+    try (Connection conn = new DBConnection().connect();
+         PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+
+        // Nonaktifkan autoCommit
+        conn.setAutoCommit(false);
+
+        // Set parameters
+        stmt.setString(1, newName);
+        stmt.setString(2, newDescription);
+        stmt.setDouble(3, newDiscount);
+        stmt.setString(4, newStartDate);
+        stmt.setString(5, newEndDate);
+        stmt.setBoolean(6, isActive);
+        stmt.setString(7, oldName);
+
+        // Execute update
+        int rowsUpdated = stmt.executeUpdate();
+
+        // Commit changes
+        if (rowsUpdated > 0) {
+            conn.commit();
+            System.out.println("Promo updated successfully: " + oldName + " -> " + newName);
+        } else {
+            System.err.println("Failed to update promo: " + oldName);
+        }
+
+        // Aktifkan kembali autoCommit
+        conn.setAutoCommit(true);
+    } catch (SQLException e) {
+        System.err.println("Error updating promo: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+    
+    
+
+
+
+
+    // Add promo to database
+    public void addPromoToDatabase(String promoName, String description, double discount, String startDate, String endDate, boolean isActive) {
+        String insertQuery = "INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = new DBConnection().connect();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+    
+            // Set parameters
+            stmt.setString(1, promoName);
+            stmt.setString(2, description);
+            stmt.setDouble(3, discount);
+            stmt.setString(4, startDate);
+            stmt.setString(5, endDate);
+            stmt.setBoolean(6, isActive);
+    
+            // Execute update
+            int rowsInserted = stmt.executeUpdate();
+    
+            // Commit changes if necessary
+            conn.commit();
+    
+            // Log result
+            if (rowsInserted > 0) {
+                System.out.println("Promo added successfully: " + promoName);
+            } else {
+                System.err.println("Failed to add promo: " + promoName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error inserting promo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // // MENU 5 - View Orders
     public void showAllOrders(DefaultTableModel tableModel) {
@@ -177,6 +298,19 @@ public class AdminController {
     }
     
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     //MENU 6
     public void updateStatusToko(int status) {
         String query = "UPDATE statusToko SET status = ?, last_updated = CURRENT_TIMESTAMP WHERE id = 1";
@@ -191,4 +325,108 @@ public class AdminController {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Menampilkan data karyawan
+public void showAllKaryawan(DefaultTableModel tableModel) {
+    String query = "SELECT id, nama, peran, jam_kerja, gaji FROM karyawan";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query);
+         ResultSet resultSet = statement.executeQuery()) {
+
+        // Membersihkan tableModel sebelum diisi ulang
+        tableModel.setRowCount(0);
+
+        // Iterasi hasil query
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String nama = resultSet.getString("nama");
+            String peran = resultSet.getString("peran");
+            String jamKerja = resultSet.getString("jam_kerja");
+            double gaji = resultSet.getDouble("gaji");
+
+            // Tambahkan data ke tableModel
+            tableModel.addRow(new Object[]{id, nama, peran, jamKerja, gaji});
+        }
+
+        System.out.println("Data karyawan berhasil diambil.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal mengambil data karyawan.");
+    }
+}
+
+public void addKaryawan(String nama, String peran, String jamKerja, double gaji) {
+    String query = "INSERT INTO karyawan (nama, peran, jam_kerja, gaji) VALUES (?, ?, ?, ?)";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setString(1, nama);
+        statement.setString(2, peran);
+        statement.setString(3, jamKerja);
+        statement.setDouble(4, gaji);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil ditambahkan.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal menambahkan karyawan.");
+    }
+}
+
+
+public void editKaryawan(int id, String nama, String peran, String jamKerja, double gaji) {
+    String query = "UPDATE karyawan SET nama = ?, peran = ?, jam_kerja = ?, gaji = ? WHERE id = ?";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setString(1, nama);
+        statement.setString(2, peran);
+        statement.setString(3, jamKerja);
+        statement.setDouble(4, gaji);
+        statement.setInt(5, id);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil diperbarui.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal memperbarui karyawan.");
+    }
+}
+
+
+public void deleteKaryawan(int id) {
+    String query = "DELETE FROM karyawan WHERE id = ?";
+    try (Connection connection = dbConnection.connect();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setInt(1, id);
+
+        statement.executeUpdate();
+        System.out.println("Karyawan berhasil dihapus.");
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println("Gagal menghapus karyawan.");
+    }
+}
+
+
+
 }

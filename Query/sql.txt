@@ -115,3 +115,22 @@ ADD FOREIGN KEY (id_promo) REFERENCES promos(id_promo);
 ALTER TABLE transaksi
 ADD COLUMN harga_sebelum_promo DOUBLE AFTER total_harga,
 ADD COLUMN harga_setelah_promo DOUBLE AFTER harga_sebelum_promo;
+
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS karyawan (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    peran VARCHAR(50) NOT NULL,
+    jam_kerja VARCHAR(50) NOT NULL, -- Rentang waktu kerja dalam format teks
+    gaji DECIMAL(10, 2) NOT NULL
+);
+
+INSERT INTO karyawan (nama, peran, jam_kerja, gaji)
+VALUES
+    ('Budi Santoso', 'Manager', 'Senin–Jumat 09:00–20:00', 8000000.00),
+    ('Siti Aminah', 'Staff', 'Senin–Jumat 09:00–17:00', 4500000.00),
+    ('Andi Wijaya', 'Intern', 'Senin–Jumat 13:00–17:00', 2000000.00);
