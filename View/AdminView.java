@@ -388,7 +388,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
         // Retrieve promo data from the database
         String promoQuery = "SELECT * FROM promos";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(promoQuery);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -530,55 +530,55 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
 
     
     private void statusToko() {
-        // Clear existing content
-        contentPanel.removeAll();
-        
-        // Create main panel for status toko
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new BorderLayout());
-        statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // Create and style the status label
-        JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
-        statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        statusPanel.add(statusLabel, BorderLayout.CENTER);
-        
-        // Create button panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        
-        // Create and style the open button
-        JButton openButton = new JButton("Buka Toko");
-        openButton.setPreferredSize(new Dimension(120, 40));
-        openButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        openButton.addActionListener(e -> {
-            controller.updateStatusToko(1);
-            statusLabel.setText("Status Toko: Buka");
-        });
-        
-        // Create and style the close button
-        JButton closeButton = new JButton("Tutup Toko");
-        closeButton.setPreferredSize(new Dimension(120, 40));
-        closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        closeButton.addActionListener(e -> {
-            controller.updateStatusToko(0);
-            statusLabel.setText("Status Toko: Tutup");
-        });
-        
-        // Add buttons to button panel
-        buttonPanel.add(openButton);
-        buttonPanel.add(closeButton);
-        
-        // Add button panel to status panel
-        statusPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        // Add status panel to content panel
-        contentPanel.add(statusPanel, BorderLayout.CENTER);
-        
-        // Refresh the display
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
+    // Clear existing content
+    contentPanel.removeAll();
+    
+    // Create main panel for status toko
+    JPanel statusPanel = new JPanel();
+    statusPanel.setLayout(new BorderLayout());
+    statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    
+    // Create and style the status label
+    JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
+    statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    statusPanel.add(statusLabel, BorderLayout.CENTER);
+    
+    // Create button panel
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    
+    // Create and style the open button
+    JButton openButton = new JButton("Buka Toko");
+    openButton.setPreferredSize(new Dimension(120, 40));
+    openButton.setFont(new Font("Arial", Font.PLAIN, 14));
+    openButton.addActionListener(e -> {
+        controller.updateStatusToko(1);
+        statusLabel.setText("Status Toko: Buka");
+    });
+    
+    // Create and style the close button
+    JButton closeButton = new JButton("Tutup Toko");
+    closeButton.setPreferredSize(new Dimension(120, 40));
+    closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
+    closeButton.addActionListener(e -> {
+        controller.updateStatusToko(0);
+        statusLabel.setText("Status Toko: Tutup");
+    });
+    
+    // Add buttons to button panel
+    buttonPanel.add(openButton);
+    buttonPanel.add(closeButton);
+    
+    // Add button panel to status panel
+    statusPanel.add(buttonPanel, BorderLayout.SOUTH);
+    
+    // Add status panel to content panel
+    contentPanel.add(statusPanel, BorderLayout.CENTER);
+    
+    // Refresh the display
+    contentPanel.revalidate();
+    contentPanel.repaint();
+}
     
     // MENU 5
     private void showAllOrders() {

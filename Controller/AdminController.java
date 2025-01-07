@@ -6,26 +6,23 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 
 import Connection.DBConnection;
 
 public class AdminController {
-
     private DBConnection dbConnection;
 
     public AdminController() {
-        dbConnection = new DBConnection();
+        dbConnection = DBConnection.getInstance();  // Menggunakan getInstance() dari Singleton
     }
 
     //MENU 1 
     public void updateTable(DefaultTableModel tableModel, String userType) {
-        
         tableModel.setRowCount(0);
 
         String query = "SELECT * FROM users WHERE user_type=?";
-        try (Connection connection = dbConnection.connect();
+        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, userType);
@@ -48,7 +45,7 @@ public class AdminController {
     // MENU 2
     public void deleteItemFromDatabase(String table, String name) {
         String deleteQuery = "DELETE FROM " + table + " WHERE name = ?";
-        try (Connection conn = dbConnection.connect();
+        try (Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
             stmt.setString(1, name);
             stmt.executeUpdate();
@@ -59,7 +56,7 @@ public class AdminController {
 
     public void updateItemInDatabase(String table, String oldName, String newName, double newPrice) {
         String updateQuery = "UPDATE " + table + " SET name = ?, price = ? WHERE name = ?";
-        try (Connection conn = dbConnection.connect();
+        try (Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
             stmt.setString(1, newName);
             stmt.setDouble(2, newPrice);
@@ -72,7 +69,7 @@ public class AdminController {
 
     public void updateItemInDatabase(String table, String oldName, String newName, String newSize, double newPrice) {
         String updateQuery = "UPDATE " + table + " SET name = ?, size = ?, price = ? WHERE name = ?";
-        try (Connection conn = dbConnection.connect();
+        try (Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
             stmt.setString(1, newName);
             stmt.setString(2, newSize);
@@ -86,7 +83,7 @@ public class AdminController {
 
     public void addItemToDatabase(String table, String name, double price) {
         String insertQuery = "INSERT INTO " + table + " (name, price) VALUES (?, ?)";
-        try (Connection conn = dbConnection.connect();
+        try (Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
             stmt.setString(1, name);
             stmt.setDouble(2, price);
@@ -98,7 +95,7 @@ public class AdminController {
 
     public void addItemToDatabase(String table, String name, String size, double price) {
         String insertQuery = "INSERT INTO " + table + " (name, size, price) VALUES (?, ?, ?)";
-        try (Connection conn = dbConnection.connect();
+        try (Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
             stmt.setString(1, name);
             stmt.setString(2, size);
@@ -111,14 +108,14 @@ public class AdminController {
 
     public ResultSet getBeverages() throws SQLException {
         String query = "SELECT * FROM beverages";
-        Connection conn = dbConnection.connect();
+        Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
         PreparedStatement stmt = conn.prepareStatement(query);
         return stmt.executeQuery();
     }
 
     public ResultSet getFoods() throws SQLException {
         String query = "SELECT * FROM foods";
-        Connection conn = dbConnection.connect();
+        Connection conn = dbConnection.getConnection();  // Menggunakan getConnection()
         PreparedStatement stmt = conn.prepareStatement(query);
         return stmt.executeQuery();
     }
@@ -250,41 +247,41 @@ public void updatePromoInDatabase(String oldName, String newName, String newDesc
 
     // // MENU 5 - View Orders
     public void showAllOrders(DefaultTableModel tableModel) {
-    tableModel.setRowCount(0);  // Membersihkan tabel
+        tableModel.setRowCount(0);
 
-    String query = "SELECT t.id_transaksi, u.email, f.name AS food_name, b.name AS beverage_name, t.tipe_item, t.ukuran, t.jumlah, t.total_harga, t.waktu_transaksi, pt.promo_name "
-                 + "FROM transaksi t "
-                 + "JOIN users u ON t.id_user = u.id_user "
-                 + "LEFT JOIN foods f ON t.nama_item = f.name "
-                 + "LEFT JOIN beverages b ON t.nama_item = b.name "
-                 + "LEFT JOIN promos pt ON t.id_promo = pt.id_promo";
-    try (Connection connection = dbConnection.connect();
-         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String query = "SELECT t.id_transaksi, u.email, f.name AS food_name, b.name AS beverage_name, t.tipe_item, t.ukuran, t.jumlah, t.total_harga, t.waktu_transaksi, pt.promo_name "
+                    + "FROM transaksi t "
+                    + "JOIN users u ON t.id_user = u.id_user "
+                    + "LEFT JOIN foods f ON t.nama_item = f.name "
+                    + "LEFT JOIN beverages b ON t.nama_item = b.name "
+                    + "LEFT JOIN promos pt ON t.id_promo = pt.id_promo";
+        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-        ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()) {
-            int idTransaksi = resultSet.getInt("id_transaksi");
-            String email = resultSet.getString("email");
-            String foodName = resultSet.getString("food_name");
-            String beverageName = resultSet.getString("beverage_name");
-            String tipeItem = resultSet.getString("tipe_item");
-            String ukuran = resultSet.getString("ukuran");
-            int jumlah = resultSet.getInt("jumlah");
-            double totalHarga = resultSet.getDouble("total_harga");
-            Timestamp waktuTransaksi = resultSet.getTimestamp("waktu_transaksi");
-            String promoName = resultSet.getString("promo_name");
+            while (resultSet.next()) {
+                int idTransaksi = resultSet.getInt("id_transaksi");
+                String email = resultSet.getString("email");
+                String foodName = resultSet.getString("food_name");
+                String beverageName = resultSet.getString("beverage_name");
+                String tipeItem = resultSet.getString("tipe_item");
+                String ukuran = resultSet.getString("ukuran");
+                int jumlah = resultSet.getInt("jumlah");
+                double totalHarga = resultSet.getDouble("total_harga");
+                Timestamp waktuTransaksi = resultSet.getTimestamp("waktu_transaksi");
+                String promoName = resultSet.getString("promo_name");
 
-            tableModel.addRow(new Object[]{idTransaksi, email, foodName, beverageName, tipeItem, ukuran, jumlah, totalHarga, waktuTransaksi, promoName});
+                tableModel.addRow(new Object[]{idTransaksi, email, foodName, beverageName, tipeItem, ukuran, jumlah, totalHarga, waktuTransaksi, promoName});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
 
     public void updateOrderStatus(int idTransaksi, boolean status) {
         String query = "UPDATE transaksi SET selesai = ? WHERE id_transaksi = ?";
-        try (Connection connection = dbConnection.connect();
+        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement statement = connection.prepareStatement(query)) {
     
             statement.setBoolean(1, status);
@@ -314,10 +311,10 @@ public void updatePromoInDatabase(String oldName, String newName, String newDesc
     //MENU 6
     public void updateStatusToko(int status) {
         String query = "UPDATE statusToko SET status = ?, last_updated = CURRENT_TIMESTAMP WHERE id = 1";
-        try (Connection connection = dbConnection.connect();
+        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, status); // Mengatur status (1 untuk buka, 0 untuk tutup)
+            statement.setInt(1, status);
             statement.executeUpdate();
 
             System.out.println("Status toko berhasil diubah.");
