@@ -132,7 +132,7 @@ public class AdminController {
 
     public void deletePromoFromDatabase(String promoName) {
         String deleteQuery = "DELETE FROM promos WHERE promo_name = ?";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
     
             // Set parameters
@@ -159,7 +159,7 @@ public class AdminController {
     
 public void updatePromoInDatabase(String oldName, String newName, String newDescription, double newDiscount, String newStartDate, String newEndDate, boolean isActive) {
     String updateQuery = "UPDATE promos SET promo_name = ?, description = ?, discount_percentage = ?, start_date = ?, end_date = ?, is_active = ? WHERE promo_name = ?";
-    try (Connection conn = new DBConnection().connect();
+    try (Connection conn = dbConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
 
         // Nonaktifkan autoCommit
@@ -202,7 +202,7 @@ public void updatePromoInDatabase(String oldName, String newName, String newDesc
     // Add promo to database
     public void addPromoToDatabase(String promoName, String description, double discount, String startDate, String endDate, boolean isActive) {
         String insertQuery = "INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = new DBConnection().connect();
+        try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
     
             // Set parameters
@@ -344,7 +344,7 @@ public void updatePromoInDatabase(String oldName, String newName, String newDesc
 // Menampilkan data karyawan
 public void showAllKaryawan(DefaultTableModel tableModel) {
     String query = "SELECT id, nama, peran, jam_kerja, gaji FROM karyawan";
-    try (Connection connection = dbConnection.connect();
+    try (Connection connection = dbConnection.getConnection();
          PreparedStatement statement = connection.prepareStatement(query);
          ResultSet resultSet = statement.executeQuery()) {
 
@@ -372,7 +372,7 @@ public void showAllKaryawan(DefaultTableModel tableModel) {
 
 public void addKaryawan(String nama, String peran, String jamKerja, double gaji) {
     String query = "INSERT INTO karyawan (nama, peran, jam_kerja, gaji) VALUES (?, ?, ?, ?)";
-    try (Connection connection = dbConnection.connect();
+    try (Connection connection = dbConnection.getConnection();
          PreparedStatement statement = connection.prepareStatement(query)) {
 
         statement.setString(1, nama);
@@ -391,7 +391,7 @@ public void addKaryawan(String nama, String peran, String jamKerja, double gaji)
 
 public void editKaryawan(int id, String nama, String peran, String jamKerja, double gaji) {
     String query = "UPDATE karyawan SET nama = ?, peran = ?, jam_kerja = ?, gaji = ? WHERE id = ?";
-    try (Connection connection = dbConnection.connect();
+    try (Connection connection = dbConnection.getConnection();
          PreparedStatement statement = connection.prepareStatement(query)) {
 
         statement.setString(1, nama);
@@ -411,7 +411,7 @@ public void editKaryawan(int id, String nama, String peran, String jamKerja, dou
 
 public void deleteKaryawan(int id) {
     String query = "DELETE FROM karyawan WHERE id = ?";
-    try (Connection connection = dbConnection.connect();
+    try (Connection connection = dbConnection.getConnection();
          PreparedStatement statement = connection.prepareStatement(query)) {
 
         statement.setInt(1, id);
