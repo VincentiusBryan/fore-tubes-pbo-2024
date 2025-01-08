@@ -97,7 +97,7 @@ INSERT INTO statusToko (status) VALUES (0);  -- set 0 default
 
 
 CREATE TABLE transaksi (
-    id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
+    id_transaksi INT PRIMARY KEY,
     id_user INT NOT NULL,
     nama_item VARCHAR(255) NOT NULL,
     tipe_item VARCHAR(50) NOT NULL,
@@ -134,3 +134,31 @@ VALUES
     ('Budi Santoso', 'Manager', 'Senin–Jumat 09:00–20:00', 8000000.00),
     ('Siti Aminah', 'Staff', 'Senin–Jumat 09:00–17:00', 4500000.00),
     ('Andi Wijaya', 'Intern', 'Senin–Jumat 13:00–17:00', 2000000.00);
+
+
+
+    CREATE TABLE transaksi (
+    id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
+    id_user INT,
+    total_harga DOUBLE,
+    tanggal_transaksi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE transaksi_detail (
+    id_detail INT AUTO_INCREMENT PRIMARY KEY,
+    id_transaksi INT,
+    nama_item VARCHAR(255),
+    tipe_item VARCHAR(50),
+    ukuran VARCHAR(50),
+    jumlah INT,
+    harga_per_item DOUBLE,
+    total_harga DOUBLE,
+    id_promo int DEFAULT NULL,
+    harga_sebelum_promo DOUBLE,
+    harga_setelah_promo DOUBLE,
+    FOREIGN KEY (id_transaksi) REFERENCES transaksi(id_transaksi)
+);
+
+ALTER TABLE transaksi_detail
+ADD CONSTRAINT fk_promo
+FOREIGN KEY (id_promo) REFERENCES promos(id_promo);

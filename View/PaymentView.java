@@ -188,7 +188,10 @@ public class PaymentView {
 
         if (connection != null) {
             try {
-                // First, get the discount percentage from the promo
+                // Get the original price from the transaction
+                double originalPrice = totalPrice;
+
+                // Get the discount percentage from the promo
                 String promoQuery = "SELECT discount_percentage FROM promos WHERE id_promo = ?";
                 PreparedStatement promoPs = connection.prepareStatement(promoQuery);
                 promoPs.setInt(1, promoId);
@@ -198,18 +201,29 @@ public class PaymentView {
                     int discountPercentage = promoRs.getInt("discount_percentage");
 
                     // Calculate the discounted price
-                    double discountMultiplier = (100 - discountPercentage) / 100.0;
+                    double discountedPrice = originalPrice * (100 - discountPercentage) / 100.0;
 
-                    // Update the transaction with both original and discounted prices
-                    String updateQuery = "UPDATE transaksi " +
+                    // Update the transaksi_detail table with promo information
+                    String updateDetailQuery = "UPDATE transaksi_detail " +
                             "SET id_promo = ?, " +
-                            "harga_setelah_promo = harga_sebelum_promo * ? " +
-                            "WHERE id_transaksi = (SELECT MAX(id_transaksi) FROM transaksi as t2)";
+                            "harga_sebelum_promo = ?, " +
+                            "harga_setelah_promo = ? " +
+                            "WHERE id_transaksi = (SELECT MAX(id_transaksi) FROM transaksi)";
+                    PreparedStatement detailPs = connection.prepareStatement(updateDetailQuery);
+                    detailPs.setInt(1, promoId);
+                    detailPs.setDouble(2, originalPrice);
+                    detailPs.setDouble(3, discountedPrice);
+                    detailPs.executeUpdate();
+                    detailPs.close();
 
-                    PreparedStatement ps = connection.prepareStatement(updateQuery);
-                    ps.setInt(1, promoId);
-                    ps.setDouble(2, discountMultiplier);
-                    ps.executeUpdate();
+                    // Update the transaksi table with the new total price after promo
+                    String updateTransactionQuery = "UPDATE transaksi " +
+                            "SET total_harga = ? " +
+                            "WHERE id_transaksi = (SELECT MAX(id_transaksi) FROM transaksi)";
+                    PreparedStatement transactionPs = connection.prepareStatement(updateTransactionQuery);
+                    transactionPs.setDouble(1, discountedPrice); // Set the discounted price as the new total_harga
+                    transactionPs.executeUpdate();
+                    transactionPs.close();
                 }
 
                 promoRs.close();
@@ -244,5 +258,4 @@ public class PaymentView {
         }
     }
 
-    
 }
