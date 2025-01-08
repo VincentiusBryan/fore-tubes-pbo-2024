@@ -65,7 +65,7 @@ public class LoginView {
                     } else {
                         JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         loginFrame.dispose();
-                        new OrderView(); // kalau user
+                        new UserMenuView(); // kalau user
                     }
                 } else {
                     JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Try again!", "Error", JOptionPane.ERROR_MESSAGE);

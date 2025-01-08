@@ -162,3 +162,29 @@ CREATE TABLE transaksi_detail (
 ALTER TABLE transaksi_detail
 ADD CONSTRAINT fk_promo
 FOREIGN KEY (id_promo) REFERENCES promos(id_promo);
+
+
+
+-- Modify users table to add membership-related columns
+ALTER TABLE users
+    ADD COLUMN id_membership int(11) DEFAULT NULL,
+    ADD COLUMN start_date date DEFAULT NULL,
+    ADD COLUMN end_date date DEFAULT NULL,
+    ADD COLUMN status_aktif_membership tinyint(1) DEFAULT 0,
+    ADD CONSTRAINT fk_membership FOREIGN KEY (id_membership) REFERENCES membership(id_membership);
+
+-- Create membership table with price
+CREATE TABLE IF NOT EXISTS membership (
+    id_membership int(11) NOT NULL AUTO_INCREMENT,
+    duration int(11) NOT NULL COMMENT 'Duration in months',
+    deskripsi text NOT NULL,
+    harga int(11) NOT NULL,  -- Added price column
+    PRIMARY KEY (id_membership)
+);
+
+-- Insert basic membership packages with prices
+INSERT INTO membership (duration, deskripsi, harga) VALUES
+    (1, '1 Month - Benefits + 10 diskon untuk semua pesanan', 50000),
+    (6, '6 Months - Benefits + 15% diskon untuk semua pesanan', 270000),
+    (12, '12 Months - Benefits + 20% diskon untuk semua pesanan', 480000);
+
