@@ -97,7 +97,7 @@ INSERT INTO statusToko (status) VALUES (0);  -- set 0 default
 
 
 CREATE TABLE transaksi (
-    id_transaksi INT PRIMARY KEY,
+    id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
     id_user INT NOT NULL,
     nama_item VARCHAR(255) NOT NULL,
     tipe_item VARCHAR(50) NOT NULL,
@@ -187,4 +187,3 @@ INSERT INTO membership (duration, deskripsi, harga) VALUES
     (1, '1 Month - Benefits + 10 diskon untuk semua pesanan', 50000),
     (6, '6 Months - Benefits + 15% diskon untuk semua pesanan', 270000),
     (12, '12 Months - Benefits + 20% diskon untuk semua pesanan', 480000);
-
