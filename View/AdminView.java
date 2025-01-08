@@ -44,7 +44,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Menu 7","Menu 8"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Menu 7","Back"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -106,6 +106,13 @@ public class AdminView {
                     break;
                 case "View Karyawan":
                     showAllKaryawan();
+                    break;
+                case "Menu 7":
+                    showAllKaryawan();
+                    break;
+                case "Back":
+                    new MainMenu();
+                    adminFrame.dispose();
                     break;
                 default:
                     contentPanel.removeAll();
