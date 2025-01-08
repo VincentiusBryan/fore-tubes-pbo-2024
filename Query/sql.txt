@@ -125,7 +125,6 @@ ADD COLUMN harga_setelah_promo DOUBLE AFTER harga_sebelum_promo;
 
 
 
-
 CREATE TABLE IF NOT EXISTS karyawan (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nama VARCHAR(100) NOT NULL,
