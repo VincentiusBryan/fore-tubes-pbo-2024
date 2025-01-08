@@ -8,6 +8,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -294,8 +295,10 @@ public class OrderView {
 
             if (selectedBeverage != null && !"None".equals(selectedBeverage)) { // cek apakah minumannya none/tidak
                 String selectedSize = (String) sizeCombo.getSelectedItem();
-                if (beveragePrices.containsKey(selectedBeverage)) {  // cek apakah beverage yang dipilih ada di beveragePrice
-                    Map<String, Double> size = beveragePrices.get(selectedBeverage); // mendapatkan daftar harga minuman berdasarkan ukuran
+                if (beveragePrices.containsKey(selectedBeverage)) { // cek apakah beverage yang dipilih ada di
+                                                                    // beveragePrice
+                    Map<String, Double> size = beveragePrices.get(selectedBeverage); // mendapatkan daftar harga minuman
+                                                                                     // berdasarkan ukuran
                     if (size.containsKey(selectedSize)) {
                         double price = size.get(selectedSize) * beverageQuantity;
                         cartModel.addElement( // add to cart
@@ -319,35 +322,54 @@ public class OrderView {
         // TRANSAKSI
         checkoutButton.addActionListener(e -> {
             totalPrice = 0;
-            StringBuilder orderSummary = new StringBuilder(); 
+            StringBuilder orderSummary = new StringBuilder();
             Connection connection = dbConnection.getConnection();
-
+        
             if (connection != null) {
                 try {
-                    int userId = SessionManager.getLoggedInUserId(); // get id user yang login dari SessionManager
-                    if (userId == -1) { // jika user belum login, kasih message error
+                    connection.setAutoCommit(false);
+        
+                    int userId = SessionManager.getLoggedInUserId();
+                    if (userId == -1) {
                         JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-
-                    for (int i = 0; i < cartModel.size(); i++) { // iterasi setiap item di keranjang
-                        String cartItem = cartModel.get(i); // get string item dari keranjang
-                        String[] itemParts = cartItem.split(" - Rp"); // misahin nama item dan harga
+        
+                    // Get new transaction id with just user_id first
+                    String initialQuery = "INSERT INTO transaksi (id_user, total_harga) VALUES (?, ?)";
+                    int transactionId;
+                    try (PreparedStatement stmt = connection.prepareStatement(initialQuery, 
+                            Statement.RETURN_GENERATED_KEYS)) {
+                        stmt.setInt(1, userId);
+                        stmt.setDouble(2, 0.0);
+                        stmt.executeUpdate();
+                        
+                        ResultSet rs = stmt.getGeneratedKeys();
+                        if (rs.next()) {
+                            transactionId = rs.getInt(1);
+                        } else {
+                            throw new SQLException("Creating transaction failed, no ID obtained.");
+                        }
+                    }
+        
+                    // Process cart items
+                    for (int i = 0; i < cartModel.size(); i++) {
+                        String cartItem = cartModel.get(i);
+                        String[] itemParts = cartItem.split(" - Rp");
                         if (itemParts.length > 1) {
-                            double itemPrice = Double.parseDouble(itemParts[1]); // get harga item
-                            totalPrice += itemPrice; // add harga ke harga total
-                            orderSummary.append(cartItem).append("\n"); // nambahin item ke orderSummary
-
+                            double itemPrice = Double.parseDouble(itemParts[1]);
+                            totalPrice += itemPrice;
+                            orderSummary.append(cartItem).append("\n");
+        
                             String[] details = itemParts[0].split(" x");
                             String itemName = details[0].trim();
                             int quantity = Integer.parseInt(details[1].trim());
                             double pricePerItem = itemPrice / quantity;
-
+        
                             String itemType;
                             String size = null;
-
-                            // jika itemName mengandung "medium" atau "large", maka itemType = minuman
+        
                             if (itemName.contains("Medium") || itemName.contains("Large")) {
                                 itemType = "Minuman";
                                 if (itemName.contains("Medium")) {
@@ -355,34 +377,59 @@ public class OrderView {
                                 } else if (itemName.contains("Large")) {
                                     size = "Large";
                                 }
-                            } else { // else itemType = makanan
-                                itemType = "Makanan"; 
+                                itemName = itemName.replace(" " + size, "");
+                            } else {
+                                itemType = "Makanan";
                             }
-
-                            // Updated query to include harga_sebelum_promo
-                            String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, harga_sebelum_promo, harga_setelah_promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+                            String query = "INSERT INTO transaksi_detail (id_transaksi, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
                             try (PreparedStatement ps = connection.prepareStatement(query)) {
-                                ps.setInt(1, userId);
+                                ps.setInt(1, transactionId);
                                 ps.setString(2, itemName);
                                 ps.setString(3, itemType);
                                 ps.setString(4, size);
                                 ps.setInt(5, quantity);
                                 ps.setDouble(6, pricePerItem);
                                 ps.setDouble(7, itemPrice);
-                                ps.setDouble(8, itemPrice); 
-                                ps.setDouble(9, itemPrice);
                                 ps.executeUpdate();
                             }
                         }
                     }
-
+        
+                    // Update total harga in main transaction
+                    try (PreparedStatement updateStmt = connection.prepareStatement(
+                            "UPDATE transaksi SET total_harga = ? WHERE id_transaksi = ?")) {
+                        updateStmt.setDouble(1, totalPrice);
+                        updateStmt.setInt(2, transactionId);
+                        updateStmt.executeUpdate();
+                    }
+        
+                    connection.commit();
+        
                     orderSummary.append("Total: Rp").append(totalPrice);
                     JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
-
-                    new PaymentView(orderSummary.toString(), totalPrice); // open paymentView dengan pesanan yang udah dibuat dan total harganya
+        
+                    cartModel.clear();
+                    new PaymentView(orderSummary.toString(), totalPrice);
                     orderFrame.dispose();
+        
                 } catch (Exception ex) {
-                    ex.printStackTrace(); // buat nangkep dan print error
+                    try {
+                        connection.rollback();
+                    } catch (Exception rollbackEx) {
+                        rollbackEx.printStackTrace();
+                    }
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(orderFrame,
+                            "Error processing transaction: " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    try {
+                        connection.setAutoCommit(true);
+                    } catch (Exception setAutoCommitEx) {
+                        setAutoCommitEx.printStackTrace();
+                    }
                 }
             }
         });
