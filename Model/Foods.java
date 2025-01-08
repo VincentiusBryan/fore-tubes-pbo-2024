@@ -1,4 +1,5 @@
 package Model;
+
 public class Foods extends ListMenu {
     private FoodsType foodsType;
 
@@ -16,8 +17,13 @@ public class Foods extends ListMenu {
     }
 
     @Override
-    public void printMenu(){
+    public void printMenu() {
         super.printMenu();
-        System.out.println("Food type : " + foodsType);
+        System.out.println("Food Type: " + foodsType);
+    }
+
+    @Override
+    public String toString() {
+        return namaMenu + " (" + foodsType + ")";
     }
 }

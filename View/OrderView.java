@@ -1,14 +1,74 @@
 package View;
 
+import Connection.DBConnection;
+import Controller.SessionManager;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrderView {
+
     private DefaultListModel<String> cartModel;
-    private int quantity = 1; // default qty
+    private int beverageQuantity = 1;
+    private int foodQuantity = 1;
+    private double totalPrice = 0;
+
+    private Map<String, Map<String, Double>> beveragePrices = new HashMap<>();
+    private Map<String, Double> foodPrices = new HashMap<>();
+
+    private DBConnection dbConnection;
 
     public OrderView() {
+
+        if (!SessionManager.isUserLoggedIn()) {
+            JOptionPane.showMessageDialog(null, "Please log in first!", "Access Denied", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        dbConnection = DBConnection.getInstance();
+        cartModel = new DefaultListModel<>();
+        initializePrices();
         showOrderMenu();
+    }
+
+    private void initializePrices() {
+        Connection connection = dbConnection.getConnection();
+        if (connection != null) {
+            try {
+                // Ngambil harga beverages dari database
+                Statement statement = connection.createStatement();
+                ResultSet rsBeverages = statement.executeQuery("SELECT * FROM beverages");
+                while (rsBeverages.next()) {
+                    String beverageName = rsBeverages.getString("name");
+                    String size = rsBeverages.getString("size");
+                    double price = rsBeverages.getDouble("price");
+
+                    beveragePrices.putIfAbsent(beverageName, new HashMap<>());
+                    beveragePrices.get(beverageName).put(size, price);
+                }
+
+                // Ngambil harga food dari database
+                ResultSet rsFood = statement.executeQuery("SELECT * FROM foods");
+                while (rsFood.next()) {
+                    String foodName = rsFood.getString("name");
+                    double price = rsFood.getDouble("price");
+
+                    foodPrices.put(foodName, price);
+                }
+
+                rsBeverages.close();
+                rsFood.close();
+                statement.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void showOrderMenu() {
@@ -30,11 +90,12 @@ public class OrderView {
         titleLabel.setBounds(260, 14, 200, 30);
         mainPanel.add(titleLabel);
 
+        // Beverage Section
         JLabel typeOfBeverageLabel = new JLabel("Tipe Minuman:");
         typeOfBeverageLabel.setBounds(30, 70, 100, 25);
         mainPanel.add(typeOfBeverageLabel);
 
-        String[] beverageTypes = {"None", "Coffee", "Non-Coffee", "Tea"};
+        String[] beverageTypes = { "None", "Coffee", "Non-Coffee", "Tea" };
         JComboBox<String> typeOfBeverageCombo = new JComboBox<>(beverageTypes);
         typeOfBeverageCombo.setBounds(130, 70, 150, 25);
         mainPanel.add(typeOfBeverageCombo);
@@ -47,204 +108,284 @@ public class OrderView {
         beverageCombo.setBounds(130, 110, 150, 25);
         mainPanel.add(beverageCombo);
 
+        JLabel sizeLabel = new JLabel("Ukuran:");
+        sizeLabel.setBounds(30, 150, 100, 25);
+        mainPanel.add(sizeLabel);
+
+        String[] sizes = { "None", "Medium", "Large" };
+        JComboBox<String> sizeCombo = new JComboBox<>(sizes);
+        sizeCombo.setBounds(130, 150, 150, 25);
+        mainPanel.add(sizeCombo);
+
         typeOfBeverageCombo.addActionListener(e -> {
             String selectedType = (String) typeOfBeverageCombo.getSelectedItem();
 
             beverageCombo.removeAllItems();
+            sizeCombo.removeAllItems(); // Reset ukuran
+
             if ("None".equals(selectedType)) {
                 return;
             }
 
+            // Menentukan ukuran yang relevan berdasarkan tipe minuman
             switch (selectedType) {
                 case "Coffee":
                     beverageCombo.addItem("Iced Americano");
                     beverageCombo.addItem("Espresso");
                     beverageCombo.addItem("Cappuccino");
+
+                    // Menambahkan ukuran untuk Coffee
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
                 case "Non-Coffee":
                     beverageCombo.addItem("Iced Matcha Latte");
                     beverageCombo.addItem("Hot Matcha Latte");
                     beverageCombo.addItem("Iced Chocolate");
+
+                    // Menambahkan ukuran untuk Non-Coffee
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
                 case "Tea":
                     beverageCombo.addItem("Oolong");
                     beverageCombo.addItem("Green Peach");
                     beverageCombo.addItem("Earl Grey");
+
+                    // Menambahkan ukuran untuk Tea
+                    sizeCombo.addItem("Medium");
+                    sizeCombo.addItem("Large");
                     break;
             }
         });
 
-        JLabel sizeLabel = new JLabel("Ukuran:");
-        sizeLabel.setBounds(30, 150, 100, 25);
-        mainPanel.add(sizeLabel);
+        // Quantity dan buttons buat beverages
+        JLabel beverageQuantityLabel = new JLabel("Quantity:");
+        beverageQuantityLabel.setBounds(30, 190, 100, 25);
+        mainPanel.add(beverageQuantityLabel);
 
-        String[] sizes = {"None", "Medium", "Large"};
-        JComboBox<String> sizeCombo = new JComboBox<>(sizes);
-        sizeCombo.setBounds(130, 150, 150, 25);
-        mainPanel.add(sizeCombo);
+        JLabel beverageQuantityValueLabel = new JLabel(String.valueOf(beverageQuantity));
+        beverageQuantityValueLabel.setBounds(175, 190, 50, 25);
+        beverageQuantityValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(beverageQuantityValueLabel);
 
+        JButton beveragePlusButton = new JButton("+");
+        beveragePlusButton.setBounds(230, 190, 45, 25);
+        mainPanel.add(beveragePlusButton);
+
+        JButton beverageMinusButton = new JButton("-");
+        beverageMinusButton.setBounds(130, 190, 45, 25);
+        mainPanel.add(beverageMinusButton);
+
+        beveragePlusButton.addActionListener(e -> {
+            beverageQuantity++;
+            beverageQuantityValueLabel.setText(String.valueOf(beverageQuantity));
+        });
+
+        beverageMinusButton.addActionListener(e -> {
+            if (beverageQuantity > 1) {
+                beverageQuantity--;
+                beverageQuantityValueLabel.setText(String.valueOf(beverageQuantity));
+            }
+        });
+
+        // Food Section
         JLabel foodTypeLabel = new JLabel("Tipe Makanan:");
-        foodTypeLabel.setBounds(30, 190, 100, 25);
+        foodTypeLabel.setBounds(30, 230, 100, 25);
         mainPanel.add(foodTypeLabel);
 
-        String[] foodTypes = {"None", "Cake", "Donut", "Churros", "Croissant"};
+        String[] foodTypes = { "None", "Cake", "Donut", "Churros", "Croissant" };
         JComboBox<String> foodTypeCombo = new JComboBox<>(foodTypes);
-        foodTypeCombo.setBounds(130, 190, 150, 25);
+        foodTypeCombo.setBounds(130, 230, 150, 25);
         mainPanel.add(foodTypeCombo);
 
         JLabel foodLabel = new JLabel("Makanan:");
-        foodLabel.setBounds(30, 230, 100, 25);
+        foodLabel.setBounds(30, 270, 100, 25);
         mainPanel.add(foodLabel);
 
         JComboBox<String> foodCombo = new JComboBox<>();
-        foodCombo.setBounds(130, 230, 150, 25);
+        foodCombo.setBounds(130, 270, 150, 25);
         mainPanel.add(foodCombo);
 
-        foodTypeCombo.addActionListener(e -> {
-            String selectedType = (String) foodTypeCombo.getSelectedItem();
+        JLabel foodQuantityLabel = new JLabel("Quantity:");
+        foodQuantityLabel.setBounds(30, 310, 100, 25);
+        mainPanel.add(foodQuantityLabel);
 
+        JLabel foodQuantityValueLabel = new JLabel(String.valueOf(foodQuantity));
+        foodQuantityValueLabel.setBounds(175, 310, 50, 25);
+        foodQuantityValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(foodQuantityValueLabel);
+
+        JButton foodPlusButton = new JButton("+");
+        foodPlusButton.setBounds(230, 310, 45, 25);
+        mainPanel.add(foodPlusButton);
+
+        JButton foodMinusButton = new JButton("-");
+        foodMinusButton.setBounds(130, 310, 45, 25);
+        mainPanel.add(foodMinusButton);
+
+        foodPlusButton.addActionListener(e -> {
+            foodQuantity++;
+            foodQuantityValueLabel.setText(String.valueOf(foodQuantity));
+        });
+
+        foodMinusButton.addActionListener(e -> {
+            if (foodQuantity > 1) {
+                foodQuantity--;
+                foodQuantityValueLabel.setText(String.valueOf(foodQuantity));
+            }
+        });
+
+        foodTypeCombo.addActionListener(e -> {
+            String selectedFoodType = (String) foodTypeCombo.getSelectedItem();
             foodCombo.removeAllItems();
-            if ("None".equals(selectedType)) {
+            if ("None".equals(selectedFoodType)) {
                 return;
             }
 
-            switch (selectedType) {
+            switch (selectedFoodType) {
                 case "Cake":
                     foodCombo.addItem("Red Velvet");
                     foodCombo.addItem("Tiramisu");
                     foodCombo.addItem("Black Forest");
                     break;
                 case "Donut":
-                    foodCombo.addItem("Glazed");
-                    foodCombo.addItem("Strawberry");
-                    foodCombo.addItem("Choco Mint");
+                    foodCombo.addItem("Glazed Donut");
+                    foodCombo.addItem("Chocolate Donut");
+                    foodCombo.addItem("Strawberry Donut");
                     break;
                 case "Churros":
-                    foodCombo.addItem("Honey");
-                    foodCombo.addItem("Taro");
+                    foodCombo.addItem("Churros Classic");
+                    foodCombo.addItem("Churros with Chocolate");
                     break;
                 case "Croissant":
-                    foodCombo.addItem("Plain");
-                    foodCombo.addItem("Smoke Beef");
+                    foodCombo.addItem("Butter Croissant");
+                    foodCombo.addItem("Chocolate Croissant");
                     break;
             }
+            System.out.println("Updated foodCombo with item for: " + selectedFoodType);
         });
 
-        JLabel quantityLabel = new JLabel("Quantity:");
-        quantityLabel.setBounds(30, 270, 100, 25);
-        mainPanel.add(quantityLabel);
-
-        JLabel quantityValueLabel = new JLabel(String.valueOf(quantity));
-        quantityValueLabel.setBounds(175, 270, 50, 25);
-        quantityValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mainPanel.add(quantityValueLabel);
-
-        JButton plusButton = new JButton("+");
-        plusButton.setBounds(230, 270, 45, 25);
-        mainPanel.add(plusButton);
-
-        JButton minusButton = new JButton("-");
-        minusButton.setBounds(130, 270, 45, 25);
-        mainPanel.add(minusButton);
-
-        plusButton.addActionListener(e -> {
-            quantity++;
-            quantityValueLabel.setText(String.valueOf(quantity));
-        });
-
-        minusButton.addActionListener(e -> {
-            if (quantity > 1) {
-                quantity--;
-                quantityValueLabel.setText(String.valueOf(quantity));
-            }
-        });
-
+        // Cart Section
         JLabel cartLabel = new JLabel("Cart:");
-        cartLabel.setBounds(350, 60, 100, 25);
+        cartLabel.setBounds(30, 360, 100, 25);
         mainPanel.add(cartLabel);
 
-        cartModel = new DefaultListModel<>();
         JList<String> cartList = new JList<>(cartModel);
         JScrollPane cartScrollPane = new JScrollPane(cartList);
-        cartScrollPane.setBounds(350, 100, 200, 250);
+        cartScrollPane.setBounds(130, 360, 250, 100);
         mainPanel.add(cartScrollPane);
 
-        JButton addButton = new JButton("Add");
-        addButton.setBounds(130, 320, 150, 30);
-        mainPanel.add(addButton);
+        JButton addToCartButton = new JButton("Add to Cart");
+        addToCartButton.setBounds(400, 360, 120, 30);
+        mainPanel.add(addToCartButton);
 
-        addButton.addActionListener(e -> {
-            String beverageType = (String) typeOfBeverageCombo.getSelectedItem();
-            String beverage = (String) beverageCombo.getSelectedItem();
-            String size = (String) sizeCombo.getSelectedItem();
-            String foodType = (String) foodTypeCombo.getSelectedItem();
-            String food = (String) foodCombo.getSelectedItem();
-
-            if (("None".equals(beverageType) || beverage == null) && ("None".equals(foodType) || food == null)) {
-                JOptionPane.showMessageDialog(orderFrame, "Please select at least one item (food or beverage).", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String order;
-            if ("None".equals(foodType) || food == null) {
-                order = quantity + "x " + size + " " + beverageType + " " + beverage;
-            } else if ("None".equals(beverageType) || beverage == null) {
-                order = quantity + "x " + foodType + " " + food;
-            } else {
-                order = quantity + "x " + size + " " + beverageType + " " + beverage + ", " + foodType + " " + food;
-            }
-
-            cartModel.addElement(order);
-        });
-
-        JButton clearButton = new JButton("Clear");
-        clearButton.setBounds(350, 410, 100, 30);
-        mainPanel.add(clearButton);
-
-        JButton resetButton = new JButton("Reset");
-        resetButton.setBounds(230, 410, 100, 30);
-        mainPanel.add(resetButton);
+        JButton clearCartButton = new JButton("Clear Cart");
+        clearCartButton.setBounds(400, 400, 120, 30);
+        mainPanel.add(clearCartButton);
 
         JButton checkoutButton = new JButton("Checkout");
-        checkoutButton.setBounds(450, 410, 100, 30);
+        checkoutButton.setBounds(400, 440, 120, 30);
         mainPanel.add(checkoutButton);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBounds(30, 410, 100, 30);
-        mainPanel.add(backButton);
+        addToCartButton.addActionListener(e -> {
+            String selectedBeverage = (String) beverageCombo.getSelectedItem();
+            String selectedFood = (String) foodCombo.getSelectedItem();
 
-        backButton.addActionListener(e -> {
-            orderFrame.dispose(); // close current order frame
-            new LoginView(); // back to login frame
-        });
-
-        clearButton.addActionListener(e -> cartModel.clear());
-
-        resetButton.addActionListener(e -> {
-            typeOfBeverageCombo.setSelectedIndex(0);
-            beverageCombo.removeAllItems();
-            sizeCombo.setSelectedIndex(0);
-            foodTypeCombo.setSelectedIndex(0);
-            foodCombo.removeAllItems();
-            quantity = 1;
-            quantityValueLabel.setText(String.valueOf(quantity));
-        });
-
-        checkoutButton.addActionListener(e -> {
-            if (cartModel.isEmpty()) {
-                JOptionPane.showMessageDialog(orderFrame, "Your cart is empty!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                StringBuilder orderSummary = new StringBuilder("Order Summary:\n");
-                for (int i = 0; i < cartModel.size(); i++) {
-                    orderSummary.append(cartModel.getElementAt(i)).append("\n");
+            if (selectedBeverage != null && !"None".equals(selectedBeverage)) { // cek apakah minumannya none/tidak
+                String selectedSize = (String) sizeCombo.getSelectedItem();
+                if (beveragePrices.containsKey(selectedBeverage)) {  // cek apakah beverage yang dipilih ada di beveragePrice
+                    Map<String, Double> size = beveragePrices.get(selectedBeverage); // mendapatkan daftar harga minuman berdasarkan ukuran
+                    if (size.containsKey(selectedSize)) {
+                        double price = size.get(selectedSize) * beverageQuantity;
+                        cartModel.addElement( // add to cart
+                                selectedBeverage + " " + selectedSize + " x" + beverageQuantity + " - Rp" + price);
+                    }
                 }
-        
-                // Tampilkan PaymentView setelah checkout
-                new PaymentView(orderSummary.toString());
+            }
+
+            if (selectedFood != null && !"None".equals(selectedFood)) {
+                if (foodPrices.containsKey(selectedFood)) {
+                    double price = foodPrices.get(selectedFood) * foodQuantity;
+                    cartModel.addElement(selectedFood + " x" + foodQuantity + " - Rp" + price);
+                } else {
+                    System.out.println("Food not found in foodPrices: " + selectedFood);
+                }
             }
         });
 
-        
+        clearCartButton.addActionListener(e -> cartModel.clear());
+
+        // TRANSAKSI
+        checkoutButton.addActionListener(e -> {
+            totalPrice = 0;
+            StringBuilder orderSummary = new StringBuilder(); 
+            Connection connection = dbConnection.getConnection();
+
+            if (connection != null) {
+                try {
+                    int userId = SessionManager.getLoggedInUserId(); // get id user yang login dari SessionManager
+                    if (userId == -1) { // jika user belum login, kasih message error
+                        JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    for (int i = 0; i < cartModel.size(); i++) { // iterasi setiap item di keranjang
+                        String cartItem = cartModel.get(i); // get string item dari keranjang
+                        String[] itemParts = cartItem.split(" - Rp"); // misahin nama item dan harga
+                        if (itemParts.length > 1) {
+                            double itemPrice = Double.parseDouble(itemParts[1]); // get harga item
+                            totalPrice += itemPrice; // add harga ke harga total
+                            orderSummary.append(cartItem).append("\n"); // nambahin item ke orderSummary
+
+                            String[] details = itemParts[0].split(" x");
+                            String itemName = details[0].trim();
+                            int quantity = Integer.parseInt(details[1].trim());
+                            double pricePerItem = itemPrice / quantity;
+
+                            String itemType;
+                            String size = null;
+
+                            // jika itemName mengandung "medium" atau "large", maka itemType = minuman
+                            if (itemName.contains("Medium") || itemName.contains("Large")) {
+                                itemType = "Minuman";
+                                if (itemName.contains("Medium")) {
+                                    size = "Medium";
+                                } else if (itemName.contains("Large")) {
+                                    size = "Large";
+                                }
+                            } else { // else itemType = makanan
+                                itemType = "Makanan"; 
+                            }
+
+                            // Updated query to include harga_sebelum_promo
+                            String query = "INSERT INTO transaksi (id_user, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, harga_sebelum_promo, harga_setelah_promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                                ps.setInt(1, userId);
+                                ps.setString(2, itemName);
+                                ps.setString(3, itemType);
+                                ps.setString(4, size);
+                                ps.setInt(5, quantity);
+                                ps.setDouble(6, pricePerItem);
+                                ps.setDouble(7, itemPrice);
+                                ps.setDouble(8, itemPrice); 
+                                ps.setDouble(9, itemPrice);
+                                ps.executeUpdate();
+                            }
+                        }
+                    }
+
+                    orderSummary.append("Total: Rp").append(totalPrice);
+                    JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
+
+                    new PaymentView(orderSummary.toString(), totalPrice); // open paymentView dengan pesanan yang udah dibuat dan total harganya
+                    orderFrame.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace(); // buat nangkep dan print error
+                }
+            }
+        });
 
         orderFrame.add(mainPanel);
         orderFrame.setVisible(true);
