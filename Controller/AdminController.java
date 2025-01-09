@@ -42,14 +42,74 @@ public class AdminController {
                 String createdAt = resultSet.getString("created_at");
                 int points = resultSet.getInt("points");  // Menambahkan points
                 int idMembership = resultSet.getInt("id_membership");  // Menambahkan id_membership
+                int statusMembership = resultSet.getInt("status_aktif_membership");  // Menambahkan id_membership
     
-                tableModel.addRow(new Object[]{id, email, phoneNumber, type, createdAt, points, idMembership});
+                tableModel.addRow(new Object[]{id, email, phoneNumber, type, createdAt, points, idMembership, statusMembership});
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     
+
+
+
+
+    // public void addUser(String email, String phoneNumber, String userType, String createdAt, int points, int idMembership, int statusMembership) {
+    //     String query = "INSERT INTO users (email, phone_number, user_type, created_at, points, id_membership, status_aktif_membership) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    //     try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
+    //          PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+    //         preparedStatement.setString(1, email);
+    //         preparedStatement.setString(2, phoneNumber);
+    //         preparedStatement.setString(3, userType);
+    //         preparedStatement.setString(4, createdAt);
+    //         preparedStatement.setInt(5, points);
+    //         preparedStatement.setInt(6, idMembership);
+    //         preparedStatement.setInt(7, statusMembership);
+    
+    //         preparedStatement.executeUpdate();
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+
+
+
+
+    public void deleteUser(int userId) {
+        String query = "DELETE FROM users WHERE id_user=?";
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    
+  
+    public void updateUser(int userId, String email, String phoneNumber, String userType, String createdAt, int points, int idMembership, int statusMembership) {
+        String query = "UPDATE users SET email=?, phone_number=?, user_type=?, created_at=?, points=?, id_membership=?, status_aktif_membership=? WHERE id_user=?";
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, phoneNumber);
+            preparedStatement.setString(3, userType);
+            preparedStatement.setString(4, createdAt);
+            preparedStatement.setInt(5, points);
+            preparedStatement.setInt(6, idMembership);
+            preparedStatement.setInt(7, statusMembership);
+            preparedStatement.setInt(8, userId);
+    
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 

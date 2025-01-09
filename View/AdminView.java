@@ -140,54 +140,135 @@ public class AdminView {
     // SHOW ALL CUSTOMER
 
 
-
     private void showAllUsers() {
         contentPanel.removeAll();
-
+    
         // Membuat panel utama
         JPanel menu1Panel = new JPanel();
         menu1Panel.setLayout(new BorderLayout());
-
+    
         // Label judul
         JLabel titleLabel = new JLabel("All Customers", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         menu1Panel.add(titleLabel, BorderLayout.NORTH);
-
-        // Panel untuk tombol filter
+    
+        // Panel untuk tombol filter dan tombol lainnya
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton adminButton = new JButton("Admin");
         JButton userButton = new JButton("User");
-
+    
+        // Tombol Add, Delete, Edit
+        // JButton addButton = new JButton("Add");
+        JButton deleteButton = new JButton("Delete");
+        JButton editButton = new JButton("Edit");
+    
+        // Menambahkan tombol ke panel
         buttonPanel.add(adminButton);
         buttonPanel.add(userButton);
+        // buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(editButton);
         menu1Panel.add(buttonPanel, BorderLayout.NORTH);
-
+    
         // Panel untuk tabel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At","id_membership", "points"};
+        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At","Points","id_membership", "Status Aktif Membership"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable userTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(userTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
-
+    
         // Tambahkan tablePanel ke menu1Panel
         menu1Panel.add(tablePanel, BorderLayout.CENTER);
-
+    
         // Tambahkan menu1Panel ke contentPanel
         contentPanel.add(menu1Panel, BorderLayout.CENTER);
-
+    
         // Event Listener untuk tombol
         adminButton.addActionListener(e -> updateTable(tableModel, "Admin"));
         userButton.addActionListener(e -> updateTable(tableModel, "User"));
-
+        // addButton.addActionListener(e -> showAddUserDialog());
+        deleteButton.addActionListener(e -> deleteUser(userTable, tableModel));
+        editButton.addActionListener(e -> editUser(userTable, tableModel));
+    
         contentPanel.revalidate();
         contentPanel.repaint();
+    }
+    
+
+
+
+    // private void showAddUserDialog() {
+   
+    //     String email = JOptionPane.showInputDialog("Enter Email:");
+    //     String phoneNumber = JOptionPane.showInputDialog("Enter Phone Number:");
+    //     String userType = JOptionPane.showInputDialog("Enter User Type:");
+    //     String createdAt = JOptionPane.showInputDialog("Enter Created At:");
+    //     int points = Integer.parseInt(JOptionPane.showInputDialog("Enter Points:"));
+    //     int idMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter Membership ID:"));
+    //     int statusMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter Membership Status:"));
+    
+    //     AdminController controller = new AdminController();
+    //     controller.addUser(email, phoneNumber, userType, createdAt, points, idMembership, statusMembership);
+    // }
+
+
+
+    private void deleteUser(JTable userTable, DefaultTableModel tableModel) {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow != -1) {
+            int userId = (int) tableModel.getValueAt(selectedRow, 0); // Ambil ID pengguna yang dipilih
+            AdminController controller = new AdminController();
+            controller.deleteUser(userId); // Hapus pengguna dari database
+            tableModel.removeRow(selectedRow); // Hapus baris dari tabel
+        } else {
+            JOptionPane.showMessageDialog(null, "Please select a user to delete.");
+        }
     }
 
 
 
+    private void editUser(JTable userTable, DefaultTableModel tableModel) {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow != -1) {
+            int userId = (int) tableModel.getValueAt(selectedRow, 0); // Ambil ID pengguna yang dipilih
+            String email = (String) tableModel.getValueAt(selectedRow, 1);
+            String phoneNumber = (String) tableModel.getValueAt(selectedRow, 2);
+            String userType = (String) tableModel.getValueAt(selectedRow, 3);
+            String createdAt = (String) tableModel.getValueAt(selectedRow, 4);
+            int points = (int) tableModel.getValueAt(selectedRow, 5); // Correct position
+            int idMembership = (int) tableModel.getValueAt(selectedRow, 6); // Correct position
+            int statusMembership = (int) tableModel.getValueAt(selectedRow, 7);
+    
+            // Tampilkan dialog untuk mengedit data pengguna
+            email = JOptionPane.showInputDialog("Edit Email:", email);
+            phoneNumber = JOptionPane.showInputDialog("Edit Phone Number:", phoneNumber);
+            userType = JOptionPane.showInputDialog("Edit User Type:", userType);
+            createdAt = JOptionPane.showInputDialog("Edit Created At:", createdAt);
+            
+            // Perbaiki urutan input: points dan id_membership
+            idMembership = Integer.parseInt(JOptionPane.showInputDialog("Edit Membership ID:", idMembership));
+            points = Integer.parseInt(JOptionPane.showInputDialog("Edit Points:", points));
+            statusMembership = Integer.parseInt(JOptionPane.showInputDialog("Edit Membership Status:", statusMembership));
+    
+            AdminController controller = new AdminController();
+            controller.updateUser(userId, email, phoneNumber, userType, createdAt, points, idMembership, statusMembership);
+            
+            // Update data tabel setelah edit
+            tableModel.setValueAt(email, selectedRow, 1);
+            tableModel.setValueAt(phoneNumber, selectedRow, 2);
+            tableModel.setValueAt(userType, selectedRow, 3);
+            tableModel.setValueAt(createdAt, selectedRow, 4);
+            tableModel.setValueAt(points, selectedRow, 5);
+            tableModel.setValueAt(idMembership, selectedRow, 6);
+            tableModel.setValueAt(statusMembership, selectedRow, 7);
+        } else {
+            JOptionPane.showMessageDialog(null, "Please select a user to edit.");
+        }
+    }
+    
 
-
+                    
 
 private void updateTable(DefaultTableModel tableModel, String userType) {
     AdminController controller = new AdminController();
