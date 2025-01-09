@@ -14,7 +14,7 @@ public class UserMenuView {
 
         JFrame menuFrame = new JFrame("User Menu");
         menuFrame.setLayout(null);
-        menuFrame.setSize(400, 300);
+        menuFrame.setSize(400, 350);  // Increased height for new button
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         int x = (screenSize.width - menuFrame.getWidth()) / 2;
@@ -36,9 +36,14 @@ public class UserMenuView {
         membershipButton.setBounds(100, 140, 200, 40);
         menuFrame.add(membershipButton);
 
+        // View Membership Status Button
+        JButton viewMembershipButton = new JButton("View Membership Status");
+        viewMembershipButton.setBounds(100, 200, 200, 40);
+        menuFrame.add(viewMembershipButton);
+
         // Logout Button
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBounds(100, 200, 200, 40);
+        logoutButton.setBounds(100, 260, 200, 40);
         menuFrame.add(logoutButton);
 
         // Action Listeners
@@ -50,6 +55,11 @@ public class UserMenuView {
         membershipButton.addActionListener(e -> {
             menuFrame.dispose();
             new MembershipView();
+        });
+
+        viewMembershipButton.addActionListener(e -> {
+            menuFrame.dispose();
+            new MembershipStatusView();
         });
 
         logoutButton.addActionListener(e -> {
