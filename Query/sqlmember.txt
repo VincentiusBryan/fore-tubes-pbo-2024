@@ -24,6 +24,14 @@ ALTER TABLE transaksi_detail
 ADD CONSTRAINT fk_promo
 FOREIGN KEY (id_promo) REFERENCES promos(id_promo);
 
+CREATE TABLE IF NOT EXISTS membership (
+    id_membership int(11) NOT NULL AUTO_INCREMENT,
+    duration int(11) NOT NULL COMMENT 'Duration in months',
+    deskripsi text NOT NULL,
+    harga int(11) NOT NULL,  -- Added price column
+    PRIMARY KEY (id_membership)
+);
+
 CREATE TABLE IF NOT EXISTS transaksi_membership (
     id_transaksi_membership INT PRIMARY KEY AUTO_INCREMENT,
     id_user INT NOT NULL,
@@ -33,14 +41,6 @@ CREATE TABLE IF NOT EXISTS transaksi_membership (
     total_pembayaran DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (id_user) REFERENCES users(id_user),
     FOREIGN KEY (id_membership) REFERENCES membership(id_membership)
-);
-
-CREATE TABLE IF NOT EXISTS membership (
-    id_membership int(11) NOT NULL AUTO_INCREMENT,
-    duration int(11) NOT NULL COMMENT 'Duration in months',
-    deskripsi text NOT NULL,
-    harga int(11) NOT NULL,  -- Added price column
-    PRIMARY KEY (id_membership)
 );
 
 ALTER TABLE users
@@ -55,3 +55,10 @@ INSERT INTO membership (duration, deskripsi, harga) VALUES
     (6, '6 Months - Benefits + 15% diskon untuk semua pesanan', 270000),
     (12, '12 Months - Benefits + 20% diskon untuk semua pesanan', 480000);
 
+
+INI BARU (09-01-25) VB YG TAMBAHIN
+--------------------------------------------------
+ALTER TABLE transaksi_detail 
+ADD COLUMN lokasi ENUM('Pick-up', 'Delivery') NOT NULL DEFAULT 'Pick-up',
+ADD COLUMN alamat_delivery TEXT,
+ADD COLUMN keterangan_delivery TEXT;
