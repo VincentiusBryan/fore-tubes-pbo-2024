@@ -62,3 +62,28 @@ ALTER TABLE transaksi_detail
 ADD COLUMN lokasi ENUM('Pick-up', 'Delivery') NOT NULL DEFAULT 'Pick-up',
 ADD COLUMN alamat_delivery TEXT,
 ADD COLUMN keterangan_delivery TEXT;
+
+BARU JUGA -jordan
+
+INSERT SATU SATU!!!!!!!!!!!
+-------------------------------------
+CREATE TABLE point_rewards (
+    id_minuman INT PRIMARY KEY,
+    nama_minuman VARCHAR(100) NOT NULL,
+    point_cost INT NOT NULL,
+    FOREIGN KEY (id_minuman) REFERENCES beverages(id_beverage)
+);
+
+CREATE TABLE point_redemptions (
+    id_redemption INT PRIMARY KEY AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    id_beverage INT NOT NULL,
+    points_used INT NOT NULL,
+    redemption_date DATETIME NOT NULL,
+    FOREIGN KEY (id_user) REFERENCES users(id_user),
+    FOREIGN KEY (id_beverage) REFERENCES beverages(id_beverage)
+);
+
+INSERT INTO point_rewards (id_beverage, nama_minuman, point_cost)
+SELECT id_beverage, name, 10 FROM beverages
+WHERE name IN ('Espresso', 'Americano', 'Cappuccino');

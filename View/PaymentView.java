@@ -1,6 +1,7 @@
 package View;
 
 import Connection.DBConnection;
+import Controller.SessionManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,13 +9,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.SQLException;
 
 public class PaymentView {
     private JFrame paymentFrame;
-    private double totalPrice; // Menyimpan total harga dari pesanan
-    private String selectedPromoName = ""; // Nama promo yang dipilih
-    private int selectedDiscount = 0; // Persentase diskonnya
-    private int selectedPromoId = 0; // Tambahkan ini di bagian instance variables
+    private double totalPrice;
+    private String selectedPromoName = "";
+    private int selectedDiscount = 0;
+    private int selectedPromoId = 0;
 
     public PaymentView(String orderSummary, double totalPrice) {
         this.totalPrice = totalPrice;
@@ -44,7 +46,6 @@ public class PaymentView {
         JScrollPane orderScrollPane = new JScrollPane(orderDetailsArea);
         mainPanel.add(orderScrollPane, BorderLayout.CENTER);
 
-        // Promo button
         JPanel promoPanel = new JPanel();
         promoPanel.setLayout(new GridLayout(0, 1, 10, 10));
         JLabel promoLabel = new JLabel("Promo", SwingConstants.CENTER);
@@ -78,7 +79,6 @@ public class PaymentView {
     }
 
     private void loadPromos(JPanel promoPanel) {
-        // Koneksi ke database
         DBConnection dbConnection = DBConnection.getInstance();
         Connection connection = dbConnection.getConnection();
 
@@ -96,10 +96,9 @@ public class PaymentView {
                 String startDate = resultSet.getString("start_date");
                 String endDate = resultSet.getString("end_date");
 
-                // Di dalam method loadPromos, ubah bagian pembuatan promoButton:
                 JButton promoButton = new JButton(promoName + " - " + discountPercentage + "%");
                 promoButton.addActionListener(e -> {
-                    selectedPromoId = id; // Tambahkan ini
+                    selectedPromoId = id;
                     selectedPromoName = promoName;
                     selectedDiscount = discountPercentage;
                     JOptionPane.showMessageDialog(paymentFrame,
@@ -115,7 +114,6 @@ public class PaymentView {
     }
 
     private void handlePayment(String method) {
-        // Menghitung diskon berdasarkan promo yang dipilih
         double discountAmount = (totalPrice * selectedDiscount) / 100;
         double finalPrice = totalPrice - discountAmount;
 
@@ -125,7 +123,6 @@ public class PaymentView {
         String formattedTotalPrice = currencyFormat.format(totalPrice);
         String formattedFinalPrice = currencyFormat.format(finalPrice);
 
-        // Menampilkan info harga
         JOptionPane.showMessageDialog(paymentFrame,
                 "Total Price: " + formattedTotalPrice +
                         "\nPromo: " + selectedPromoName + " - Discount: " + selectedDiscount + "%" +
@@ -133,7 +130,6 @@ public class PaymentView {
                 "Payment Details",
                 JOptionPane.INFORMATION_MESSAGE);
 
-        // Proses pembayaran
         if (method.equals("GoPay") || method.equals("Ovo")) {
             String phoneNumber = JOptionPane.showInputDialog(paymentFrame,
                     "Enter your phone number for " + method + " payment:", "Phone Number",
@@ -143,7 +139,7 @@ public class PaymentView {
                 JOptionPane.showMessageDialog(paymentFrame,
                         "You have successfully paid with " + method + ". Payment completed!", "Payment Success",
                         JOptionPane.INFORMATION_MESSAGE);
-                updateTransactionWithPromo(selectedPromoId); // Update transaksi dengan promo
+                updateTransactionWithPromo(selectedPromoId);
                 continueAfterPayment(true);
             } else {
                 JOptionPane.showMessageDialog(paymentFrame, "Phone number is required to complete the payment.",
@@ -174,7 +170,7 @@ public class PaymentView {
 
             qrFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                 public void windowClosing(java.awt.event.WindowEvent we) {
-                    updateTransactionWithPromo(selectedPromoId); // Update transaksi dengan promo
+                    updateTransactionWithPromo(selectedPromoId);
                     continueAfterPayment(true);
                     qrFrame.dispose();
                 }
@@ -188,10 +184,8 @@ public class PaymentView {
 
         if (connection != null) {
             try {
-                // Get the original price from the transaction
                 double originalPrice = totalPrice;
 
-                // Get the discount percentage from the promo
                 String promoQuery = "SELECT discount_percentage FROM promos WHERE id_promo = ?";
                 PreparedStatement promoPs = connection.prepareStatement(promoQuery);
                 promoPs.setInt(1, promoId);
@@ -200,10 +194,8 @@ public class PaymentView {
                 if (promoRs.next()) {
                     int discountPercentage = promoRs.getInt("discount_percentage");
 
-                    // Calculate the discounted price
                     double discountedPrice = originalPrice * (100 - discountPercentage) / 100.0;
 
-                    // Update the transaksi_detail table with promo information
                     String updateDetailQuery = "UPDATE transaksi_detail " +
                             "SET id_promo = ?, " +
                             "harga_sebelum_promo = ?, " +
@@ -216,12 +208,11 @@ public class PaymentView {
                     detailPs.executeUpdate();
                     detailPs.close();
 
-                    // Update the transaksi table with the new total price after promo
                     String updateTransactionQuery = "UPDATE transaksi " +
                             "SET total_harga = ? " +
                             "WHERE id_transaksi = (SELECT MAX(id_transaksi) FROM transaksi)";
                     PreparedStatement transactionPs = connection.prepareStatement(updateTransactionQuery);
-                    transactionPs.setDouble(1, discountedPrice); // Set the discounted price as the new total_harga
+                    transactionPs.setDouble(1, discountedPrice);
                     transactionPs.executeUpdate();
                     transactionPs.close();
                 }
@@ -238,8 +229,47 @@ public class PaymentView {
         }
     }
 
+    private void addPointsToUser() {
+        DBConnection dbConnection = DBConnection.getInstance();
+        Connection connection = dbConnection.getConnection();
+        if (connection != null) {
+            try {
+                String updatePointsQuery = "UPDATE users SET points = points + 2 WHERE id_user = ?";
+                PreparedStatement ps = connection.prepareStatement(updatePointsQuery);
+                ps.setInt(1, SessionManager.getLoggedInUserId());
+                ps.executeUpdate();
+                ps.close();
+
+                String getPointsQuery = "SELECT points FROM users WHERE id_user = ?";
+                ps = connection.prepareStatement(getPointsQuery);
+                ps.setInt(1, SessionManager.getLoggedInUserId());
+                ResultSet rs = ps.executeQuery();
+                
+                if (rs.next()) {
+                    int currentPoints = rs.getInt("points");
+                    JOptionPane.showMessageDialog(paymentFrame,
+                        "You earned 2 points for this transaction!\n" +
+                        "Your current points: " + currentPoints,
+                        "Points Earned",
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
+                
+                ps.close();
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null,
+                    "Failed to add points: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private void continueAfterPayment(boolean paymentSuccess) {
         if (paymentSuccess) {
+            addPointsToUser();  // Added points system integration
+            
             int response = JOptionPane.showConfirmDialog(paymentFrame, "Do you want to create another order?",
                     "Order Again", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
@@ -257,5 +287,4 @@ public class PaymentView {
             }
         }
     }
-
 }
