@@ -591,25 +591,38 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
     private void showAllOrders() {
         contentPanel.removeAll();
         JPanel ordersPanel = new JPanel(new BorderLayout());
+        
         JLabel titleLabel = new JLabel("View Orders", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         ordersPanel.add(titleLabel, BorderLayout.NORTH);
-        String[] columnNames = {"ID Transaksi", "Email", "Nama Makanan", "Nama Minuman", 
-                              "Tipe Item", "Ukuran", "Jumlah", "Total Harga", 
-                              "Waktu Transaksi", "Promo", "Selesai"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    
+        String[] columnNames = {
+            "ID Detail", "ID Transaksi", "Email Customer", "Nama Item", 
+            "Tipe Item", "Ukuran", "Jumlah", "Harga/Item", "Total Harga",
+            "Lokasi", "Alamat Delivery", "Keterangan",
+            "Tanggal Transaksi"
+        };
+        
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+    
         controller.showAllOrders(tableModel);
+        
         JTable table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
-        table.getColumnModel().getColumn(10).setCellEditor(new DefaultCellEditor(new JCheckBox()));
-        table.getModel().addTableModelListener(e -> {
-            if (e.getColumn() == 10) {
-                int selectedRow = table.getSelectedRow();
-                int idTransaksi = (int) table.getValueAt(selectedRow, 0);
-                boolean status = (boolean) table.getValueAt(selectedRow, 10);
-                controller.updateOrderStatus(idTransaksi, status);
-            }
-        });
+        
+        table.getColumnModel().getColumn(0).setPreferredWidth(60);   // ID Detail
+        table.getColumnModel().getColumn(1).setPreferredWidth(60);   // ID Transaksi
+        table.getColumnModel().getColumn(2).setPreferredWidth(150);  // Email
+        table.getColumnModel().getColumn(9).setPreferredWidth(80);   // Lokasi
+        table.getColumnModel().getColumn(10).setPreferredWidth(200); // Alamat
+        table.getColumnModel().getColumn(11).setPreferredWidth(150); // Keterangan
+        table.getColumnModel().getColumn(12).setPreferredWidth(120); // Tanggal
+        
         ordersPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.add(ordersPanel);
         contentPanel.revalidate();

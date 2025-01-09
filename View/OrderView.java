@@ -25,6 +25,11 @@ public class OrderView {
 
     private DBConnection dbConnection;
 
+    private JPanel mainPanel;
+    private JPanel deliveryPanel;
+    private JTextArea alamatArea;
+    private JTextArea keteranganArea;
+
     public OrderView() {
 
         if (!SessionManager.isUserLoggedIn()) {
@@ -83,13 +88,16 @@ public class OrderView {
         int y = (screenSize.height - orderFrame.getHeight()) / 2;
         orderFrame.setLocation(x, y);
 
-        JPanel mainPanel = new JPanel();
+        mainPanel = new JPanel();
         mainPanel.setLayout(null);
 
         JLabel titleLabel = new JLabel("Menu");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 30));
         titleLabel.setBounds(260, 14, 200, 30);
         mainPanel.add(titleLabel);
+
+        JPanel deliveryOptionsPanel = createDeliveryOptionsPanel();
+        mainPanel.add(deliveryOptionsPanel);
 
         // Beverage Section
         JLabel typeOfBeverageLabel = new JLabel("Tipe Minuman:");
@@ -336,7 +344,6 @@ public class OrderView {
                         return;
                     }
         
-                    // Get new transaction id with just user_id first
                     String initialQuery = "INSERT INTO transaksi (id_user, total_harga) VALUES (?, ?)";
                     int transactionId;
                     try (PreparedStatement stmt = connection.prepareStatement(initialQuery, 
@@ -353,7 +360,6 @@ public class OrderView {
                         }
                     }
         
-                    // Process cart items
                     for (int i = 0; i < cartModel.size(); i++) {
                         String cartItem = cartModel.get(i);
                         String[] itemParts = cartItem.split(" - Rp");
@@ -381,8 +387,14 @@ public class OrderView {
                             } else {
                                 itemType = "Makanan";
                             }
-        
-                            String query = "INSERT INTO transaksi_detail (id_transaksi, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+                            String lokasi = deliveryType;
+                            String alamat = (deliveryType.equals("Delivery")) ? alamatArea.getText() : "";
+                            String keterangan = (deliveryType.equals("Delivery")) ? keteranganArea.getText() : "";
+
+                            String query = "INSERT INTO transaksi_detail (id_transaksi, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, lokasi, alamat_delivery, keterangan_delivery) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
                             try (PreparedStatement ps = connection.prepareStatement(query)) {
                                 ps.setInt(1, transactionId);
                                 ps.setString(2, itemName);
@@ -391,12 +403,14 @@ public class OrderView {
                                 ps.setInt(5, quantity);
                                 ps.setDouble(6, pricePerItem);
                                 ps.setDouble(7, itemPrice);
+                                ps.setString(8, lokasi);
+                                ps.setString(9, alamat);
+                                ps.setString(10, keterangan);
                                 ps.executeUpdate();
                             }
                         }
                     }
         
-                    // Update total harga in main transaction
                     try (PreparedStatement updateStmt = connection.prepareStatement(
                             "UPDATE transaksi SET total_harga = ? WHERE id_transaksi = ?")) {
                         updateStmt.setDouble(1, totalPrice);
@@ -437,6 +451,115 @@ public class OrderView {
         orderFrame.add(mainPanel);
         orderFrame.setVisible(true);
     }
+
+    // PICK-UP OR DELIVERY
+
+private String deliveryType = "";  
+
+private JPanel createDeliveryOptionsPanel() {
+    JPanel panel = new JPanel();
+    panel.setLayout(null);
+    panel.setBounds(30, 40, 540, 30);
+
+    JLabel deliveryLabel = new JLabel("Pilih Lokasi:");
+    deliveryLabel.setBounds(0, 0, 80, 25);
+    panel.add(deliveryLabel);
+
+    JRadioButton pickupButton = new JRadioButton("Pick-up");
+    pickupButton.setBounds(90, 0, 80, 25);
+    pickupButton.setSelected(true); 
+    JRadioButton deliveryButton = new JRadioButton("Delivery");
+    deliveryButton.setBounds(180, 0, 80, 25);
+
+    ButtonGroup group = new ButtonGroup();
+    group.add(pickupButton);
+    group.add(deliveryButton);
+
+    deliveryPanel = new JPanel();
+    deliveryPanel.setLayout(null);
+    deliveryPanel.setBounds(30, 65, 540, 120);
+    deliveryPanel.setVisible(false);
+
+    JLabel alamatLabel = new JLabel("Alamat:");
+    alamatLabel.setBounds(0, 0, 60, 25);
+    
+    alamatArea = new JTextArea();
+    alamatArea.setLineWrap(true);
+    alamatArea.setWrapStyleWord(true);
+    JScrollPane alamatScroll = new JScrollPane(alamatArea);
+    alamatScroll.setBounds(70, 0, 450, 50);
+
+    JLabel keteranganLabel = new JLabel("Catatan:");
+    keteranganLabel.setBounds(0, 60, 70, 25);
+    
+    keteranganArea = new JTextArea();
+    keteranganArea.setLineWrap(true);
+    keteranganArea.setWrapStyleWord(true);
+    JScrollPane keteranganScroll = new JScrollPane(keteranganArea);
+    keteranganScroll.setBounds(70, 60, 450, 50);
+
+    deliveryPanel.add(alamatLabel);
+    deliveryPanel.add(alamatScroll);
+    deliveryPanel.add(keteranganLabel);
+    deliveryPanel.add(keteranganScroll);
+
+    pickupButton.addActionListener(e -> {
+        deliveryType = "Pick-up";
+        deliveryPanel.setVisible(false);
+        mainPanel.remove(deliveryPanel);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        adjustMenuComponents(false);
+        pickupButton.setSelected(true);
+        deliveryButton.setSelected(false);
+    });
+
+    deliveryButton.addActionListener(e -> {
+        deliveryType = "Delivery";  
+        deliveryPanel.setVisible(true);
+        mainPanel.add(deliveryPanel);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        adjustMenuComponents(true);
+        deliveryButton.setSelected(true);  
+        pickupButton.setSelected(false);
+    });
+
+    panel.add(pickupButton);
+    panel.add(deliveryButton);
+
+    return panel;
+}
+
+
+    
+
+    private boolean isDeliveryMode = false;
+    
+    private void adjustMenuComponents(boolean isDelivery) {
+        if (isDelivery == isDeliveryMode) {
+            return;
+        }
+
+        int offset = isDelivery ? 120 : -120;
+        
+        Component[] components = mainPanel.getComponents();
+        for (Component comp : components) {
+            if (comp != deliveryPanel && comp.getY() > 65) {
+                comp.setLocation(comp.getX(), comp.getY() + offset);
+            }
+        }
+        
+        Window window = SwingUtilities.getWindowAncestor(mainPanel);
+        if (window instanceof JFrame) {
+            JFrame frame = (JFrame) window;
+            frame.setSize(frame.getWidth(), frame.getHeight() + (isDelivery ? 120 : -120));
+            frame.revalidate();
+        }
+        isDeliveryMode = isDelivery;
+    }
+
+    
 
     public static void main(String[] args) {
         new OrderView();

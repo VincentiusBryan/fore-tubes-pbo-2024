@@ -96,26 +96,6 @@ CREATE TABLE statusToko (
 INSERT INTO statusToko (status) VALUES (0);  -- set 0 default
 
 
-CREATE TABLE transaksi (
-    id_transaksi INT PRIMARY KEY,
-    id_user INT NOT NULL,
-    nama_item VARCHAR(255) NOT NULL,
-    tipe_item VARCHAR(50) NOT NULL,
-    ukuran VARCHAR(50),
-    jumlah INT NOT NULL,
-    harga_per_item DECIMAL(10, 2) NOT NULL,
-    total_harga DECIMAL(10, 2) NOT NULL,
-    waktu_transaksi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_user) REFERENCES users(id_user)
-);
-
-ALTER TABLE transaksi ADD COLUMN id_promo INT,
-ADD FOREIGN KEY (id_promo) REFERENCES promos(id_promo);
-
-ALTER TABLE transaksi
-ADD COLUMN harga_sebelum_promo DOUBLE AFTER total_harga,
-ADD COLUMN harga_setelah_promo DOUBLE AFTER harga_sebelum_promo;
-
 
 
 

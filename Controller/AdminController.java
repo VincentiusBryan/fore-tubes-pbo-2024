@@ -1,5 +1,6 @@
 package Controller;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -245,54 +246,76 @@ public void updatePromoInDatabase(String oldName, String newName, String newDesc
 
 
 
-    // // MENU 5 - View Orders
+    // MENU 5 - View Orders
     public void showAllOrders(DefaultTableModel tableModel) {
         tableModel.setRowCount(0);
-
-        String query = "SELECT t.id_transaksi, u.email, f.name AS food_name, b.name AS beverage_name, t.tipe_item, t.ukuran, t.jumlah, t.total_harga, t.waktu_transaksi, pt.promo_name "
-                    + "FROM transaksi t "
-                    + "JOIN users u ON t.id_user = u.id_user "
-                    + "LEFT JOIN foods f ON t.nama_item = f.name "
-                    + "LEFT JOIN beverages b ON t.nama_item = b.name "
-                    + "LEFT JOIN promos pt ON t.id_promo = pt.id_promo";
-        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
-            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
+    
+        String query = """
+            SELECT td.id_detail, td.id_transaksi, td.nama_item, td.tipe_item, 
+                   td.ukuran, td.jumlah, td.harga_per_item, td.total_harga,
+                   td.id_promo, td.harga_sebelum_promo, td.harga_setelah_promo,
+                   td.lokasi, td.alamat_delivery, td.keterangan_delivery,
+                   t.tanggal_transaksi, u.email
+            FROM transaksi_detail td
+            JOIN transaksi t ON td.id_transaksi = t.id_transaksi
+            JOIN users u ON t.id_user = u.id_user
+            LEFT JOIN promos p ON td.id_promo = p.id_promo
+            ORDER BY t.tanggal_transaksi DESC
+        """;
+    
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+    
             ResultSet resultSet = preparedStatement.executeQuery();
-
+    
             while (resultSet.next()) {
-                int idTransaksi = resultSet.getInt("id_transaksi");
-                String email = resultSet.getString("email");
-                String foodName = resultSet.getString("food_name");
-                String beverageName = resultSet.getString("beverage_name");
-                String tipeItem = resultSet.getString("tipe_item");
-                String ukuran = resultSet.getString("ukuran");
-                int jumlah = resultSet.getInt("jumlah");
-                double totalHarga = resultSet.getDouble("total_harga");
-                Timestamp waktuTransaksi = resultSet.getTimestamp("waktu_transaksi");
-                String promoName = resultSet.getString("promo_name");
-
-                tableModel.addRow(new Object[]{idTransaksi, email, foodName, beverageName, tipeItem, ukuran, jumlah, totalHarga, waktuTransaksi, promoName});
+                Object[] row = {
+                    resultSet.getInt("id_detail"),
+                    resultSet.getInt("id_transaksi"),
+                    resultSet.getString("email"),
+                    resultSet.getString("nama_item"),
+                    resultSet.getString("tipe_item"),
+                    resultSet.getString("ukuran"),
+                    resultSet.getInt("jumlah"),
+                    resultSet.getDouble("harga_per_item"),
+                    resultSet.getDouble("total_harga"),
+                    resultSet.getString("lokasi"),
+                    resultSet.getString("alamat_delivery"),
+                    resultSet.getString("keterangan_delivery"),
+                    resultSet.getTimestamp("tanggal_transaksi")
+                };
+                tableModel.addRow(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, 
+                "Error mengambil data transaksi: " + e.getMessage(),
+                "Database Error",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public void updateOrderStatus(int idTransaksi, boolean status) {
-        String query = "UPDATE transaksi SET selesai = ? WHERE id_transaksi = ?";
-        try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
-             PreparedStatement statement = connection.prepareStatement(query)) {
-    
-            statement.setBoolean(1, status);
-            statement.setInt(2, idTransaksi);
-            statement.executeUpdate();
-    
-            System.out.println("Status pesanan berhasil diperbarui.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+public void updateOrderStatus(int idTransaksi, boolean status) {
+    String query = "UPDATE transaksi SET status_selesai = ? WHERE id_transaksi = ?";
+    try (Connection connection = dbConnection.getConnection();
+         PreparedStatement statement = connection.prepareStatement(query)) {
+
+        statement.setBoolean(1, status);
+        statement.setInt(2, idTransaksi);
+        statement.executeUpdate();
+
+        JOptionPane.showMessageDialog(null,
+            "Status pesanan berhasil diperbarui.",
+            "Sukses",
+            JOptionPane.INFORMATION_MESSAGE);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null,
+            "Error mengupdate status: " + e.getMessage(),
+            "Database Error",
+            JOptionPane.ERROR_MESSAGE);
     }
+}
     
 
 
