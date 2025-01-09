@@ -68,10 +68,10 @@ BARU JUGA -jordan
 INSERT SATU SATU!!!!!!!!!!!
 -------------------------------------
 CREATE TABLE point_rewards (
-    id_minuman INT PRIMARY KEY,
+    id_beverage INT PRIMARY KEY,
     nama_minuman VARCHAR(100) NOT NULL,
     point_cost INT NOT NULL,
-    FOREIGN KEY (id_minuman) REFERENCES beverages(id_beverage)
+    FOREIGN KEY (id_beverage) REFERENCES beverages(id_beverage)
 );
 
 CREATE TABLE point_redemptions (
@@ -87,3 +87,5 @@ CREATE TABLE point_redemptions (
 INSERT INTO point_rewards (id_beverage, nama_minuman, point_cost)
 SELECT id_beverage, name, 10 FROM beverages
 WHERE name IN ('Espresso', 'Americano', 'Cappuccino');
+
+ALTER TABLE users ADD COLUMN points int default 0;

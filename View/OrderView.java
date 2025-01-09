@@ -454,7 +454,7 @@ public class OrderView {
 
     // PICK-UP OR DELIVERY
 
-private String deliveryType = "";  
+private String deliveryType = "Pick-up";  
 
 private JPanel createDeliveryOptionsPanel() {
     JPanel panel = new JPanel();
