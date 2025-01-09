@@ -48,7 +48,7 @@ public class AdminView {
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Laporan Penjualan","Back"};
+        String[] menuNames = {"All Users", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Laporan Penjualan","Membership","Back"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -93,8 +93,8 @@ public class AdminView {
         @Override
         public void actionPerformed(ActionEvent e) {
             switch (menuName) {
-                case "All Customer":
-                    showAllCustomer();
+                case "All Users":
+                    showAllUsers();
                     break;
                 case "Edit Menu":
                     editMenu();
@@ -113,6 +113,9 @@ public class AdminView {
                     break;
                 case "Laporan Penjualan":
                     showSalesReport();
+                    break;
+                case "Membership":
+                    MembershipControl();
                     break;
                 case "Back":
                     new MainMenu();
@@ -136,7 +139,7 @@ public class AdminView {
 
 
 
-    private void showAllCustomer() {
+    private void showAllUsers() {
         contentPanel.removeAll();
 
         // Membuat panel utama
@@ -159,7 +162,7 @@ public class AdminView {
 
         // Panel untuk tabel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At"};
+        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At","id_membership", "points"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable userTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(userTable);
@@ -186,7 +189,7 @@ public class AdminView {
 
 private void updateTable(DefaultTableModel tableModel, String userType) {
     AdminController controller = new AdminController();
-    controller.updateTable(tableModel, userType);
+    controller.updateTableShowUsers(tableModel, userType);
 }
 
 
@@ -806,6 +809,13 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
         contentPanel.repaint();
     }
 
+
+
+
+
+    private void MembershipControl(){
+
+    }
 
 public static void main(String[] args) {
   new AdminView();

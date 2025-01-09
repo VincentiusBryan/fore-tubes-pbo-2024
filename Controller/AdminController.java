@@ -20,29 +20,37 @@ public class AdminController {
     }
 
     //MENU 1 
-    public void updateTable(DefaultTableModel tableModel, String userType) {
+    public void updateTableShowUsers(DefaultTableModel tableModel, String userType) {
         tableModel.setRowCount(0);
-
+    
         String query = "SELECT * FROM users WHERE user_type=?";
         try (Connection connection = dbConnection.getConnection();  // Menggunakan getConnection()
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
+    
             preparedStatement.setString(1, userType);
             ResultSet resultSet = preparedStatement.executeQuery();
-
+    
             while (resultSet.next()) {
                 int id = resultSet.getInt("id_user");
                 String email = resultSet.getString("email");
                 String phoneNumber = resultSet.getString("phone_number");
                 String type = resultSet.getString("user_type");
                 String createdAt = resultSet.getString("created_at");
-
-                tableModel.addRow(new Object[]{id, email, phoneNumber, type, createdAt});
+                int points = resultSet.getInt("points");  // Menambahkan points
+                int idMembership = resultSet.getInt("id_membership");  // Menambahkan id_membership
+    
+                tableModel.addRow(new Object[]{id, email, phoneNumber, type, createdAt, points, idMembership});
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
+
+
+
+
+
 
     // MENU 2
     public void deleteItemFromDatabase(String table, String name) {
