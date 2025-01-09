@@ -1,5 +1,6 @@
 package Controller;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
@@ -444,6 +445,65 @@ public void deleteKaryawan(int id) {
     } catch (SQLException e) {
         e.printStackTrace();
         System.out.println("Gagal menghapus karyawan.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public void updateSalesTable(DefaultTableModel tableModel, String tipeItem, String tanggal, JLabel totalLabel) {
+    String query = "SELECT t.tanggal_transaksi, td.nama_item, td.tipe_item, td.jumlah, td.harga_per_item, td.total_harga " +
+                   "FROM transaksi t " +
+                   "JOIN transaksi_detail td ON t.id_transaksi = td.id_transaksi " +
+                   "WHERE (? = 'Semua' OR td.tipe_item = ?) " +
+                   "AND (? IS NULL OR DATE(t.tanggal_transaksi) = ?)";
+
+    double totalPendapatan = 0;
+
+    try (Connection connection = dbConnection.getConnection(); 
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+        preparedStatement.setString(1, tipeItem);
+        preparedStatement.setString(2, tipeItem);
+        preparedStatement.setString(3, tanggal);
+        preparedStatement.setString(4, tanggal);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            // Clear existing rows
+            tableModel.setRowCount(0);
+
+            // Populate table with data and calculate total pendapatan
+            while (resultSet.next()) {
+                Object[] row = {
+                    resultSet.getString("tanggal_transaksi"),
+                    resultSet.getString("nama_item"),
+                    resultSet.getString("tipe_item"),
+                    resultSet.getInt("jumlah"),
+                    resultSet.getDouble("harga_per_item"),
+                    resultSet.getDouble("total_harga")
+                };
+                tableModel.addRow(row);
+
+                // Update total pendapatan
+                totalPendapatan += resultSet.getDouble("total_harga");
+            }
+
+            // Update total pendapatan label
+            totalLabel.setText("Total Pendapatan: Rp " + String.format("%,.2f", totalPendapatan));
+
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(null, "Error fetching data: " + ex.getMessage());
     }
 }
 

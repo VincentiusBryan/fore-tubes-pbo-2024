@@ -2,6 +2,13 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
 
   USE tubesForeDemo;
 
+
+
+
+
+
+
+
   CREATE TABLE IF NOT EXISTS users (
     id_user int(11) NOT NULL AUTO_INCREMENT,
     email varchar(255) NOT NULL,
@@ -17,6 +24,17 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
   (2, 'user@example.com', '082345678901', 'userpassword', 'User', '2024-12-04 15:45:22'),
   (4, 'admin@example.com', '081234567890', 'adminpassword', 'Admin', '2024-12-04 15:45:40'),
   (5, 'yoel@gmail.com', '082214664444', 'yoel', 'User', '2024-12-04 15:46:05');
+
+
+
+
+
+
+
+
+
+
+
 
   CREATE TABLE IF NOT EXISTS beverages (
     id_beverage int(11) NOT NULL AUTO_INCREMENT,
@@ -46,6 +64,19 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
   ('Earl Grey', 'Medium', 22000.0),
   ('Earl Grey', 'Large', 27000.0);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   CREATE TABLE IF NOT EXISTS foods (
     id_food int(11) NOT NULL AUTO_INCREMENT,
     name varchar(255) NOT NULL,
@@ -64,6 +95,18 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
   ('Churros with Chocolate', 22000.0),
   ('Butter Croissant', 12000.0),
   ('Chocolate Croissant', 20000.0);
+
+
+
+
+
+
+
+
+
+
+
+
 
   CREATE TABLE IF NOT EXISTS promos (
     id_promo int(11) NOT NULL AUTO_INCREMENT,
@@ -86,6 +129,16 @@ CREATE DATABASE IF NOT EXISTS tubesForeDemo;
 
 
 
+
+
+
+
+
+
+
+
+
+
 CREATE TABLE statusToko (
     id INT AUTO_INCREMENT PRIMARY KEY,
     status INT NOT NULL,  -- 1: Buka, 0: Tutup
@@ -94,6 +147,11 @@ CREATE TABLE statusToko (
 
 
 INSERT INTO statusToko (status) VALUES (0);  -- set 0 default
+
+
+
+
+
 
 
 
@@ -114,3 +172,40 @@ VALUES
     ('Budi Santoso', 'Manager', 'Senin–Jumat 09:00–20:00', 8000000.00),
     ('Siti Aminah', 'Staff', 'Senin–Jumat 09:00–17:00', 4500000.00),
     ('Andi Wijaya', 'Intern', 'Senin–Jumat 13:00–17:00', 2000000.00);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- DUMMY TRANSAKSI
+
+INSERT INTO `transaksi` (`id_transaksi`, `id_user`, `total_harga`, `tanggal_transaksi`) VALUES
+(1, 5, 37500, '2025-01-09 14:05:00'),
+(2, 2, 100000, '2025-01-01 03:00:00'),
+(3, 5, 175000, '2025-01-02 04:30:00'),
+(4, 2, 120000, '2025-01-03 07:20:00'),
+(5, 5, 85000, '2025-01-04 08:10:00');
+
+
+
+    INSERT INTO transaksi_detail (id_transaksi, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, id_promo, harga_sebelum_promo, harga_setelah_promo) VALUES
+(1, 'Tiramisu', 'Makanan', NULL, 2, 30000.0, 60000.0, 3, 60000.0, 48000.0), -- Spring Promo
+(1, 'Iced Americano', 'Minuman', 'Medium', 1, 25000.0, 25000.0, 2, 25000.0, 17500.0), -- New Year Offer
+(2, 'Black Forest', 'Makanan', NULL, 3, 28000.0, 84000.0, NULL, NULL, 84000.0),
+(2, 'Green Peach', 'Minuman', 'Large', 2, 30000.0, 60000.0, 4, 60000.0, 54000.0), -- Weekend Deal
+(3, 'Churros Classic', 'Makanan', NULL, 2, 18000.0, 36000.0, 3, 36000.0, 28800.0), -- Spring Promo
+(3, 'Hot Matcha Latte', 'Minuman', 'Medium', 2, 30000.0, 60000.0, NULL, NULL, 60000.0),
+(4, 'Strawberry Donut', 'Makanan', NULL, 1, 20000.0, 20000.0, NULL, NULL, 20000.0),
+(4, 'Earl Grey', 'Minuman', 'Large', 1, 27000.0, 27000.0, 4, 27000.0, 24300.0), -- Weekend Deal
+(5, 'Butter Croissant', 'Makanan', NULL, 2, 12000.0, 24000.0, NULL, NULL, 24000.0),
+(5, 'Iced Chocolate', 'Minuman', 'Medium', 1, 40000.0, 40000.0, 1, 40000.0, 20000.0); -- Christmas Sale

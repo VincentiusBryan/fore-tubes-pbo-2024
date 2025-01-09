@@ -39,12 +39,16 @@ public class AdminView {
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setLayout(new BorderLayout());
     
+
+        adminFrame.setExtendedState(JFrame.MAXIMIZED_BOTH); // BUAT FULSCREEN
+     
+    
         // Create the menu panel
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridLayout(1, 6));
     
         // Add menu buttons
-        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Menu 7","Back"};
+        String[] menuNames = {"All Customer", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Laporan Penjualan","Back"};
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
@@ -107,8 +111,8 @@ public class AdminView {
                 case "View Karyawan":
                     showAllKaryawan();
                     break;
-                case "Menu 7":
-                    showAllKaryawan();
+                case "Laporan Penjualan":
+                    showSalesReport();
                     break;
                 case "Back":
                     new MainMenu();
@@ -725,6 +729,82 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
 
     }
     
+
+
+
+
+
+
+
+
+
+
+
+
+    private void showSalesReport() {
+        contentPanel.removeAll();
+    
+        // Membuat panel utama
+        JPanel reportPanel = new JPanel();
+        reportPanel.setLayout(new BorderLayout());
+    
+        // Label judul
+        JLabel titleLabel = new JLabel("Laporan Penjualan", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        reportPanel.add(titleLabel, BorderLayout.NORTH);
+    
+        // Panel untuk tombol filter
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton makananButton = new JButton("Makanan");
+        JButton minumanButton = new JButton("Minuman");
+        JButton semuaButton = new JButton("Semua");
+    
+        JTextField dateField = new JTextField(10);
+        JButton filterButton = new JButton("Filter Tanggal");
+    
+        buttonPanel.add(new JLabel("Filter Tipe:"));
+        buttonPanel.add(makananButton);
+        buttonPanel.add(minumanButton);
+        buttonPanel.add(semuaButton);
+        buttonPanel.add(new JLabel("Tanggal (YYYY-MM-DD):"));
+        buttonPanel.add(dateField);
+        buttonPanel.add(filterButton);
+    
+        reportPanel.add(buttonPanel, BorderLayout.NORTH);
+    
+        // Panel untuk tabel
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"Tanggal", "Nama Item", "Tipe Item", "Jumlah", "Harga Per Item", "Total Harga"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable salesTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(salesTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+    
+        // Panel untuk menampilkan Total Pendapatan
+        JPanel totalPanel = new JPanel();
+        JLabel totalLabel = new JLabel("Total Pendapatan: Rp 0");
+        totalPanel.add(totalLabel);
+        reportPanel.add(totalPanel, BorderLayout.SOUTH);
+    
+        // Tambahkan tablePanel ke reportPanel
+        reportPanel.add(tablePanel, BorderLayout.CENTER);
+        totalLabel.setFont(new Font("Arial", Font.BOLD, 32));  // Mengubah font dan ukuran
+
+        // Tambahkan reportPanel ke contentPanel
+        contentPanel.add(reportPanel, BorderLayout.CENTER);
+    
+        // Event Listener untuk tombol filter
+        semuaButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Semua", null, totalLabel));
+        makananButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Makanan", null, totalLabel));
+        minumanButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Minuman", null, totalLabel));
+        filterButton.addActionListener(e -> {
+            String selectedDate = dateField.getText();
+            controller.updateSalesTable(tableModel, "Semua", selectedDate, totalLabel);
+        });
+    
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
 
 
 public static void main(String[] args) {
