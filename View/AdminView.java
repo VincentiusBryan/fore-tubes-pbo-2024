@@ -3,6 +3,8 @@ package View;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -115,7 +117,7 @@ public class AdminView {
                     showSalesReport();
                     break;
                 case "Membership":
-                    MembershipControl();
+                    showMembership();
                     break;
                 case "Back":
                     new MainMenu();
@@ -430,6 +432,8 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         // Create labels for the section
         JLabel promoLabel = new JLabel("PROMOS", JLabel.CENTER);
         promoLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+
 
         // Create Delete button
         JButton deleteButton = new JButton("Delete");
@@ -813,10 +817,211 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
 
 
 
-    private void MembershipControl(){
 
+
+
+
+
+
+
+
+
+
+
+
+
+    private void showMembership() {
+        // Clear existing content
+        contentPanel.removeAll();
+        
+        // Create main panel
+        JPanel membershipPanel = new JPanel(new BorderLayout());
+        
+        // Create title label
+        JLabel titleLabel = new JLabel("MEMBERSHIP MANAGEMENT", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        membershipPanel.add(titleLabel, BorderLayout.NORTH);
+    
+        // Define columns for the membership table
+        String[] membershipColumns = {"ID Membership", "Duration (Months)", "Description", "Price"};
+    
+        // Create DefaultTableModel for memberships
+        DefaultTableModel membershipModel = new DefaultTableModel(membershipColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table read-only
+            }
+        };
+    
+        // Create table and scroll pane
+        JTable membershipTable = new JTable(membershipModel);
+        JScrollPane scrollPane = new JScrollPane(membershipTable);
+        membershipPanel.add(scrollPane, BorderLayout.CENTER);
+    
+        // Create button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+    
+        // Add button
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(e -> {
+            try {
+                String durationStr = JOptionPane.showInputDialog("Enter Duration (months):");
+                String description = JOptionPane.showInputDialog("Enter Description:");
+                String priceStr = JOptionPane.showInputDialog("Enter Price:");
+                
+                if (durationStr != null && description != null && priceStr != null) {
+                    int duration = Integer.parseInt(durationStr);
+                    int price = Integer.parseInt(priceStr);
+                    
+                    try (Connection conn = DBConnection.getInstance().getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(
+                             "INSERT INTO membership (duration, deskripsi, harga) VALUES (?, ?, ?)")) {
+                        
+                        stmt.setInt(1, duration);
+                        stmt.setString(2, description);
+                        stmt.setInt(3, price);
+                        stmt.executeUpdate();
+                        
+                        // Refresh table
+                        refreshMembershipTable(membershipModel);
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Please enter valid numbers for duration and price");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error adding membership: " + ex.getMessage());
+            }
+        });
+    
+        // Edit button
+        JButton editButton = new JButton("Edit");
+        editButton.addActionListener(e -> {
+            int selectedRow = membershipTable.getSelectedRow();
+            if (selectedRow != -1) {
+                try {
+                    int id = (int) membershipTable.getValueAt(selectedRow, 0);
+                    String durationStr = JOptionPane.showInputDialog("Enter new Duration (months):",
+                        membershipTable.getValueAt(selectedRow, 1));
+                    String description = JOptionPane.showInputDialog("Enter new Description:",
+                        membershipTable.getValueAt(selectedRow, 2));
+                    String priceStr = JOptionPane.showInputDialog("Enter new Price:",
+                        membershipTable.getValueAt(selectedRow, 3));
+                    
+                    if (durationStr != null && description != null && priceStr != null) {
+                        int duration = Integer.parseInt(durationStr);
+                        int price = Integer.parseInt(priceStr);
+                        
+                        try (Connection conn = DBConnection.getInstance().getConnection();
+                             PreparedStatement stmt = conn.prepareStatement(
+                                 "UPDATE membership SET duration=?, deskripsi=?, harga=? WHERE id_membership=?")) {
+                            
+                            stmt.setInt(1, duration);
+                            stmt.setString(2, description);
+                            stmt.setInt(3, price);
+                            stmt.setInt(4, id);
+                            stmt.executeUpdate();
+                            
+                            // Refresh table
+                            refreshMembershipTable(membershipModel);
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Please enter valid numbers for duration and price");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Error updating membership: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a membership to edit");
+            }
+        });
+    
+        // Delete button
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            int selectedRow = membershipTable.getSelectedRow();
+            if (selectedRow != -1) {
+                int confirm = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to delete this membership?",
+                    "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        int id = (int) membershipTable.getValueAt(selectedRow, 0);
+                        try (Connection conn = DBConnection.getInstance().getConnection();
+                             PreparedStatement stmt = conn.prepareStatement(
+                                 "DELETE FROM membership WHERE id_membership=?")) {
+                            
+                            stmt.setInt(1, id);
+                            stmt.executeUpdate();
+                            
+                            // Refresh table
+                            refreshMembershipTable(membershipModel);
+                        }
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "Error deleting membership: " + ex.getMessage());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a membership to delete");
+            }
+        });
+    
+        // Add buttons to button panel
+        buttonPanel.add(addButton);
+        buttonPanel.add(editButton);
+        buttonPanel.add(deleteButton);
+        membershipPanel.add(buttonPanel, BorderLayout.SOUTH);
+    
+        // Add to content panel
+        contentPanel.add(membershipPanel);
+        
+        // Initial table population
+        refreshMembershipTable(membershipModel);
+        
+        // Refresh display
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+    
+    // Helper method to refresh membership table data
+    private void refreshMembershipTable(DefaultTableModel model) {
+        model.setRowCount(0); // Clear existing rows
+        
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM membership");
+             ResultSet rs = stmt.executeQuery()) {
+    
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getInt("id_membership"),
+                    rs.getInt("duration"),
+                    rs.getString("deskripsi"),
+                    rs.getInt("harga")
+                };
+                model.addRow(row);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error refreshing membership table: " + e.getMessage());
+        }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
 public static void main(String[] args) {
   new AdminView();
   

@@ -1,7 +1,11 @@
 package Controller;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -514,6 +518,34 @@ public void updateSalesTable(DefaultTableModel tableModel, String tipeItem, Stri
         JOptionPane.showMessageDialog(null, "Error fetching data: " + ex.getMessage());
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
