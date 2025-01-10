@@ -2,6 +2,8 @@ package View;
 
 import javax.swing.*;
 import Controller.LoginController;
+import Controller.SessionManager;
+
 import java.awt.*;
 
 public class LoginView {
@@ -57,7 +59,11 @@ public class LoginView {
                 LoginController controller = new LoginController();
                 boolean success = controller.loginUser(email, password);
 
-                if (success) {
+                if (success) {                  
+                  //SINGLETON BOS
+                    SessionManager.setLoggedIn(true);
+
+
                     if (controller.isAdmin(email)) {
                         JOptionPane.showMessageDialog(loginFrame, "Welcome Admin!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         loginFrame.dispose();

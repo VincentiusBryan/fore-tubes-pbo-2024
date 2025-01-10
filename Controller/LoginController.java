@@ -25,8 +25,10 @@ public class LoginController {
     
                 ResultSet resultSet = statement.executeQuery();
     
+                
                 if (resultSet.next()) {
                     int userId = resultSet.getInt("id_user");
+                    SessionManager.setLoggedIn(true);
                     SessionManager.setLoggedInUserId(userId);
                     return true;
                 }
@@ -37,6 +39,11 @@ public class LoginController {
         }
         return false;
     }
+
+
+
+
+
 
     public boolean isAdmin(String email) {
         Connection connection = dbConnection.getConnection();
@@ -59,4 +66,11 @@ public class LoginController {
         }
         return isAdmin;
     }
+
+
+
+
+
+
+    
 }

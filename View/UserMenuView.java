@@ -1,6 +1,9 @@
 package View;
 
 import javax.swing.*;
+
+import Controller.SessionManager;
+
 import java.awt.*;
 
 public class UserMenuView {
@@ -12,18 +15,26 @@ public class UserMenuView {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
+        // OH YES SINGLETON
+        int userId = SessionManager.getLoggedInUserId();
+        String userName = SessionManager.getUserNameById(userId);
+
+
         JFrame menuFrame = new JFrame("User Menu");
+
         menuFrame.setLayout(null);
-        menuFrame.setSize(400, 450);  // Increased height for new button
+        menuFrame.setSize(400, 450);  
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         int x = (screenSize.width - menuFrame.getWidth()) / 2;
         int y = (screenSize.height - menuFrame.getHeight()) / 2;
         menuFrame.setLocation(x, y);
 
-        JLabel title = new JLabel("User Menu");
-        title.setBounds(140, 20, 200, 30);
-        title.setFont(new Font("SansSerif", Font.BOLD, 24));
+
+        //SINGLETON
+        JLabel title = new JLabel("Welcome to User Menu "+ userName);
+        title.setBounds(20, 20, 1000, 30);
+        title.setFont(new Font("SansSerif", Font.BOLD, 16));
         menuFrame.add(title);
 
         // Order Button
@@ -79,5 +90,9 @@ public class UserMenuView {
         });
 
         menuFrame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new UserMenuView();
     }
 }

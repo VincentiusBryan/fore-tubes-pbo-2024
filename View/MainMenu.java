@@ -16,7 +16,7 @@ public class MainMenu {
     private DBConnection dbConnection;
 
     public MainMenu() {
-        // Menggunakan getInstance() untuk mendapatkan instance DBConnection
+        
         dbConnection = DBConnection.getInstance();
         showMenu();
     }
@@ -24,7 +24,7 @@ public class MainMenu {
     public int getStatusToko() {
         String query = "SELECT status FROM statustoko WHERE id = 1";
         
-        // Menggunakan getConnection() untuk mendapatkan koneksi
+      
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
@@ -53,7 +53,7 @@ public class MainMenu {
         int y = (screenSize.height - mainMenu.getHeight()) / 2;
         mainMenu.setLocation(x, y);
 
-        // ... rest of the showMenu code remains the same ...
+        
         
         JLabel label = new JLabel("Selamat Datang di Menu Utama");
         label.setBounds(150, 60, 200, 30);
@@ -113,7 +113,7 @@ public class MainMenu {
         int y = (screenSize.height - mainMenu.getHeight()) / 2;
         mainMenu.setLocation(x, y);
 
-        // ... rest of the customer code remains the same ...
+       
         
         JLabel label = new JLabel("Selamat Datang di Menu Utama Customer");
         label.setBounds(125, 60, 300, 30);

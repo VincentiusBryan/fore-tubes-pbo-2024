@@ -81,22 +81,87 @@ public class PaymentView {
     private void loadPromos(JPanel promoPanel) {
         DBConnection dbConnection = DBConnection.getInstance();
         Connection connection = dbConnection.getConnection();
-
-        String query = "SELECT id_promo, promo_name, description, discount_percentage, start_date, end_date FROM promos WHERE is_active = 1";
-
+    
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id_promo");
-                String promoName = resultSet.getString("promo_name");
-                String description = resultSet.getString("description");
-                int discountPercentage = resultSet.getInt("discount_percentage");
-                String startDate = resultSet.getString("start_date");
-                String endDate = resultSet.getString("end_date");
-
+            // First get user's membership duration
+            String membershipQuery = """
+                SELECT m.duration 
+                FROM users u
+                JOIN membership m ON u.id_membership = m.id_membership
+                WHERE u.id_user = ? AND u.status_aktif_membership = 1
+            """;
+            
+            PreparedStatement membershipStmt = connection.prepareStatement(membershipQuery);
+            membershipStmt.setInt(1, SessionManager.getLoggedInUserId());
+            ResultSet membershipRs = membershipStmt.executeQuery();
+            
+            int membershipDuration = 0;
+            if (membershipRs.next()) {
+                membershipDuration = membershipRs.getInt("duration");
+            }
+            
+            // Get ALL active promos, including both membership and non-membership promos
+            String promoQuery = """
+                SELECT id_promo, promo_name, description, discount_percentage,
+                       CASE 
+                           WHEN discount_percentage IN (10, 15, 20) THEN 'Membership'
+                           ELSE 'Regular'
+                       END as promo_type
+                FROM promos 
+                WHERE is_active = 1
+                ORDER BY 
+                    CASE 
+                        WHEN discount_percentage IN (10, 15, 20) THEN 0
+                        ELSE 1
+                    END,
+                    discount_percentage DESC
+            """;
+            
+            Statement promoStmt = connection.createStatement();
+            ResultSet promoRs = promoStmt.executeQuery(promoQuery);
+            
+            // Add section header for available promos
+            JLabel availablePromosLabel = new JLabel("Available Promos:", SwingConstants.CENTER);
+            availablePromosLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+            promoPanel.add(availablePromosLabel);
+            
+            boolean hasPromos = false;
+            String currentPromoType = "";
+            
+            while (promoRs.next()) {
+                hasPromos = true;
+                int id = promoRs.getInt("id_promo");
+                String promoName = promoRs.getString("promo_name");
+                String description = promoRs.getString("description");
+                int discountPercentage = promoRs.getInt("discount_percentage");
+                String promoType = promoRs.getString("promo_type");
+                
+                // Add section headers for different promo types
+                if (!currentPromoType.equals(promoType)) {
+                    currentPromoType = promoType;
+                    JLabel typeLabel = new JLabel(promoType + " Promos:", SwingConstants.CENTER);
+                    typeLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
+                    promoPanel.add(typeLabel);
+                }
+                
+                // For membership promos, check if user is eligible
+                boolean isEligible = true;
+                if (promoType.equals("Membership")) {
+                    isEligible = (membershipDuration > 0) && (
+                        (membershipDuration == 1 && discountPercentage == 10) ||
+                        (membershipDuration == 6 && discountPercentage == 15) ||
+                        (membershipDuration == 12 && discountPercentage == 20)
+                    );
+                }
+                
                 JButton promoButton = new JButton(promoName + " - " + discountPercentage + "%");
+                promoButton.setToolTipText(description);
+                
+                if (!isEligible) {
+                    promoButton.setEnabled(false);
+                    promoButton.setToolTipText(description + " (Requires appropriate membership level)");
+                }
+                
                 promoButton.addActionListener(e -> {
                     selectedPromoId = id;
                     selectedPromoName = promoName;
@@ -104,11 +169,21 @@ public class PaymentView {
                     JOptionPane.showMessageDialog(paymentFrame,
                             "Selected Promo: " + promoName + "\nDiscount: " + discountPercentage + "%");
                 });
+                
                 promoPanel.add(promoButton);
             }
+            
+            if (!hasPromos) {
+                JLabel noPromosLabel = new JLabel("No promos currently available");
+                noPromosLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                promoPanel.add(noPromosLabel);
+            }
+            
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Failed to load promotions: " + e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, 
+                "Failed to load promotions: " + e.getMessage(), 
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
