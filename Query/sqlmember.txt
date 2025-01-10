@@ -144,3 +144,50 @@ SELECT id_beverage, name, 10 FROM beverages
 WHERE name IN ('Espresso', 'Americano', 'Cappuccino');
 
 ALTER TABLE users ADD COLUMN points int default 0;
+
+
+
+
+
+
+
+DUMMY PROMO YANG BARU
+_________________________________
+INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active) VALUES
+  ('Christmas Sale', 'Diskon spesial untuk Natal, dapatkan potongan hingga 50% untuk semua makanan dan minuman.', 50.0, '2024-12-01', '2024-12-25', TRUE),
+  ('New Year Offer', 'Rayakan Tahun Baru dengan diskon 30% untuk semua jenis kopi.', 30.0, '2024-12-25', '2025-01-01', TRUE),
+  ('Spring Promo', 'Nikmati promo spesial musim semi dengan diskon 20% untuk semua kue dan donut.', 20.0, '2024-03-01', '2024-03-31', TRUE),
+  ('Weekend Deal', 'Dapatkan 10% potongan harga setiap weekend untuk menu minuman', 10.0, '2024-12-01', '2024-12-31', TRUE);
+
+  -- Promo for 1-month membership
+INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active)
+VALUES (
+    'Member 1 Month',
+    'Special 10% discount for 1-month membership holders',
+    10,
+    '2024-01-01',
+    '2024-12-31',
+    1
+);
+
+-- Promo for 6-month membership
+INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active)
+VALUES (
+    'Member 6 Months',
+    'Special 15% discount for 6-month membership holders',
+    15,
+    '2025-01-01',
+    '2025-12-31',
+    1
+);
+
+-- Promo for 12-month membership
+INSERT INTO promos (promo_name, description, discount_percentage, start_date, end_date, is_active)
+VALUES (
+    'Member 12 Months',
+    'Special 20% discount for 12-month membership holders',
+    20,
+    '2025-01-01',
+    '2025-12-31',
+    1
+);
