@@ -1,58 +1,57 @@
 package Model;
-import java.util.ArrayList;
-import java.util.List;
-public class Customer extends User  {
-    private String phoneNumber;
-    private List<Keranjang> keranjangKu;
-    
 
-    
+public class Customer {
+    private int customer_id;
+    private String password;
+    private String name;
+    private String address;
+    private String phone;
 
-    public Customer(String id_user, String nama, String password, String phoneNumber) {
-        super(id_user, nama, password);
-        this.phoneNumber = phoneNumber;
-        this.keranjangKu =new ArrayList<>();
+    public Customer(int customer_id, String password, String name, String address, String phone) {
+        this.customer_id = customer_id;
+        this.password = password;
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public int getCustomer_id() {
+        return customer_id;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setCustomer_id(int customer_id) {
+        this.customer_id = customer_id;
     }
 
-    public void addToKeranjang(String namaMenu, int quantity){
-        Keranjang itemKeranjangku = new Keranjang(namaMenu,quantity);
-        keranjangKu.add(itemKeranjangku);
+    public String getPassword() {
+        return password;
     }
 
-    public void printKeranjang(ListMenu[] list){
-        System.out.println("\n\nKeranjang kamu:");
-        int x = 1;
-        int totalHarga = 0; 
-        for (Keranjang item : keranjangKu) {
-            String namaMenu = item.getNamaMenu();
-            int quantity = item.getQuantity();
-            int hargaMenu = 0;
-            
-
-            //nyari harga dari daftar yg ada di main
-            for (ListMenu menuItem : list) {
-                if (menuItem.getNamaMenu().equals(namaMenu)) {
-                    hargaMenu = menuItem.getHarga();
-                    break;
-                }
-            }
-            int subtotal = hargaMenu * quantity;
-            totalHarga += subtotal; 
-
-            System.out.println(x + ". " + namaMenu+ " Qty: " + quantity + " - Total Harga: Rp " + subtotal);
-            x++;
-        }
-
-        System.out.println("Sub total :  Rp " + totalHarga); 
-    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+}

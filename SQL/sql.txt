@@ -1,0 +1,31 @@
+CREATE TABLE Customer (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    password VARCHAR(255),
+    name VARCHAR(255),
+    address VARCHAR(255),
+    phone VARCHAR(20)
+);
+
+CREATE TABLE `Transaction` (
+    `transaction_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `customer_id` INT,
+    `delivery_type` VARCHAR(255),
+    `expected_weight` INT,
+    `total_cost` INT,
+    `created_at` DATETIME,
+    `receipt_name` VARCHAR(255),
+    `receipt_address` TEXT,
+    `receipt_phone` VARCHAR(15),
+    FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`)
+);
+
+CREATE TABLE `DeliveryDetails` (
+    `detail_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `transaction_id` INT,
+    `status` ENUM('pending', 'in_progress', 'on_delivery', 'arrived'),
+    `current_position` VARCHAR(255),
+    `evidence` TEXT,
+    `date` DATETIME,
+    `updated_by` VARCHAR(255),
+    FOREIGN KEY (`transaction_id`) REFERENCES `Transaction`(`transaction_id`)
+);

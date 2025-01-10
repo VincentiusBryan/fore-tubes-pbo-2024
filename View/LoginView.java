@@ -27,13 +27,17 @@ public class LoginView {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         loginFrame.add(title);
 
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(50, 80, 100, 25);
-        loginFrame.add(emailLabel);
+        JLabel logoLabel = new JLabel(new ImageIcon("UAS_PrakPBO.png")); 
+        logoLabel.setBounds(50, 150, 50, 200); 
+        loginFrame.add(logoLabel);
 
-        JTextField emailField = new JTextField();
-        emailField.setBounds(150, 80, 200, 25);
-        loginFrame.add(emailField);
+        JLabel phoneLabel = new JLabel("Phone:");
+        phoneLabel.setBounds(50, 80, 100, 25);
+        loginFrame.add(phoneLabel);
+
+        JTextField phoneField = new JTextField();
+        phoneField.setBounds(150, 80, 200, 25);
+        loginFrame.add(phoneField);
 
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(50, 120, 100, 25);
@@ -48,25 +52,19 @@ public class LoginView {
         loginFrame.add(loginButton);
 
         loginButton.addActionListener(e -> {
-            String email = emailField.getText();
+            String phone = phoneField.getText();
             String password = new String(passwordField.getPassword());
 
-            if (email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(loginFrame, "Email or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (phone.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(loginFrame, "Phone or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 LoginController controller = new LoginController();
-                boolean success = controller.loginUser(email, password);
+                boolean success = controller.loginUser(phone, password);
 
                 if (success) {
-                    if (controller.isAdmin(email)) {
-                        JOptionPane.showMessageDialog(loginFrame, "Welcome Admin!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        loginFrame.dispose();
-                        new AdminView(); // kalau admin
-                    } else {
-                        JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        loginFrame.dispose();
-                        new UserMenuView(); // kalau user
-                    }
+                    JOptionPane.showMessageDialog(loginFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loginFrame.dispose();
+                    new MenuLain();
                 } else {
                     JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -79,7 +77,7 @@ public class LoginView {
 
         backButton.addActionListener(e -> {
             loginFrame.dispose();
-            new MainMenu(); // back to menu
+            new MainMenu();
         });
 
         loginFrame.setVisible(true);

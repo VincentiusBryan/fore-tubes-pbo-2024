@@ -1,7 +1,7 @@
 package Controller;
 
 public class SessionManager {
-    private static int loggedInUserId = -1; // Default value for no user
+    private static int loggedInUserId = -1;
 
     public static void setLoggedInUserId(int userId) {
         loggedInUserId = userId;

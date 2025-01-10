@@ -15,7 +15,7 @@ public class RegisterView {
 
         JFrame registerFrame = new JFrame("Register");
         registerFrame.setLayout(null);
-        registerFrame.setSize(400, 350);
+        registerFrame.setSize(400, 400);
         registerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         int x = (screenSize.width - registerFrame.getWidth()) / 2;
@@ -27,70 +27,73 @@ public class RegisterView {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         registerFrame.add(title);
 
-        // email
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(50, 80, 100, 25);
-        registerFrame.add(emailLabel);
-
-        JTextField emailField = new JTextField();
-        emailField.setBounds(150, 80, 200, 25);
-        registerFrame.add(emailField);
-
-        // phone
         JLabel phoneLabel = new JLabel("Phone:");
-        phoneLabel.setBounds(50, 120, 100, 25);
+        phoneLabel.setBounds(50, 80, 100, 25);
         registerFrame.add(phoneLabel);
 
         JTextField phoneField = new JTextField();
-        phoneField.setBounds(150, 120, 200, 25);
+        phoneField.setBounds(150, 80, 200, 25);
         registerFrame.add(phoneField);
 
-        // password
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setBounds(50, 120, 100, 25);
+        registerFrame.add(nameLabel);
+
+        JTextField nameField = new JTextField();
+        nameField.setBounds(150, 120, 200, 25);
+        registerFrame.add(nameField);
+
+        JLabel addressLabel = new JLabel("Address:");
+        addressLabel.setBounds(50, 160, 100, 25);
+        registerFrame.add(addressLabel);
+
+        JTextField addressField = new JTextField();
+        addressField.setBounds(150, 160, 200, 25);
+        registerFrame.add(addressField);
+
         JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(50, 160, 100, 25);
+        passwordLabel.setBounds(50, 200, 100, 25);
         registerFrame.add(passwordLabel);
 
         JPasswordField passwordField = new JPasswordField();
-        passwordField.setBounds(150, 160, 200, 25);
+        passwordField.setBounds(150, 200, 200, 25);
         registerFrame.add(passwordField);
 
-        // register button
         JButton registerButton = new JButton("Register");
-        registerButton.setBounds(150, 200, 90, 30);
+        registerButton.setBounds(150, 240, 90, 30);
         registerFrame.add(registerButton);
 
         registerButton.addActionListener(e -> {
-            String email = emailField.getText();
             String phone = phoneField.getText();
+            String name = nameField.getText();
+            String address = addressField.getText();
             String password = new String(passwordField.getPassword());
 
-            // validasi input
-            if (email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(registerFrame, "Email, Phone, or Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (phone.isEmpty() || name.isEmpty() || address.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(registerFrame, "Phone, Name, Address, or Password gaboleh kosong!", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!phone.matches("\\d{10,12}")) {
-                JOptionPane.showMessageDialog(registerFrame, "Invalid phone number format!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(registerFrame, "Invalid phone number", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 RegisterController controller = new RegisterController();
-                boolean success = controller.registerUser(email, password, phone);
+                boolean success = controller.registerUser(phone, name, address, password);
 
                 if (success) {
-                    JOptionPane.showMessageDialog(registerFrame, "User registered successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(registerFrame, "User registered gg!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     registerFrame.dispose();
-                    new MainMenu(); // Kembali ke MainMenu setelah registrasi berhasil
+                    new MainMenu();
                 } else {
-                    JOptionPane.showMessageDialog(registerFrame, "Failed to register user. Try again!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(registerFrame, "Gagal Register!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        // back button
         JButton backButton = new JButton("Back");
-        backButton.setBounds(260, 200, 90, 30);
+        backButton.setBounds(260, 240, 90, 30);
         registerFrame.add(backButton);
 
         backButton.addActionListener(e -> {
             registerFrame.dispose();
-            new MainMenu(); // Kembali ke MainMenu
+            new MainMenu();
         });
 
         registerFrame.setVisible(true);

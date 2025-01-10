@@ -10,53 +10,57 @@ public class LoginController {
     private DBConnection dbConnection;
 
     public LoginController() {
-        dbConnection = DBConnection.getInstance();
+        dbConnection = new DBConnection();
     }
 
-    public boolean loginUser(String email, String password) {
-        Connection connection = dbConnection.getConnection();
-    
+    public boolean loginUser(String phoneNumber, String password) {
+        Connection connection = dbConnection.logOn();
+        
         if (connection != null) {
             try {
-                String query = "SELECT id_user FROM users WHERE email = ? AND password = ?";
+                String query = "SELECT customer_id, password FROM customer WHERE phone = ? AND password = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, email);
+                statement.setString(1, phoneNumber);
                 statement.setString(2, password);
-    
+                
                 ResultSet resultSet = statement.executeQuery();
-    
+                
                 if (resultSet.next()) {
-                    int userId = resultSet.getInt("id_user");
-                    SessionManager.setLoggedInUserId(userId);
+                    int userId = resultSet.getInt("customer_id");
+                    SessionManager.setLoggedInUserId(userId); 
                     return true;
                 }
-    
             } catch (SQLException e) {
+                System.out.println("Error : " + e.getMessage());
                 e.printStackTrace();
+            } finally {
+                dbConnection.logOff();
             }
         }
         return false;
     }
 
-    public boolean isAdmin(String email) {
-        Connection connection = dbConnection.getConnection();
-        boolean isAdmin = false;
-
+    public boolean isAdmin(String phoneNumber) {
+        Connection connection = dbConnection.logOn();
         if (connection != null) {
-            String query = "SELECT user_type FROM users WHERE email = ?";
-            
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, email);
-                ResultSet resultSet = preparedStatement.executeQuery();
+            try {
+                String query = "SELECT role FROM customer WHERE phone = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, phoneNumber);
+                
+                ResultSet resultSet = statement.executeQuery();
                 
                 if (resultSet.next()) {
-                    String userType = resultSet.getString("user_type");
-                    isAdmin = "Admin".equalsIgnoreCase(userType);
+                    String role = resultSet.getString("role");
+                    return "Admin".equals(role);
                 }
             } catch (SQLException e) {
+                System.out.println("Error : " + e.getMessage());
                 e.printStackTrace();
+            } finally {
+                dbConnection.logOff();
             }
         }
-        return isAdmin;
+        return false;
     }
 }

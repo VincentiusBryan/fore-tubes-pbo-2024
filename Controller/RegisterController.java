@@ -9,34 +9,36 @@ public class RegisterController {
     private DBConnection dbConnection;
 
     public RegisterController() {
-        dbConnection = DBConnection.getInstance();
+        dbConnection = new DBConnection();
     }
 
-    public boolean registerUser(String email, String password, String phone) {
-        Connection connection = dbConnection.getConnection();
+    public boolean registerUser(String phone, String name, String address, String password) {
+        Connection connection = dbConnection.logOn();
         
         if (connection != null) {
             try {
-                String query = "INSERT INTO users (email, phone_number, password, user_type, created_at) VALUES (?, ?, ?, ?, NOW())";
+                String query = "INSERT INTO Customer (phone, name, address, password) VALUES (?, ?, ?, ?)";
                 PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, email);
-                statement.setString(2, phone);
-                statement.setString(3, password);
-                statement.setString(4, "User");
+                statement.setString(1, phone);
+                statement.setString(2, name);
+                statement.setString(3, address);
+                statement.setString(4, password);
 
                 int rowsInserted = statement.executeUpdate();
                 if (rowsInserted > 0) {
-                    System.out.println("User registered successfully.");
+                    System.out.println("User registered!");
                     return true;
                 } else {
-                    System.out.println("Failed to insert data into database.");
+                    System.out.println("Gagal insert data ke database.");
                 }
             } catch (SQLException e) {
-                System.out.println("Error occurred during registration.");
+                System.out.println("Error di regis.");
                 e.printStackTrace();
+            } finally {
+                dbConnection.logOff();
             }
         } else {
-            System.out.println("Database connection failed.");
+            System.out.println("Database ga konek.");
         }
         return false;
     }
