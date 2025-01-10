@@ -16,11 +16,9 @@ public class MembershipController {
         Connection connection = dbConnection.getConnection();
         if (connection != null) {
             try {
-                // Start transaction
                 connection.setAutoCommit(false);
 
                 try {
-                    // 1. Insert into transaksi_membership table
                     String insertTransaction = "INSERT INTO transaksi_membership (id_user, id_membership, tanggal_transaksi, metode_pembayaran, total_pembayaran) VALUES (?, ?, NOW(), ?, ?)";
                     PreparedStatement transactionStmt = connection.prepareStatement(insertTransaction);
                     transactionStmt.setInt(1, userId);
@@ -29,21 +27,19 @@ public class MembershipController {
                     transactionStmt.setDouble(4, amount);
                     transactionStmt.executeUpdate();
 
-                    // 2. Get membership duration
                     String getDuration = "SELECT duration FROM membership WHERE id_membership = ?";
                     PreparedStatement durationStmt = connection.prepareStatement(getDuration);
                     durationStmt.setInt(1, membershipId);
                     ResultSet rs = durationStmt.executeQuery();
-                    
+
                     int duration = 0;
                     if (rs.next()) {
                         duration = rs.getInt("duration");
                     }
 
-                    // 3. Update user's membership status
                     LocalDate startDate = LocalDate.now();
                     LocalDate endDate = startDate.plusMonths(duration);
-                    
+
                     String updateUser = "UPDATE users SET id_membership = ?, start_date = ?, end_date = ?, status_aktif_membership = 1 WHERE id_user = ?";
                     PreparedStatement userStmt = connection.prepareStatement(updateUser);
                     userStmt.setInt(1, membershipId);
@@ -64,10 +60,10 @@ public class MembershipController {
 
             } catch (SQLException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, 
-                    "Error processing membership transaction: " + e.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Error processing membership transaction: " + e.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
         return false;
@@ -82,10 +78,10 @@ public class MembershipController {
                 return stmt.executeQuery(query);
             } catch (SQLException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, 
-                    "Error fetching membership packages: " + e.getMessage(),
-                    "Database Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Error fetching membership packages: " + e.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
         return null;
@@ -103,7 +99,7 @@ public class MembershipController {
                 if (rs.next()) {
                     boolean isActive = rs.getBoolean("status_aktif_membership");
                     Date endDate = rs.getDate("end_date");
-                    
+
                     if (isActive && endDate != null) {
                         LocalDate now = LocalDate.now();
                         return !now.isAfter(endDate.toLocalDate());

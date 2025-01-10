@@ -37,33 +37,26 @@ public class UserMenuView {
         title.setFont(new Font("SansSerif", Font.BOLD, 16));
         menuFrame.add(title);
 
-        // Order Button
         JButton orderButton = new JButton("Order");
         orderButton.setBounds(100, 80, 200, 40);
         menuFrame.add(orderButton);
 
-        // Buy Membership Button
         JButton membershipButton = new JButton("Buy Membership");
         membershipButton.setBounds(100, 140, 200, 40);
         menuFrame.add(membershipButton);
 
-        // View Membership Status Button
         JButton viewMembershipButton = new JButton("View Membership Status");
         viewMembershipButton.setBounds(100, 200, 200, 40);
         menuFrame.add(viewMembershipButton);
 
-
-        // Shop Point
         JButton pointShopButton = new JButton("Point Shop");
         pointShopButton.setBounds(100, 260, 200, 40);
         menuFrame.add(pointShopButton);
 
-        // Logout Button
         JButton logoutButton = new JButton("Logout");
         logoutButton.setBounds(100, 320, 200, 40);
         menuFrame.add(logoutButton);
 
-        // Action Listeners
         orderButton.addActionListener(e -> {
             menuFrame.dispose();
             new OrderView();

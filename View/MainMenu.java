@@ -40,7 +40,6 @@ public class MainMenu {
     }
 
     public void showMenu() {
-        // Kode showMenu() tetap sama
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
@@ -100,7 +99,6 @@ public class MainMenu {
             return;
         }
 
-        // Kode customer() tetap sama
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 

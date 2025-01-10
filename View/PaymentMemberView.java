@@ -38,20 +38,19 @@ public class PaymentMemberView {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout(10, 10));
 
-        // Title Panel
         JLabel titleLabel = new JLabel("Membership Payment", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
-        // Details Panel
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new GridLayout(3, 1, 5, 5));
         detailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel packageLabel = new JLabel("Package: " + packageName);
         JLabel durationLabel = new JLabel("Duration: " + selectedDuration + " month(s)");
-        
-        java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id", "ID"));
+
+        java.text.NumberFormat currencyFormat = java.text.NumberFormat
+                .getCurrencyInstance(new java.util.Locale("id", "ID"));
         String formattedPrice = currencyFormat.format(totalPrice);
         JLabel priceLabel = new JLabel("Price: " + formattedPrice);
 
@@ -65,7 +64,6 @@ public class PaymentMemberView {
 
         mainPanel.add(detailsPanel, BorderLayout.CENTER);
 
-        // Payment Buttons Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(3, 1, 10, 10));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
@@ -104,7 +102,6 @@ public class PaymentMemberView {
                         JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            // QRIS Payment
             JPanel imagePanel = new JPanel();
             JLabel qrImageLabel = new JLabel();
 
@@ -132,24 +129,23 @@ public class PaymentMemberView {
     private void processPayment(String paymentMethod) {
         int userId = SessionManager.getLoggedInUserId();
         boolean success = membershipController.createMembershipTransaction(
-            userId, 
-            selectedMembershipId, 
-            totalPrice, 
-            paymentMethod
-        );
+                userId,
+                selectedMembershipId,
+                totalPrice,
+                paymentMethod);
 
         if (success) {
             JOptionPane.showMessageDialog(paymentFrame,
-                "Membership payment successful! Your membership is now active.",
-                "Payment Success",
-                JOptionPane.INFORMATION_MESSAGE);
+                    "Membership payment successful! Your membership is now active.",
+                    "Payment Success",
+                    JOptionPane.INFORMATION_MESSAGE);
             paymentFrame.dispose();
             new UserMenuView();
         } else {
             JOptionPane.showMessageDialog(paymentFrame,
-                "Payment failed. Please try again.",
-                "Payment Error",
-                JOptionPane.ERROR_MESSAGE);
+                    "Payment failed. Please try again.",
+                    "Payment Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

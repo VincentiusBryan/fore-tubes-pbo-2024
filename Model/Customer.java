@@ -36,8 +36,6 @@ public class Customer extends User  {
             int quantity = item.getQuantity();
             int hargaMenu = 0;
             
-
-            //nyari harga dari daftar yg ada di main
             for (ListMenu menuItem : list) {
                 if (menuItem.getNamaMenu().equals(namaMenu)) {
                     hargaMenu = menuItem.getHarga();

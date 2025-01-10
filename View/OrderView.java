@@ -47,7 +47,6 @@ public class OrderView {
         Connection connection = dbConnection.getConnection();
         if (connection != null) {
             try {
-                // Ngambil harga beverages dari database
                 Statement statement = connection.createStatement();
                 ResultSet rsBeverages = statement.executeQuery("SELECT * FROM beverages");
                 while (rsBeverages.next()) {
@@ -59,7 +58,6 @@ public class OrderView {
                     beveragePrices.get(beverageName).put(size, price);
                 }
 
-                // Ngambil harga food dari database
                 ResultSet rsFood = statement.executeQuery("SELECT * FROM foods");
                 while (rsFood.next()) {
                     String foodName = rsFood.getString("name");
@@ -99,7 +97,6 @@ public class OrderView {
         JPanel deliveryOptionsPanel = createDeliveryOptionsPanel();
         mainPanel.add(deliveryOptionsPanel);
 
-        // Beverage Section
         JLabel typeOfBeverageLabel = new JLabel("Tipe Minuman:");
         typeOfBeverageLabel.setBounds(30, 70, 100, 25);
         mainPanel.add(typeOfBeverageLabel);
@@ -130,20 +127,18 @@ public class OrderView {
             String selectedType = (String) typeOfBeverageCombo.getSelectedItem();
 
             beverageCombo.removeAllItems();
-            sizeCombo.removeAllItems(); // Reset ukuran
+            sizeCombo.removeAllItems();
 
             if ("None".equals(selectedType)) {
                 return;
             }
 
-            // Menentukan ukuran yang relevan berdasarkan tipe minuman
             switch (selectedType) {
                 case "Coffee":
                     beverageCombo.addItem("Iced Americano");
                     beverageCombo.addItem("Espresso");
                     beverageCombo.addItem("Cappuccino");
 
-                    // Menambahkan ukuran untuk Coffee
                     sizeCombo.addItem("Medium");
                     sizeCombo.addItem("Large");
                     break;
@@ -152,7 +147,6 @@ public class OrderView {
                     beverageCombo.addItem("Hot Matcha Latte");
                     beverageCombo.addItem("Iced Chocolate");
 
-                    // Menambahkan ukuran untuk Non-Coffee
                     sizeCombo.addItem("Medium");
                     sizeCombo.addItem("Large");
                     break;
@@ -161,14 +155,12 @@ public class OrderView {
                     beverageCombo.addItem("Green Peach");
                     beverageCombo.addItem("Earl Grey");
 
-                    // Menambahkan ukuran untuk Tea
                     sizeCombo.addItem("Medium");
                     sizeCombo.addItem("Large");
                     break;
             }
         });
 
-        // Quantity dan buttons buat beverages
         JLabel beverageQuantityLabel = new JLabel("Quantity:");
         beverageQuantityLabel.setBounds(30, 190, 100, 25);
         mainPanel.add(beverageQuantityLabel);
@@ -198,7 +190,6 @@ public class OrderView {
             }
         });
 
-        // Food Section
         JLabel foodTypeLabel = new JLabel("Tipe Makanan:");
         foodTypeLabel.setBounds(30, 230, 100, 25);
         mainPanel.add(foodTypeLabel);
@@ -275,7 +266,6 @@ public class OrderView {
             System.out.println("Updated foodCombo with item for: " + selectedFoodType);
         });
 
-        // Cart Section
         JLabel cartLabel = new JLabel("Cart:");
         cartLabel.setBounds(30, 360, 100, 25);
         mainPanel.add(cartLabel);
@@ -301,15 +291,13 @@ public class OrderView {
             String selectedBeverage = (String) beverageCombo.getSelectedItem();
             String selectedFood = (String) foodCombo.getSelectedItem();
 
-            if (selectedBeverage != null && !"None".equals(selectedBeverage)) { // cek apakah minumannya none/tidak
+            if (selectedBeverage != null && !"None".equals(selectedBeverage)) {
                 String selectedSize = (String) sizeCombo.getSelectedItem();
-                if (beveragePrices.containsKey(selectedBeverage)) { // cek apakah beverage yang dipilih ada di
-                                                                    // beveragePrice
-                    Map<String, Double> size = beveragePrices.get(selectedBeverage); // mendapatkan daftar harga minuman
-                                                                                     // berdasarkan ukuran
+                if (beveragePrices.containsKey(selectedBeverage)) {
+                    Map<String, Double> size = beveragePrices.get(selectedBeverage);
                     if (size.containsKey(selectedSize)) {
                         double price = size.get(selectedSize) * beverageQuantity;
-                        cartModel.addElement( // add to cart
+                        cartModel.addElement(
                                 selectedBeverage + " " + selectedSize + " x" + beverageQuantity + " - Rp" + price);
                     }
                 }
@@ -332,26 +320,26 @@ public class OrderView {
             totalPrice = 0;
             StringBuilder orderSummary = new StringBuilder();
             Connection connection = dbConnection.getConnection();
-        
+
             if (connection != null) {
                 try {
                     connection.setAutoCommit(false);
-        
+
                     int userId = SessionManager.getLoggedInUserId();
                     if (userId == -1) {
                         JOptionPane.showMessageDialog(orderFrame, "User not logged in!", "Error",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-        
+
                     String initialQuery = "INSERT INTO transaksi (id_user, total_harga) VALUES (?, ?)";
                     int transactionId;
-                    try (PreparedStatement stmt = connection.prepareStatement(initialQuery, 
+                    try (PreparedStatement stmt = connection.prepareStatement(initialQuery,
                             Statement.RETURN_GENERATED_KEYS)) {
                         stmt.setInt(1, userId);
                         stmt.setDouble(2, 0.0);
                         stmt.executeUpdate();
-                        
+
                         ResultSet rs = stmt.getGeneratedKeys();
                         if (rs.next()) {
                             transactionId = rs.getInt(1);
@@ -359,7 +347,7 @@ public class OrderView {
                             throw new SQLException("Creating transaction failed, no ID obtained.");
                         }
                     }
-        
+
                     for (int i = 0; i < cartModel.size(); i++) {
                         String cartItem = cartModel.get(i);
                         String[] itemParts = cartItem.split(" - Rp");
@@ -367,15 +355,15 @@ public class OrderView {
                             double itemPrice = Double.parseDouble(itemParts[1]);
                             totalPrice += itemPrice;
                             orderSummary.append(cartItem).append("\n");
-        
+
                             String[] details = itemParts[0].split(" x");
                             String itemName = details[0].trim();
                             int quantity = Integer.parseInt(details[1].trim());
                             double pricePerItem = itemPrice / quantity;
-        
+
                             String itemType;
                             String size = null;
-        
+
                             if (itemName.contains("Medium") || itemName.contains("Large")) {
                                 itemType = "Minuman";
                                 if (itemName.contains("Medium")) {
@@ -393,7 +381,7 @@ public class OrderView {
                             String keterangan = (deliveryType.equals("Delivery")) ? keteranganArea.getText() : "";
 
                             String query = "INSERT INTO transaksi_detail (id_transaksi, nama_item, tipe_item, ukuran, jumlah, harga_per_item, total_harga, lokasi, alamat_delivery, keterangan_delivery) "
-                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                             try (PreparedStatement ps = connection.prepareStatement(query)) {
                                 ps.setInt(1, transactionId);
@@ -410,23 +398,23 @@ public class OrderView {
                             }
                         }
                     }
-        
+
                     try (PreparedStatement updateStmt = connection.prepareStatement(
                             "UPDATE transaksi SET total_harga = ? WHERE id_transaksi = ?")) {
                         updateStmt.setDouble(1, totalPrice);
                         updateStmt.setInt(2, transactionId);
                         updateStmt.executeUpdate();
                     }
-        
+
                     connection.commit();
-        
+
                     orderSummary.append("Total: Rp").append(totalPrice);
                     JOptionPane.showMessageDialog(orderFrame, "Total: Rp" + totalPrice);
-        
+
                     cartModel.clear();
                     new PaymentView(orderSummary.toString(), totalPrice);
                     orderFrame.dispose();
-        
+
                 } catch (Exception ex) {
                     try {
                         connection.rollback();
@@ -454,102 +442,99 @@ public class OrderView {
 
     // PICK-UP OR DELIVERY
 
-private String deliveryType = "Pick-up";  
+    private String deliveryType = "Pick-up";
 
-private JPanel createDeliveryOptionsPanel() {
-    JPanel panel = new JPanel();
-    panel.setLayout(null);
-    panel.setBounds(30, 40, 540, 30);
+    private JPanel createDeliveryOptionsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(30, 40, 540, 30);
 
-    JLabel deliveryLabel = new JLabel("Pilih Lokasi:");
-    deliveryLabel.setBounds(0, 0, 80, 25);
-    panel.add(deliveryLabel);
+        JLabel deliveryLabel = new JLabel("Pilih Lokasi:");
+        deliveryLabel.setBounds(0, 0, 80, 25);
+        panel.add(deliveryLabel);
 
-    JRadioButton pickupButton = new JRadioButton("Pick-up");
-    pickupButton.setBounds(90, 0, 80, 25);
-    pickupButton.setSelected(true); 
-    JRadioButton deliveryButton = new JRadioButton("Delivery");
-    deliveryButton.setBounds(180, 0, 80, 25);
-
-    ButtonGroup group = new ButtonGroup();
-    group.add(pickupButton);
-    group.add(deliveryButton);
-
-    deliveryPanel = new JPanel();
-    deliveryPanel.setLayout(null);
-    deliveryPanel.setBounds(30, 65, 540, 120);
-    deliveryPanel.setVisible(false);
-
-    JLabel alamatLabel = new JLabel("Alamat:");
-    alamatLabel.setBounds(0, 0, 60, 25);
-    
-    alamatArea = new JTextArea();
-    alamatArea.setLineWrap(true);
-    alamatArea.setWrapStyleWord(true);
-    JScrollPane alamatScroll = new JScrollPane(alamatArea);
-    alamatScroll.setBounds(70, 0, 450, 50);
-
-    JLabel keteranganLabel = new JLabel("Catatan:");
-    keteranganLabel.setBounds(0, 60, 70, 25);
-    
-    keteranganArea = new JTextArea();
-    keteranganArea.setLineWrap(true);
-    keteranganArea.setWrapStyleWord(true);
-    JScrollPane keteranganScroll = new JScrollPane(keteranganArea);
-    keteranganScroll.setBounds(70, 60, 450, 50);
-
-    deliveryPanel.add(alamatLabel);
-    deliveryPanel.add(alamatScroll);
-    deliveryPanel.add(keteranganLabel);
-    deliveryPanel.add(keteranganScroll);
-
-    pickupButton.addActionListener(e -> {
-        deliveryType = "Pick-up";
-        deliveryPanel.setVisible(false);
-        mainPanel.remove(deliveryPanel);
-        mainPanel.revalidate();
-        mainPanel.repaint();
-        adjustMenuComponents(false);
+        JRadioButton pickupButton = new JRadioButton("Pick-up");
+        pickupButton.setBounds(90, 0, 80, 25);
         pickupButton.setSelected(true);
-        deliveryButton.setSelected(false);
-    });
+        JRadioButton deliveryButton = new JRadioButton("Delivery");
+        deliveryButton.setBounds(180, 0, 80, 25);
 
-    deliveryButton.addActionListener(e -> {
-        deliveryType = "Delivery";  
-        deliveryPanel.setVisible(true);
-        mainPanel.add(deliveryPanel);
-        mainPanel.revalidate();
-        mainPanel.repaint();
-        adjustMenuComponents(true);
-        deliveryButton.setSelected(true);  
-        pickupButton.setSelected(false);
-    });
+        ButtonGroup group = new ButtonGroup();
+        group.add(pickupButton);
+        group.add(deliveryButton);
 
-    panel.add(pickupButton);
-    panel.add(deliveryButton);
+        deliveryPanel = new JPanel();
+        deliveryPanel.setLayout(null);
+        deliveryPanel.setBounds(30, 65, 540, 120);
+        deliveryPanel.setVisible(false);
 
-    return panel;
-}
+        JLabel alamatLabel = new JLabel("Alamat:");
+        alamatLabel.setBounds(0, 0, 60, 25);
 
+        alamatArea = new JTextArea();
+        alamatArea.setLineWrap(true);
+        alamatArea.setWrapStyleWord(true);
+        JScrollPane alamatScroll = new JScrollPane(alamatArea);
+        alamatScroll.setBounds(70, 0, 450, 50);
 
-    
+        JLabel keteranganLabel = new JLabel("Catatan:");
+        keteranganLabel.setBounds(0, 60, 70, 25);
+
+        keteranganArea = new JTextArea();
+        keteranganArea.setLineWrap(true);
+        keteranganArea.setWrapStyleWord(true);
+        JScrollPane keteranganScroll = new JScrollPane(keteranganArea);
+        keteranganScroll.setBounds(70, 60, 450, 50);
+
+        deliveryPanel.add(alamatLabel);
+        deliveryPanel.add(alamatScroll);
+        deliveryPanel.add(keteranganLabel);
+        deliveryPanel.add(keteranganScroll);
+
+        pickupButton.addActionListener(e -> {
+            deliveryType = "Pick-up";
+            deliveryPanel.setVisible(false);
+            mainPanel.remove(deliveryPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+            adjustMenuComponents(false);
+            pickupButton.setSelected(true);
+            deliveryButton.setSelected(false);
+        });
+
+        deliveryButton.addActionListener(e -> {
+            deliveryType = "Delivery";
+            deliveryPanel.setVisible(true);
+            mainPanel.add(deliveryPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+            adjustMenuComponents(true);
+            deliveryButton.setSelected(true);
+            pickupButton.setSelected(false);
+        });
+
+        panel.add(pickupButton);
+        panel.add(deliveryButton);
+
+        return panel;
+    }
 
     private boolean isDeliveryMode = false;
-    
+
     private void adjustMenuComponents(boolean isDelivery) {
         if (isDelivery == isDeliveryMode) {
             return;
         }
 
         int offset = isDelivery ? 120 : -120;
-        
+
         Component[] components = mainPanel.getComponents();
         for (Component comp : components) {
             if (comp != deliveryPanel && comp.getY() > 65) {
                 comp.setLocation(comp.getX(), comp.getY() + offset);
             }
         }
-        
+
         Window window = SwingUtilities.getWindowAncestor(mainPanel);
         if (window instanceof JFrame) {
             JFrame frame = (JFrame) window;
@@ -558,8 +543,6 @@ private JPanel createDeliveryOptionsPanel() {
         }
         isDeliveryMode = isDelivery;
     }
-
-    
 
     public static void main(String[] args) {
         new OrderView();
