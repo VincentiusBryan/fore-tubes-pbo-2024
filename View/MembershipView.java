@@ -21,7 +21,6 @@ public class MembershipView {
         membershipFrame.setSize(600, 500);
         membershipFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Center the frame
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
         int x = (screenSize.width - membershipFrame.getWidth()) / 2;
@@ -33,10 +32,8 @@ public class MembershipView {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         membershipFrame.add(title);
 
-        // Get packages from database
         loadMembershipPackages();
 
-        // Back button
         JButton backButton = new JButton("Back to Menu");
         backButton.setBounds(225, 420, 150, 30);
         backButton.addActionListener(e -> {
@@ -84,25 +81,21 @@ public class MembershipView {
         panel.setBounds(50, yPosition, 500, 100);
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        // Package duration
         JLabel durationLabel = new JLabel(duration + " Month" + (duration > 1 ? "s" : ""));
         durationLabel.setBounds(20, 10, 200, 25);
         durationLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         panel.add(durationLabel);
 
-        // Price
         java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id", "ID"));
         JLabel priceLabel = new JLabel(currencyFormat.format(price));
         priceLabel.setBounds(20, 35, 200, 25);
         panel.add(priceLabel);
 
-        // Description
         JLabel descLabel = new JLabel("<html><body style='width: 250px'>" + description + "</body></html>");
         descLabel.setBounds(20, 60, 300, 25);
         descLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         panel.add(descLabel);
 
-        // Buy button
         JButton buyButton = new JButton("Purchase");
         buyButton.setBounds(350, 35, 100, 30);
         buyButton.addActionListener(e -> handlePurchase(membershipId, duration + " Month Package", price, duration));

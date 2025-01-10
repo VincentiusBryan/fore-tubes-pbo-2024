@@ -3,8 +3,6 @@ package View;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,8 +13,6 @@ import java.sql.SQLException;
 
 import Connection.DBConnection;
 import Controller.AdminController;
-
-
 
 public class AdminView {
     // private JFrame frame;
@@ -30,38 +26,32 @@ public class AdminView {
     private MainMenu mainMenu;
 
     public AdminView() {
-        controller = new AdminController(); // Inisialisasi AdminController
+        controller = new AdminController();
         showAdminView();
     }
 
     public void showAdminView() {
-        // Setup the main frame
         adminFrame = new JFrame("Admin Menu");
         adminFrame.setSize(600, 550);
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setLayout(new BorderLayout());
-    
 
-        adminFrame.setExtendedState(JFrame.MAXIMIZED_BOTH); // BUAT FULSCREEN
-     
-    
-        // Create the menu panel
+        adminFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridLayout(1, 6));
-    
-        // Add menu buttons
-        String[] menuNames = {"All Users", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan", "Laporan Penjualan","Membership","Back"};
+
+        String[] menuNames = { "All Users", "Edit Menu", "Show Promo", "Status Toko", "View Order", "View Karyawan",
+                "Laporan Penjualan", "Membership", "Back" };
         for (String menuName : menuNames) {
             JButton menuButton = new JButton(menuName);
             menuButton.addActionListener(new MenuButtonListener(menuName));
             menuPanel.add(menuButton);
         }
-    
-        // Create the content panel
+
         contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
-    
-        // Create the Back button to return to MainMenu
+
         JButton backButton = new JButton("Back");
         backButton.setFont(new Font("SansSerif", Font.BOLD, 16));
         backButton.setBackground(new Color(44, 62, 80));
@@ -69,19 +59,16 @@ public class AdminView {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                adminFrame.dispose(); // Close the Admin Menu
-                new MainMenu(); // Show the MainMenu again
+                adminFrame.dispose();
+                new MainMenu();
             }
         });
-    
-        // Add back button to the content panel
+
         contentPanel.add(backButton, BorderLayout.SOUTH);
-    
-        // Add panels to the frame
+
         adminFrame.add(menuPanel, BorderLayout.NORTH);
         adminFrame.add(contentPanel, BorderLayout.CENTER);
-    
-        // Set frame visibility
+
         adminFrame.setVisible(true);
     }
 
@@ -133,128 +120,109 @@ public class AdminView {
         }
     }
 
-
-
-
-
     // SHOW ALL CUSTOMER
-
 
     private void showAllUsers() {
         contentPanel.removeAll();
-    
-        // Membuat panel utama
+
         JPanel menu1Panel = new JPanel();
         menu1Panel.setLayout(new BorderLayout());
-    
-        // Label judul
+
         JLabel titleLabel = new JLabel("All Customers", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         menu1Panel.add(titleLabel, BorderLayout.NORTH);
-    
-        // Panel untuk tombol filter dan tombol lainnya
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton adminButton = new JButton("Admin");
         JButton userButton = new JButton("User");
-    
-        // Tombol Add, Delete, Edit
-        // JButton addButton = new JButton("Add");
+
         JButton deleteButton = new JButton("Delete");
         JButton editButton = new JButton("Edit");
-    
-        // Menambahkan tombol ke panel
+
         buttonPanel.add(adminButton);
         buttonPanel.add(userButton);
         // buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(editButton);
         menu1Panel.add(buttonPanel, BorderLayout.NORTH);
-    
-        // Panel untuk tabel
+
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Email", "Phone Number", "User Type", "Created At","Points","id_membership", "Status Aktif Membership"};
+        String[] columnNames = { "ID", "Email", "Phone Number", "User Type", "Created At", "Points", "id_membership",
+                "Status Aktif Membership" };
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable userTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(userTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
-    
-        // Tambahkan tablePanel ke menu1Panel
+
         menu1Panel.add(tablePanel, BorderLayout.CENTER);
-    
-        // Tambahkan menu1Panel ke contentPanel
+
         contentPanel.add(menu1Panel, BorderLayout.CENTER);
-    
-        // Event Listener untuk tombol
+
         adminButton.addActionListener(e -> updateTable(tableModel, "Admin"));
         userButton.addActionListener(e -> updateTable(tableModel, "User"));
         // addButton.addActionListener(e -> showAddUserDialog());
         deleteButton.addActionListener(e -> deleteUser(userTable, tableModel));
         editButton.addActionListener(e -> editUser(userTable, tableModel));
-    
+
         contentPanel.revalidate();
         contentPanel.repaint();
     }
-    
-
-
 
     // private void showAddUserDialog() {
-   
-    //     String email = JOptionPane.showInputDialog("Enter Email:");
-    //     String phoneNumber = JOptionPane.showInputDialog("Enter Phone Number:");
-    //     String userType = JOptionPane.showInputDialog("Enter User Type:");
-    //     String createdAt = JOptionPane.showInputDialog("Enter Created At:");
-    //     int points = Integer.parseInt(JOptionPane.showInputDialog("Enter Points:"));
-    //     int idMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter Membership ID:"));
-    //     int statusMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter Membership Status:"));
-    
-    //     AdminController controller = new AdminController();
-    //     controller.addUser(email, phoneNumber, userType, createdAt, points, idMembership, statusMembership);
+
+    // String email = JOptionPane.showInputDialog("Enter Email:");
+    // String phoneNumber = JOptionPane.showInputDialog("Enter Phone Number:");
+    // String userType = JOptionPane.showInputDialog("Enter User Type:");
+    // String createdAt = JOptionPane.showInputDialog("Enter Created At:");
+    // int points = Integer.parseInt(JOptionPane.showInputDialog("Enter Points:"));
+    // int idMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter
+    // Membership ID:"));
+    // int statusMembership = Integer.parseInt(JOptionPane.showInputDialog("Enter
+    // Membership Status:"));
+
+    // AdminController controller = new AdminController();
+    // controller.addUser(email, phoneNumber, userType, createdAt, points,
+    // idMembership, statusMembership);
     // }
-
-
 
     private void deleteUser(JTable userTable, DefaultTableModel tableModel) {
         int selectedRow = userTable.getSelectedRow();
         if (selectedRow != -1) {
-            int userId = (int) tableModel.getValueAt(selectedRow, 0); // Ambil ID pengguna yang dipilih
+            int userId = (int) tableModel.getValueAt(selectedRow, 0);
             AdminController controller = new AdminController();
-            controller.deleteUser(userId); // Hapus pengguna dari database
-            tableModel.removeRow(selectedRow); // Hapus baris dari tabel
+            controller.deleteUser(userId);
+            tableModel.removeRow(selectedRow);
         } else {
             JOptionPane.showMessageDialog(null, "Please select a user to delete.");
         }
     }
 
-
-
     private void editUser(JTable userTable, DefaultTableModel tableModel) {
         int selectedRow = userTable.getSelectedRow();
         if (selectedRow != -1) {
-            int userId = (int) tableModel.getValueAt(selectedRow, 0); // Ambil ID pengguna yang dipilih
+            int userId = (int) tableModel.getValueAt(selectedRow, 0);
             String email = (String) tableModel.getValueAt(selectedRow, 1);
             String phoneNumber = (String) tableModel.getValueAt(selectedRow, 2);
             String userType = (String) tableModel.getValueAt(selectedRow, 3);
             String createdAt = (String) tableModel.getValueAt(selectedRow, 4);
-            int points = (int) tableModel.getValueAt(selectedRow, 5); // Correct position
-            int idMembership = (int) tableModel.getValueAt(selectedRow, 6); // Correct position
+            int points = (int) tableModel.getValueAt(selectedRow, 5);
+            int idMembership = (int) tableModel.getValueAt(selectedRow, 6);
             int statusMembership = (int) tableModel.getValueAt(selectedRow, 7);
-    
-            // Tampilkan dialog untuk mengedit data pengguna
+
             email = JOptionPane.showInputDialog("Edit Email:", email);
             phoneNumber = JOptionPane.showInputDialog("Edit Phone Number:", phoneNumber);
             userType = JOptionPane.showInputDialog("Edit User Type:", userType);
             createdAt = JOptionPane.showInputDialog("Edit Created At:", createdAt);
-            
-            // Perbaiki urutan input: points dan id_membership
+
             idMembership = Integer.parseInt(JOptionPane.showInputDialog("Edit Membership ID:", idMembership));
             points = Integer.parseInt(JOptionPane.showInputDialog("Edit Points:", points));
-            statusMembership = Integer.parseInt(JOptionPane.showInputDialog("Edit Membership Status:", statusMembership));
-    
+            statusMembership = Integer
+                    .parseInt(JOptionPane.showInputDialog("Edit Membership Status:", statusMembership));
+
             AdminController controller = new AdminController();
-            controller.updateUser(userId, email, phoneNumber, userType, createdAt, points, idMembership, statusMembership);
-            
-            // Update data tabel setelah edit
+            controller.updateUser(userId, email, phoneNumber, userType, createdAt, points, idMembership,
+                    statusMembership);
+
             tableModel.setValueAt(email, selectedRow, 1);
             tableModel.setValueAt(phoneNumber, selectedRow, 2);
             tableModel.setValueAt(userType, selectedRow, 3);
@@ -266,85 +234,59 @@ public class AdminView {
             JOptionPane.showMessageDialog(null, "Please select a user to edit.");
         }
     }
-    
 
-                    
+    private void updateTable(DefaultTableModel tableModel, String userType) {
+        AdminController controller = new AdminController();
+        controller.updateTableShowUsers(tableModel, userType);
+    }
 
-private void updateTable(DefaultTableModel tableModel, String userType) {
-    AdminController controller = new AdminController();
-    controller.updateTableShowUsers(tableModel, userType);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-// EDIT MENU
+    // EDIT MENU
 
     private void editMenu() {
-        AdminController controller= new AdminController();
-        // Define column names for beverages and foods
-        String[] beverageColumns = {"Name", "Size", "Price"};
-        String[] foodColumns = {"Name", "Price"};
+        AdminController controller = new AdminController();
+        String[] beverageColumns = { "Name", "Size", "Price" };
+        String[] foodColumns = { "Name", "Price" };
 
-        // Create DefaultTableModels with the column names
         DefaultTableModel beverageModel = new DefaultTableModel(beverageColumns, 0);
         DefaultTableModel foodModel = new DefaultTableModel(foodColumns, 0);
 
-        // Retrieve beverage data from the database
         try (ResultSet rs = controller.getBeverages()) {
             while (rs.next()) {
                 String name = rs.getString("name");
                 String size = rs.getString("size");
                 double price = rs.getDouble("price");
-                Object[] row = {name, size, price};
+                Object[] row = { name, size, price };
                 beverageModel.addRow(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Retrieve food data from the database
         try (ResultSet rs = controller.getFoods()) {
             while (rs.next()) {
                 String name = rs.getString("name");
                 double price = rs.getDouble("price");
-                Object[] row = {name, price};
+                Object[] row = { name, price };
                 foodModel.addRow(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Create JTables with the models
         JTable beverageTable = new JTable(beverageModel);
         JTable foodTable = new JTable(foodModel);
 
-        // Add the tables to scroll panes
         JScrollPane beverageScrollPane = new JScrollPane(beverageTable);
         JScrollPane foodScrollPane = new JScrollPane(foodTable);
 
-        // Create labels for the sections with larger font and centered text
         JLabel beverageLabel = new JLabel("BEVERAGES", JLabel.CENTER);
         JLabel foodLabel = new JLabel("FOODS", JLabel.CENTER);
 
-        // Set font size for labels
         beverageLabel.setFont(new Font("Arial", Font.BOLD, 18));
         foodLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        // Create Delete button
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> {
-            // Get the selected row from beverage or food table
             int selectedRow = beverageTable.getSelectedRow();
             if (selectedRow != -1) {
                 String name = (String) beverageTable.getValueAt(selectedRow, 0);
@@ -360,7 +302,6 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
             }
         });
 
-        // Create Edit button
         JButton editButton = new JButton("Edit");
         editButton.addActionListener(e -> {
             int selectedRow = beverageTable.getSelectedRow();
@@ -393,12 +334,11 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
             }
         });
 
-        // Create Add button
         JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
-            String[] options = {"Food", "Beverage"};
-            int choice = JOptionPane.showOptionDialog(null, "Choose the type of item to add", 
-                    "Add Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, 
+            String[] options = { "Food", "Beverage" };
+            int choice = JOptionPane.showOptionDialog(null, "Choose the type of item to add",
+                    "Add Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
                     null, options, options[0]);
 
             if (choice == 0) {
@@ -407,7 +347,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
                 if (name != null && priceStr != null) {
                     double price = Double.parseDouble(priceStr);
                     controller.addItemToDatabase("foods", name, price);
-                    foodModel.addRow(new Object[]{name, price});
+                    foodModel.addRow(new Object[] { name, price });
                 }
             } else if (choice == 1) {
                 String name = JOptionPane.showInputDialog("Enter Beverage Name:");
@@ -416,17 +356,15 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
                 if (name != null && size != null && priceStr != null) {
                     double price = Double.parseDouble(priceStr);
                     controller.addItemToDatabase("beverages", name, size, price);
-                    beverageModel.addRow(new Object[]{name, size, price});
+                    beverageModel.addRow(new Object[] { name, size, price });
                 }
             }
         });
 
-        // Set a smaller size for the buttons
         deleteButton.setPreferredSize(new Dimension(100, 30));
         editButton.setPreferredSize(new Dimension(100, 30));
         addButton.setPreferredSize(new Dimension(100, 30));
 
-        // Create a panel to hold the tables, labels, and buttons using FlowLayout
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         tablePanel.add(beverageLabel);
@@ -437,13 +375,10 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         tablePanel.add(editButton);
         tablePanel.add(addButton);
 
-        // Clear the current content panel
         contentPanel.removeAll();
 
-        // Add the table panel to the content panel
         contentPanel.add(tablePanel, BorderLayout.CENTER);
 
-        // Revalidate and repaint the content panel to update the display
         contentPanel.revalidate();
         contentPanel.repaint();
     }
@@ -452,44 +387,18 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         return contentPanel;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //menu 4
-
+    // menu 4
 
     private void showPromos() {
-        // Define columns for the promos table
-        String[] promoColumns = {"Promo Name", "Description", "Discount %", "Start Date", "End Date", "Active"};
+        String[] promoColumns = { "Promo Name", "Description", "Discount %", "Start Date", "End Date", "Active" };
 
-        // Create DefaultTableModel for promos
         DefaultTableModel promoModel = new DefaultTableModel(promoColumns, 0);
 
-        // Retrieve promo data from the database
         String promoQuery = "SELECT * FROM promos";
         try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(promoQuery);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(promoQuery);
+                ResultSet rs = stmt.executeQuery()) {
 
-            // Populate the promo model with database data
             while (rs.next()) {
                 String promoName = rs.getString("promo_name");
                 String description = rs.getString("description");
@@ -497,45 +406,35 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
                 String startDate = rs.getString("start_date");
                 String endDate = rs.getString("end_date");
                 boolean isActive = rs.getBoolean("is_active");
-                Object[] row = {promoName, description, discount, startDate, endDate, isActive};
+                Object[] row = { promoName, description, discount, startDate, endDate, isActive };
                 promoModel.addRow(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Create JTable for promos
         JTable promoTable = new JTable(promoModel);
 
-        // Add the table to a scroll pane
         JScrollPane promoScrollPane = new JScrollPane(promoTable);
 
-        // Create labels for the section
         JLabel promoLabel = new JLabel("PROMOS", JLabel.CENTER);
         promoLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-
-
-        // Create Delete button
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> {
-            // Get the selected row
             int selectedRow = promoTable.getSelectedRow();
             if (selectedRow != -1) {
-                // Remove the selected row from the model and database
                 String promoName = (String) promoTable.getValueAt(selectedRow, 0);
                 controller.deletePromoFromDatabase(promoName);
                 promoModel.removeRow(selectedRow);
             }
         });
 
-        // Create Edit button
         JButton editButton = new JButton("Edit");
         editButton.addActionListener(e -> {
-            // Get the selected row
+
             int selectedRow = promoTable.getSelectedRow();
             if (selectedRow != -1) {
-                // Get current promo details
                 String promoName = (String) promoTable.getValueAt(selectedRow, 0);
                 String description = (String) promoTable.getValueAt(selectedRow, 1);
                 double discount = (Double) promoTable.getValueAt(selectedRow, 2);
@@ -543,16 +442,16 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
                 String endDate = (String) promoTable.getValueAt(selectedRow, 4);
                 boolean isActive = (Boolean) promoTable.getValueAt(selectedRow, 5);
 
-                // Prompt for new values
                 String newPromoName = JOptionPane.showInputDialog("Edit Promo Name:", promoName);
                 String newDescription = JOptionPane.showInputDialog("Edit Description:", description);
                 String newDiscountStr = JOptionPane.showInputDialog("Edit Discount (%):", discount);
                 String newStartDate = JOptionPane.showInputDialog("Edit Start Date (YYYY-MM-DD):", startDate);
                 String newEndDate = JOptionPane.showInputDialog("Edit End Date (YYYY-MM-DD):", endDate);
-                int newIsActive = JOptionPane.showConfirmDialog(null, "Is this promo active?", "Edit Active Status", JOptionPane.YES_NO_OPTION);
+                int newIsActive = JOptionPane.showConfirmDialog(null, "Is this promo active?", "Edit Active Status",
+                        JOptionPane.YES_NO_OPTION);
 
-                if (newPromoName != null && newDescription != null && newDiscountStr != null && newStartDate != null && newEndDate != null) {
-                    // Update database and table model
+                if (newPromoName != null && newDescription != null && newDiscountStr != null && newStartDate != null
+                        && newEndDate != null) {
                     controller.updatePromoInDatabase(
                             promoName,
                             newPromoName,
@@ -560,8 +459,7 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
                             Double.parseDouble(newDiscountStr),
                             newStartDate,
                             newEndDate,
-                            newIsActive == JOptionPane.YES_OPTION
-                    );
+                            newIsActive == JOptionPane.YES_OPTION);
                     promoModel.setValueAt(newPromoName, selectedRow, 0);
                     promoModel.setValueAt(newDescription, selectedRow, 1);
                     promoModel.setValueAt(Double.parseDouble(newDiscountStr), selectedRow, 2);
@@ -572,28 +470,27 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
             }
         });
 
-        // Create Add button
         JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
-            // Prompt for new promo details
             String promoName = JOptionPane.showInputDialog("Enter Promo Name:");
             String description = JOptionPane.showInputDialog("Enter Description:");
             String discountStr = JOptionPane.showInputDialog("Enter Discount (%):");
             String startDate = JOptionPane.showInputDialog("Enter Start Date (YYYY-MM-DD):");
             String endDate = JOptionPane.showInputDialog("Enter End Date (YYYY-MM-DD):");
-            int isActive = JOptionPane.showConfirmDialog(null, "Is this promo active?", "Add Active Status", JOptionPane.YES_NO_OPTION);
+            int isActive = JOptionPane.showConfirmDialog(null, "Is this promo active?", "Add Active Status",
+                    JOptionPane.YES_NO_OPTION);
 
-            if (promoName != null && description != null && discountStr != null && startDate != null && endDate != null) {
-                // Add promo to database and update table model
+            if (promoName != null && description != null && discountStr != null && startDate != null
+                    && endDate != null) {
+
                 controller.addPromoToDatabase(
                         promoName,
                         description,
                         Double.parseDouble(discountStr),
                         startDate,
                         endDate,
-                        isActive == JOptionPane.YES_OPTION
-                );
-                promoModel.addRow(new Object[]{
+                        isActive == JOptionPane.YES_OPTION);
+                promoModel.addRow(new Object[] {
                         promoName,
                         description,
                         Double.parseDouble(discountStr),
@@ -604,7 +501,6 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
             }
         });
 
-        // Create a panel to hold the table and buttons
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         tablePanel.add(promoLabel);
@@ -613,243 +509,186 @@ private void updateTable(DefaultTableModel tableModel, String userType) {
         tablePanel.add(editButton);
         tablePanel.add(addButton);
 
-        // Clear the current content panel and add the new table panel
         contentPanel.removeAll();
         contentPanel.add(tablePanel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
-    
-
-    
-
-
-    
-
-    
     private void statusToko() {
-    // Clear existing content
-    contentPanel.removeAll();
-    
-    // Create main panel for status toko
-    JPanel statusPanel = new JPanel();
-    statusPanel.setLayout(new BorderLayout());
-    statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-    
-    // Create and style the status label
-    JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
-    statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
-    statusPanel.add(statusLabel, BorderLayout.CENTER);
-    
-    // Create button panel
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    
-    // Create and style the open button
-    JButton openButton = new JButton("Buka Toko");
-    openButton.setPreferredSize(new Dimension(120, 40));
-    openButton.setFont(new Font("Arial", Font.PLAIN, 14));
-    openButton.addActionListener(e -> {
-        controller.updateStatusToko(1);
-        statusLabel.setText("Status Toko: Buka");
-    });
-    
-    // Create and style the close button
-    JButton closeButton = new JButton("Tutup Toko");
-    closeButton.setPreferredSize(new Dimension(120, 40));
-    closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
-    closeButton.addActionListener(e -> {
-        controller.updateStatusToko(0);
-        statusLabel.setText("Status Toko: Tutup");
-    });
-    
-    // Add buttons to button panel
-    buttonPanel.add(openButton);
-    buttonPanel.add(closeButton);
-    
-    // Add button panel to status panel
-    statusPanel.add(buttonPanel, BorderLayout.SOUTH);
-    
-    // Add status panel to content panel
-    contentPanel.add(statusPanel, BorderLayout.CENTER);
-    
-    // Refresh the display
-    contentPanel.revalidate();
-    contentPanel.repaint();
-}
-    
+
+        contentPanel.removeAll();
+
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel statusLabel = new JLabel("Status Toko: Tidak Diketahui", JLabel.CENTER);
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        statusPanel.add(statusLabel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        JButton openButton = new JButton("Buka Toko");
+        openButton.setPreferredSize(new Dimension(120, 40));
+        openButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        openButton.addActionListener(e -> {
+            controller.updateStatusToko(1);
+            statusLabel.setText("Status Toko: Buka");
+        });
+
+        JButton closeButton = new JButton("Tutup Toko");
+        closeButton.setPreferredSize(new Dimension(120, 40));
+        closeButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        closeButton.addActionListener(e -> {
+            controller.updateStatusToko(0);
+            statusLabel.setText("Status Toko: Tutup");
+        });
+
+        buttonPanel.add(openButton);
+        buttonPanel.add(closeButton);
+
+        statusPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        contentPanel.add(statusPanel, BorderLayout.CENTER);
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
     // MENU 5
     private void showAllOrders() {
         contentPanel.removeAll();
         JPanel ordersPanel = new JPanel(new BorderLayout());
-        
+
         JLabel titleLabel = new JLabel("View Orders", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         ordersPanel.add(titleLabel, BorderLayout.NORTH);
-    
+
         String[] columnNames = {
-            "ID Detail", "ID Transaksi", "Email Customer", "Nama Item", 
-            "Tipe Item", "Ukuran", "Jumlah", "Harga/Item", "Total Harga",
-            "Lokasi", "Alamat Delivery", "Keterangan",
-            "Tanggal Transaksi"
+                "ID Detail", "ID Transaksi", "Email Customer", "Nama Item",
+                "Tipe Item", "Ukuran", "Jumlah", "Harga/Item", "Total Harga",
+                "Lokasi", "Alamat Delivery", "Keterangan",
+                "Tanggal Transaksi"
         };
-        
+
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-    
+
         controller.showAllOrders(tableModel);
-        
+
         JTable table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
-        
-        table.getColumnModel().getColumn(0).setPreferredWidth(60);   // ID Detail
-        table.getColumnModel().getColumn(1).setPreferredWidth(60);   // ID Transaksi
-        table.getColumnModel().getColumn(2).setPreferredWidth(150);  // Email
-        table.getColumnModel().getColumn(9).setPreferredWidth(80);   // Lokasi
+
+        table.getColumnModel().getColumn(0).setPreferredWidth(60); // ID Detail
+        table.getColumnModel().getColumn(1).setPreferredWidth(60); // ID Transaksi
+        table.getColumnModel().getColumn(2).setPreferredWidth(150); // Email
+        table.getColumnModel().getColumn(9).setPreferredWidth(80); // Lokasi
         table.getColumnModel().getColumn(10).setPreferredWidth(200); // Alamat
         table.getColumnModel().getColumn(11).setPreferredWidth(150); // Keterangan
         table.getColumnModel().getColumn(12).setPreferredWidth(120); // Tanggal
-        
+
         ordersPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.add(ordersPanel);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void showAllKaryawan(){
+    public void showAllKaryawan() {
         contentPanel.removeAll();
-JPanel karyawanPanel = new JPanel(new BorderLayout());
-JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
-titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-karyawanPanel.add(titleLabel, BorderLayout.NORTH);
+        JPanel karyawanPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("View Karyawan", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        karyawanPanel.add(titleLabel, BorderLayout.NORTH);
 
-// Definisikan kolom tabel
-String[] columnNames = {"ID", "Nama", "Peran", "Jam Kerja", "Gaji"};
-DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        String[] columnNames = { "ID", "Nama", "Peran", "Jam Kerja", "Gaji" };
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
-// Ambil data karyawan dari controller
-controller.showAllKaryawan(tableModel);
+        controller.showAllKaryawan(tableModel);
 
-// Tampilkan tabel
-JTable table = new JTable(tableModel);
-JScrollPane scrollPane = new JScrollPane(table);
-karyawanPanel.add(scrollPane, BorderLayout.CENTER);
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        karyawanPanel.add(scrollPane, BorderLayout.CENTER);
 
-// Tambahkan panel ke contentPanel
-contentPanel.add(karyawanPanel);
-contentPanel.revalidate();
-contentPanel.repaint();
+        contentPanel.add(karyawanPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
 
+        JPanel actionPanel = new JPanel(new FlowLayout());
 
-JPanel actionPanel = new JPanel(new FlowLayout());
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(e -> {
+            String nama = JOptionPane.showInputDialog("Masukkan Nama:");
+            String peran = JOptionPane.showInputDialog("Masukkan Peran:");
+            String jamKerja = JOptionPane.showInputDialog("Masukkan Jam Kerja (contoh: Senin–Jumat 09:00–17:00):");
+            double gaji = Double.parseDouble(JOptionPane.showInputDialog("Masukkan Gaji:"));
+            controller.addKaryawan(nama, peran, jamKerja, gaji);
+            controller.showAllKaryawan(tableModel);
+        });
 
-JButton addButton = new JButton("Add");
-addButton.addActionListener(e -> {
-    String nama = JOptionPane.showInputDialog("Masukkan Nama:");
-    String peran = JOptionPane.showInputDialog("Masukkan Peran:");
-    String jamKerja = JOptionPane.showInputDialog("Masukkan Jam Kerja (contoh: Senin–Jumat 09:00–17:00):");
-    double gaji = Double.parseDouble(JOptionPane.showInputDialog("Masukkan Gaji:"));
-    controller.addKaryawan(nama, peran, jamKerja, gaji);
-    controller.showAllKaryawan(tableModel); // Refresh tabel
-});
+        JButton editButton = new JButton("Edit");
+        editButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                int id = (int) table.getValueAt(selectedRow, 0);
+                String nama = JOptionPane.showInputDialog("Edit Nama:", table.getValueAt(selectedRow, 1));
+                String peran = JOptionPane.showInputDialog("Edit Peran:", table.getValueAt(selectedRow, 2));
+                String jamKerja = JOptionPane.showInputDialog("Edit Jam Kerja:", table.getValueAt(selectedRow, 3));
+                double gaji = Double
+                        .parseDouble(JOptionPane.showInputDialog("Edit Gaji:", table.getValueAt(selectedRow, 4)));
+                controller.editKaryawan(id, nama, peran, jamKerja, gaji);
+                controller.showAllKaryawan(tableModel);
+            } else {
+                JOptionPane.showMessageDialog(null, "Pilih baris untuk diedit.");
+            }
+        });
 
-JButton editButton = new JButton("Edit");
-editButton.addActionListener(e -> {
-    int selectedRow = table.getSelectedRow();
-    if (selectedRow >= 0) {
-        int id = (int) table.getValueAt(selectedRow, 0);
-        String nama = JOptionPane.showInputDialog("Edit Nama:", table.getValueAt(selectedRow, 1));
-        String peran = JOptionPane.showInputDialog("Edit Peran:", table.getValueAt(selectedRow, 2));
-        String jamKerja = JOptionPane.showInputDialog("Edit Jam Kerja:", table.getValueAt(selectedRow, 3));
-        double gaji = Double.parseDouble(JOptionPane.showInputDialog("Edit Gaji:", table.getValueAt(selectedRow, 4)));
-        controller.editKaryawan(id, nama, peran, jamKerja, gaji);
-        controller.showAllKaryawan(tableModel); // Refresh tabel
-    } else {
-        JOptionPane.showMessageDialog(null, "Pilih baris untuk diedit.");
-    }
-});
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                int id = (int) table.getValueAt(selectedRow, 0);
+                int confirm = JOptionPane.showConfirmDialog(null, "Yakin ingin menghapus karyawan?", "Konfirmasi",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    controller.deleteKaryawan(id);
+                    controller.showAllKaryawan(tableModel);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Pilih baris untuk dihapus.");
+            }
+        });
 
-JButton deleteButton = new JButton("Delete");
-deleteButton.addActionListener(e -> {
-    int selectedRow = table.getSelectedRow();
-    if (selectedRow >= 0) {
-        int id = (int) table.getValueAt(selectedRow, 0);
-        int confirm = JOptionPane.showConfirmDialog(null, "Yakin ingin menghapus karyawan?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            controller.deleteKaryawan(id);
-            controller.showAllKaryawan(tableModel); // Refresh tabel
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Pilih baris untuk dihapus.");
-    }
-});
-
-// Tambahkan tombol ke panel
-actionPanel.add(addButton);
-actionPanel.add(editButton);
-actionPanel.add(deleteButton);
-contentPanel.add(actionPanel, BorderLayout.SOUTH);
-
+        actionPanel.add(addButton);
+        actionPanel.add(editButton);
+        actionPanel.add(deleteButton);
+        contentPanel.add(actionPanel, BorderLayout.SOUTH);
 
     }
-    
-
-
-
-
-
-
-
-
-
-
-
 
     private void showSalesReport() {
         contentPanel.removeAll();
-    
-        // Membuat panel utama
+
         JPanel reportPanel = new JPanel();
         reportPanel.setLayout(new BorderLayout());
-    
-        // Label judul
+
         JLabel titleLabel = new JLabel("Laporan Penjualan", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         reportPanel.add(titleLabel, BorderLayout.NORTH);
-    
-        // Panel untuk tombol filter
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton makananButton = new JButton("Makanan");
         JButton minumanButton = new JButton("Minuman");
         JButton semuaButton = new JButton("Semua");
-    
+
         JTextField dateField = new JTextField(10);
         JButton filterButton = new JButton("Filter Tanggal");
-    
+
         buttonPanel.add(new JLabel("Filter Tipe:"));
         buttonPanel.add(makananButton);
         buttonPanel.add(minumanButton);
@@ -857,31 +696,26 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
         buttonPanel.add(new JLabel("Tanggal (YYYY-MM-DD):"));
         buttonPanel.add(dateField);
         buttonPanel.add(filterButton);
-    
+
         reportPanel.add(buttonPanel, BorderLayout.NORTH);
-    
-        // Panel untuk tabel
+
         JPanel tablePanel = new JPanel(new BorderLayout());
-        String[] columnNames = {"Tanggal", "Nama Item", "Tipe Item", "Jumlah", "Harga Per Item", "Total Harga"};
+        String[] columnNames = { "Tanggal", "Nama Item", "Tipe Item", "Jumlah", "Harga Per Item", "Total Harga" };
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable salesTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(salesTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
-    
-        // Panel untuk menampilkan Total Pendapatan
+
         JPanel totalPanel = new JPanel();
         JLabel totalLabel = new JLabel("Total Pendapatan: Rp 0");
         totalPanel.add(totalLabel);
         reportPanel.add(totalPanel, BorderLayout.SOUTH);
-    
-        // Tambahkan tablePanel ke reportPanel
-        reportPanel.add(tablePanel, BorderLayout.CENTER);
-        totalLabel.setFont(new Font("Arial", Font.BOLD, 32));  // Mengubah font dan ukuran
 
-        // Tambahkan reportPanel ke contentPanel
+        reportPanel.add(tablePanel, BorderLayout.CENTER);
+        totalLabel.setFont(new Font("Arial", Font.BOLD, 32));
+
         contentPanel.add(reportPanel, BorderLayout.CENTER);
-    
-        // Event Listener untuk tombol filter
+
         semuaButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Semua", null, totalLabel));
         makananButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Makanan", null, totalLabel));
         minumanButton.addActionListener(e -> controller.updateSalesTable(tableModel, "Minuman", null, totalLabel));
@@ -889,81 +723,55 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
             String selectedDate = dateField.getText();
             controller.updateSalesTable(tableModel, "Semua", selectedDate, totalLabel);
         });
-    
+
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private void showMembership() {
-        // Clear existing content
         contentPanel.removeAll();
-        
-        // Create main panel
+
         JPanel membershipPanel = new JPanel(new BorderLayout());
-        
-        // Create title label
+
         JLabel titleLabel = new JLabel("MEMBERSHIP MANAGEMENT", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         membershipPanel.add(titleLabel, BorderLayout.NORTH);
-    
-        // Define columns for the membership table
-        String[] membershipColumns = {"ID Membership", "Duration (Months)", "Description", "Price"};
-    
-        // Create DefaultTableModel for memberships
+
+        String[] membershipColumns = { "ID Membership", "Duration (Months)", "Description", "Price" };
+
         DefaultTableModel membershipModel = new DefaultTableModel(membershipColumns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table read-only
+                return false;
             }
         };
-    
-        // Create table and scroll pane
+
         JTable membershipTable = new JTable(membershipModel);
         JScrollPane scrollPane = new JScrollPane(membershipTable);
         membershipPanel.add(scrollPane, BorderLayout.CENTER);
-    
-        // Create button panel
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    
-        // Add button
+
         JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
             try {
                 String durationStr = JOptionPane.showInputDialog("Enter Duration (months):");
                 String description = JOptionPane.showInputDialog("Enter Description:");
                 String priceStr = JOptionPane.showInputDialog("Enter Price:");
-                
+
                 if (durationStr != null && description != null && priceStr != null) {
                     int duration = Integer.parseInt(durationStr);
                     int price = Integer.parseInt(priceStr);
-                    
+
                     try (Connection conn = DBConnection.getInstance().getConnection();
-                         PreparedStatement stmt = conn.prepareStatement(
-                             "INSERT INTO membership (duration, deskripsi, harga) VALUES (?, ?, ?)")) {
-                        
+                            PreparedStatement stmt = conn.prepareStatement(
+                                    "INSERT INTO membership (duration, deskripsi, harga) VALUES (?, ?, ?)")) {
+
                         stmt.setInt(1, duration);
                         stmt.setString(2, description);
                         stmt.setInt(3, price);
                         stmt.executeUpdate();
-                        
-                        // Refresh table
+
                         refreshMembershipTable(membershipModel);
                     }
                 }
@@ -973,8 +781,7 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
                 JOptionPane.showMessageDialog(null, "Error adding membership: " + ex.getMessage());
             }
         });
-    
-        // Edit button
+
         JButton editButton = new JButton("Edit");
         editButton.addActionListener(e -> {
             int selectedRow = membershipTable.getSelectedRow();
@@ -982,27 +789,26 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
                 try {
                     int id = (int) membershipTable.getValueAt(selectedRow, 0);
                     String durationStr = JOptionPane.showInputDialog("Enter new Duration (months):",
-                        membershipTable.getValueAt(selectedRow, 1));
+                            membershipTable.getValueAt(selectedRow, 1));
                     String description = JOptionPane.showInputDialog("Enter new Description:",
-                        membershipTable.getValueAt(selectedRow, 2));
+                            membershipTable.getValueAt(selectedRow, 2));
                     String priceStr = JOptionPane.showInputDialog("Enter new Price:",
-                        membershipTable.getValueAt(selectedRow, 3));
-                    
+                            membershipTable.getValueAt(selectedRow, 3));
+
                     if (durationStr != null && description != null && priceStr != null) {
                         int duration = Integer.parseInt(durationStr);
                         int price = Integer.parseInt(priceStr);
-                        
+
                         try (Connection conn = DBConnection.getInstance().getConnection();
-                             PreparedStatement stmt = conn.prepareStatement(
-                                 "UPDATE membership SET duration=?, deskripsi=?, harga=? WHERE id_membership=?")) {
-                            
+                                PreparedStatement stmt = conn.prepareStatement(
+                                        "UPDATE membership SET duration=?, deskripsi=?, harga=? WHERE id_membership=?")) {
+
                             stmt.setInt(1, duration);
                             stmt.setString(2, description);
                             stmt.setInt(3, price);
                             stmt.setInt(4, id);
                             stmt.executeUpdate();
-                            
-                            // Refresh table
+
                             refreshMembershipTable(membershipModel);
                         }
                     }
@@ -1015,27 +821,25 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
                 JOptionPane.showMessageDialog(null, "Please select a membership to edit");
             }
         });
-    
-        // Delete button
+
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> {
             int selectedRow = membershipTable.getSelectedRow();
             if (selectedRow != -1) {
                 int confirm = JOptionPane.showConfirmDialog(null,
-                    "Are you sure you want to delete this membership?",
-                    "Confirm Delete", JOptionPane.YES_NO_OPTION);
-                    
+                        "Are you sure you want to delete this membership?",
+                        "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
                         int id = (int) membershipTable.getValueAt(selectedRow, 0);
                         try (Connection conn = DBConnection.getInstance().getConnection();
-                             PreparedStatement stmt = conn.prepareStatement(
-                                 "DELETE FROM membership WHERE id_membership=?")) {
-                            
+                                PreparedStatement stmt = conn.prepareStatement(
+                                        "DELETE FROM membership WHERE id_membership=?")) {
+
                             stmt.setInt(1, id);
                             stmt.executeUpdate();
-                            
-                            // Refresh table
+
                             refreshMembershipTable(membershipModel);
                         }
                     } catch (SQLException ex) {
@@ -1046,38 +850,33 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
                 JOptionPane.showMessageDialog(null, "Please select a membership to delete");
             }
         });
-    
-        // Add buttons to button panel
+
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         membershipPanel.add(buttonPanel, BorderLayout.SOUTH);
-    
-        // Add to content panel
+
         contentPanel.add(membershipPanel);
-        
-        // Initial table population
+
         refreshMembershipTable(membershipModel);
-        
-        // Refresh display
+
         contentPanel.revalidate();
         contentPanel.repaint();
     }
-    
-    // Helper method to refresh membership table data
+
     private void refreshMembershipTable(DefaultTableModel model) {
-        model.setRowCount(0); // Clear existing rows
-        
+        model.setRowCount(0);
+
         try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM membership");
-             ResultSet rs = stmt.executeQuery()) {
-    
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM membership");
+                ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Object[] row = {
-                    rs.getInt("id_membership"),
-                    rs.getInt("duration"),
-                    rs.getString("deskripsi"),
-                    rs.getInt("harga")
+                        rs.getInt("id_membership"),
+                        rs.getInt("duration"),
+                        rs.getString("deskripsi"),
+                        rs.getInt("harga")
                 };
                 model.addRow(row);
             }
@@ -1086,27 +885,9 @@ contentPanel.add(actionPanel, BorderLayout.SOUTH);
         }
     }
 
+    public static void main(String[] args) {
+        new AdminView();
 
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-public static void main(String[] args) {
-  new AdminView();
-  
-}
-
-  
 }
